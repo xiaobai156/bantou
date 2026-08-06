@@ -1,0 +1,5581 @@
+﻿{
+  "schema": 2,
+  "kind": "bantou_recent_duplicate_backup",
+  "state": "bootstrap",
+  "period": 217,
+  "window": 10,
+  "issues": [
+    216,
+    217
+  ],
+  "updated_at": "2026-08-05T18:01:13",
+  "sites": [
+    {
+      "name": "忠不可兼",
+      "url": "https://hbwtl.7xzry-2gul3-olawdt.xyz/topic/227014.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "1头双",
+          "order": 376,
+          "position": 7600,
+          "anchor_text": "半头",
+          "anchor_position": 7607,
+          "block_id": "0:7600:9536",
+          "block_start": 7600,
+          "block_end": 9536,
+          "source": {
+            "url": "https://hbwtl.7xzry-2gul3-olawdt.xyz/topic/227014.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:必杀半头[1头双]开00对",
+            "container_id": "rendered-page:https://hbwtl.7xzry-2gul3-olawdt.xyz/topic/227014.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "0头单",
+          "order": 377,
+          "position": 7620,
+          "anchor_text": "半头",
+          "anchor_position": 7627,
+          "block_id": "0:7620:9556",
+          "block_start": 7620,
+          "block_end": 9556,
+          "source": {
+            "url": "https://hbwtl.7xzry-2gul3-olawdt.xyz/topic/227014.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:必杀半头[0头单]开00对",
+            "container_id": "rendered-page:https://hbwtl.7xzry-2gul3-olawdt.xyz/topic/227014.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "福生于微",
+      "url": "https://rh2fgz.w043g-ql5mr-lfxblm.work/topic/499784.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头双",
+          "order": 2,
+          "position": 141,
+          "anchor_text": "半头",
+          "anchor_position": 150,
+          "block_id": "0:141:166",
+          "block_start": 141,
+          "block_end": 166,
+          "source": {
+            "url": "https://rh2fgz.w043g-ql5mr-lfxblm.work/topic/499784.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:～～必杀半头～～[4头双]开000对",
+            "container_id": "rendered-page:https://rh2fgz.w043g-ql5mr-lfxblm.work/topic/499784.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "3头双",
+          "order": 2,
+          "position": 141,
+          "anchor_text": "半头",
+          "anchor_position": 150,
+          "block_id": "0:141:166",
+          "block_start": 141,
+          "block_end": 166,
+          "source": {
+            "url": "https://rh2fgz.w043g-ql5mr-lfxblm.work/topic/499784.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:～～必杀半头～～[3头双]开000对",
+            "container_id": "rendered-page:https://rh2fgz.w043g-ql5mr-lfxblm.work/topic/499784.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "五六七八",
+      "url": "https://sfch0f.2c6xk-l5fko-klefxa.work/topic/453945.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头双",
+          "order": 2,
+          "position": 217,
+          "anchor_text": "半头",
+          "anchor_position": 225,
+          "block_id": "0:217:239",
+          "block_start": 217,
+          "block_end": 239,
+          "source": {
+            "url": "https://sfch0f.2c6xk-l5fko-klefxa.work/topic/453945.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:(绝杀半头)[4头双]开00准",
+            "container_id": "rendered-page:https://sfch0f.2c6xk-l5fko-klefxa.work/topic/453945.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "2头双",
+          "order": 2,
+          "position": 215,
+          "anchor_text": "半头",
+          "anchor_position": 223,
+          "block_id": "0:215:237",
+          "block_start": 215,
+          "block_end": 237,
+          "source": {
+            "url": "https://sfch0f.2c6xk-l5fko-klefxa.work/topic/453945.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:(绝杀半头)[2头双]开00准",
+            "container_id": "rendered-page:https://sfch0f.2c6xk-l5fko-klefxa.work/topic/453945.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "西库规划",
+      "url": "https://s4wqb.p2b6h-0xj4v-suxrzo.xyz/topic/206519.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "3头单",
+          "order": 1,
+          "position": 2077,
+          "anchor_text": "半头",
+          "anchor_position": 2085,
+          "block_id": "0:2077:2102",
+          "block_start": 2077,
+          "block_end": 2102,
+          "source": {
+            "url": "https://s4wqb.p2b6h-0xj4v-suxrzo.xyz/topic/206519.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "作者:西库规划",
+            "snippet": "216期:★必杀半头★[3头单]开0000对",
+            "container_id": "topic-content:0:2076:12102",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "4头单",
+          "order": 1,
+          "position": 2077,
+          "anchor_text": "半头",
+          "anchor_position": 2085,
+          "block_id": "0:2077:2102",
+          "block_start": 2077,
+          "block_end": 2102,
+          "source": {
+            "url": "https://s4wqb.p2b6h-0xj4v-suxrzo.xyz/topic/206519.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "作者:西库规划",
+            "snippet": "217期:★必杀半头★[4头单]开0000对",
+            "container_id": "topic-content:0:2076:12126",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "万恶不赦",
+      "url": "https://54matx.ulky8-iau8d-tzdsok.xyz/topic/225400.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "3头双",
+          "order": 2,
+          "position": 192,
+          "anchor_text": "半头",
+          "anchor_position": 200,
+          "block_id": "0:192:216",
+          "block_start": 192,
+          "block_end": 216,
+          "source": {
+            "url": "https://54matx.ulky8-iau8d-tzdsok.xyz/topic/225400.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:(绝杀半头)[3头双]开0000对",
+            "container_id": "rendered-page:https://54matx.ulky8-iau8d-tzdsok.xyz/topic/225400.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "3头单",
+          "order": 2,
+          "position": 192,
+          "anchor_text": "半头",
+          "anchor_position": 200,
+          "block_id": "0:192:216",
+          "block_start": 192,
+          "block_end": 216,
+          "source": {
+            "url": "https://54matx.ulky8-iau8d-tzdsok.xyz/topic/225400.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:(绝杀半头)[3头单]开0000对",
+            "container_id": "rendered-page:https://54matx.ulky8-iau8d-tzdsok.xyz/topic/225400.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "美不胜收",
+      "url": "https://ryfbdty.p4a53-f1hew-diwcrg.xyz:16677/topic/453368.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头单",
+          "order": 2,
+          "position": 405,
+          "anchor_text": "半头",
+          "anchor_position": 412,
+          "block_id": "0:405:427",
+          "block_start": 405,
+          "block_end": 427,
+          "source": {
+            "url": "https://ryfbdty.p4a53-f1hew-diwcrg.xyz:16677/topic/453368.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:必杀半头[4头单]开0000对",
+            "container_id": "rendered-page:https://ryfbdty.p4a53-f1hew-diwcrg.xyz:16677/topic/453368.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "2头单",
+          "order": 2,
+          "position": 405,
+          "anchor_text": "半头",
+          "anchor_position": 412,
+          "block_id": "0:405:427",
+          "block_start": 405,
+          "block_end": 427,
+          "source": {
+            "url": "https://ryfbdty.p4a53-f1hew-diwcrg.xyz:16677/topic/453368.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:必杀半头[2头单]开0000对",
+            "container_id": "rendered-page:https://ryfbdty.p4a53-f1hew-diwcrg.xyz:16677/topic/453368.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "众多落叶",
+      "url": "https://jogavu.6bl6s-ilo1w-yfnvvl.work:16677/topic/678626.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "0头双",
+          "order": 96,
+          "position": 2646,
+          "anchor_text": "半头",
+          "anchor_position": 2655,
+          "block_id": "0:2646:2677",
+          "block_start": 2646,
+          "block_end": 2677,
+          "source": {
+            "url": "https://jogavu.6bl6s-ilo1w-yfnvvl.work:16677/topic/678626.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:～～绝杀半头～～[0头双]开000对",
+            "container_id": "rendered-page:https://jogavu.6bl6s-ilo1w-yfnvvl.work:16677/topic/678626.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "0头单",
+          "order": 97,
+          "position": 2673,
+          "anchor_text": "半头",
+          "anchor_position": 2682,
+          "block_id": "0:2673:2704",
+          "block_start": 2673,
+          "block_end": 2704,
+          "source": {
+            "url": "https://jogavu.6bl6s-ilo1w-yfnvvl.work:16677/topic/678626.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:～～绝杀半头～～[0头单]开000对",
+            "container_id": "rendered-page:https://jogavu.6bl6s-ilo1w-yfnvvl.work:16677/topic/678626.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "一清二楚",
+      "url": "https://tulprhfc.wghcb-bnmgm-hyymaz.work:16655/topic/324701.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "秒杀"
+      ],
+      "records": {
+        "216": {
+          "value": "3头双",
+          "order": 1,
+          "position": 508,
+          "anchor_text": "秒杀",
+          "anchor_position": 513,
+          "block_id": "0:508:529",
+          "block_start": 508,
+          "block_end": 529,
+          "source": {
+            "url": "https://tulprhfc.wghcb-bnmgm-hyymaz.work:16655/topic/324701.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期ღ秒杀ღ[3头双]开0000对",
+            "container_id": "rendered-page:https://tulprhfc.wghcb-bnmgm-hyymaz.work:16655/topic/324701.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "2头双",
+          "order": 1,
+          "position": 508,
+          "anchor_text": "秒杀",
+          "anchor_position": 513,
+          "block_id": "0:508:529",
+          "block_start": 508,
+          "block_end": 529,
+          "source": {
+            "url": "https://tulprhfc.wghcb-bnmgm-hyymaz.work:16655/topic/324701.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期ღ秒杀ღ[2头双]开0000对",
+            "container_id": "rendered-page:https://tulprhfc.wghcb-bnmgm-hyymaz.work:16655/topic/324701.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "揭竿而起",
+      "url": "https://zcphjs.ce83x-ms2rz-orwude.work:12277/#/users/116162",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "2头单",
+          "order": 3,
+          "position": 93,
+          "anchor_text": "半头",
+          "anchor_position": 102,
+          "block_id": "0:93:172",
+          "block_start": 93,
+          "block_end": 172,
+          "source": {
+            "url": "https://zcphjs.ce83x-ms2rz-orwude.work:12277/api/v1/users/116162/forums?per_page=1000",
+            "kind": "dynamic-record",
+            "record_id": "15744957",
+            "record_path": "root",
+            "route_type": "forum",
+            "url_record_id": "15744957",
+            "api_url": "https://zcphjs.ce83x-ms2rz-orwude.work:12277/api/v1/users/116162/forums?per_page=1000",
+            "title": "216期:[绝杀半头]已公开",
+            "author": "揭竿而起",
+            "snippet": "216期:～～绝杀半头～～[2头单]开？00对",
+            "container_id": "root",
+            "table_column": "",
+            "document_authority": "exact-dynamic-record",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "3头单",
+          "order": 3,
+          "position": 93,
+          "anchor_text": "半头",
+          "anchor_position": 102,
+          "block_id": "0:93:172",
+          "block_start": 93,
+          "block_end": 172,
+          "source": {
+            "url": "https://zcphjs.ce83x-ms2rz-orwude.work:12277/api/v1/users/116162/forums?per_page=1000",
+            "kind": "dynamic-record",
+            "record_id": "15751263",
+            "record_path": "root",
+            "route_type": "forum",
+            "url_record_id": "15751263",
+            "api_url": "https://zcphjs.ce83x-ms2rz-orwude.work:12277/api/v1/users/116162/forums?per_page=1000",
+            "title": "217期:[绝杀半头]已公开",
+            "author": "揭竿而起",
+            "snippet": "217期:～～绝杀半头～～[3头单]开？00对",
+            "container_id": "root",
+            "table_column": "",
+            "document_authority": "exact-dynamic-record",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "东掩西遮",
+      "url": "https://kqfmnjht.ip6et-0zvu7-gpqkrf.work:16677/topic/253144.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头单",
+          "order": 196,
+          "position": 5265,
+          "anchor_text": "半头",
+          "anchor_position": 5274,
+          "block_id": "0:5265:7111",
+          "block_start": 5265,
+          "block_end": 7111,
+          "source": {
+            "url": "https://kqfmnjht.ip6et-0zvu7-gpqkrf.work:16677/topic/253144.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:～～必杀半头～～ [4头单]开000对",
+            "container_id": "rendered-page:https://kqfmnjht.ip6et-0zvu7-gpqkrf.work:16677/topic/253144.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "1头单",
+          "order": 197,
+          "position": 5291,
+          "anchor_text": "半头",
+          "anchor_position": 5300,
+          "block_id": "0:5291:7137",
+          "block_start": 5291,
+          "block_end": 7137,
+          "source": {
+            "url": "https://kqfmnjht.ip6et-0zvu7-gpqkrf.work:16677/topic/253144.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:～～必杀半头～～ [1头单]开000对",
+            "container_id": "rendered-page:https://kqfmnjht.ip6et-0zvu7-gpqkrf.work:16677/topic/253144.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "殊方异域",
+      "url": "https://4m6dz.r1wvw-qncts-admwen.xyz/topic/222781.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "2头双",
+          "order": 365,
+          "position": 7449,
+          "anchor_text": "半头",
+          "anchor_position": 7456,
+          "block_id": "0:7449:9321",
+          "block_start": 7449,
+          "block_end": 9321,
+          "source": {
+            "url": "https://4m6dz.r1wvw-qncts-admwen.xyz/topic/222781.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:必杀半头[2头双]开00对",
+            "container_id": "rendered-page:https://4m6dz.r1wvw-qncts-admwen.xyz/topic/222781.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "0头双",
+          "order": 366,
+          "position": 7471,
+          "anchor_text": "半头",
+          "anchor_position": 7478,
+          "block_id": "0:7471:9343",
+          "block_start": 7471,
+          "block_end": 9343,
+          "source": {
+            "url": "https://4m6dz.r1wvw-qncts-admwen.xyz/topic/222781.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:必杀半头[0头双]开00对",
+            "container_id": "rendered-page:https://4m6dz.r1wvw-qncts-admwen.xyz/topic/222781.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "顾而言他",
+      "url": "https://vhgswwe.7rdnv-4uc7h-yshpkm.xyz:16677/topic/447905.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "1头双",
+          "order": 187,
+          "position": 4480,
+          "anchor_text": "半头",
+          "anchor_position": 4487,
+          "block_id": "0:4480:4512",
+          "block_start": 4480,
+          "block_end": 4512,
+          "source": {
+            "url": "https://vhgswwe.7rdnv-4uc7h-yshpkm.xyz:16677/topic/447905.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:稳杀半头〖1头双〗开:000准",
+            "container_id": "rendered-page:https://vhgswwe.7rdnv-4uc7h-yshpkm.xyz:16677/topic/447905.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "3头单",
+          "order": 188,
+          "position": 4502,
+          "anchor_text": "半头",
+          "anchor_position": 4509,
+          "block_id": "0:4502:4534",
+          "block_start": 4502,
+          "block_end": 4534,
+          "source": {
+            "url": "https://vhgswwe.7rdnv-4uc7h-yshpkm.xyz:16677/topic/447905.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:稳杀半头〖3头单〗开:000准",
+            "container_id": "rendered-page:https://vhgswwe.7rdnv-4uc7h-yshpkm.xyz:16677/topic/447905.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "处之泰然",
+      "url": "https://kulipur.l5paz-a0o8v-uozmmd.xyz:16677/topic/435504.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "1头单",
+          "order": 1,
+          "position": 455,
+          "anchor_text": "半头",
+          "anchor_position": 462,
+          "block_id": "0:455:478",
+          "block_start": 455,
+          "block_end": 478,
+          "source": {
+            "url": "https://kulipur.l5paz-a0o8v-uozmmd.xyz:16677/topic/435504.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:必杀半头 [1头单]开0000准",
+            "container_id": "rendered-page:https://kulipur.l5paz-a0o8v-uozmmd.xyz:16677/topic/435504.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "1头双",
+          "order": 1,
+          "position": 455,
+          "anchor_text": "半头",
+          "anchor_position": 462,
+          "block_id": "0:455:478",
+          "block_start": 455,
+          "block_end": 478,
+          "source": {
+            "url": "https://kulipur.l5paz-a0o8v-uozmmd.xyz:16677/topic/435504.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:必杀半头 [1头双]开0000准",
+            "container_id": "rendered-page:https://kulipur.l5paz-a0o8v-uozmmd.xyz:16677/topic/435504.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "烟花易冷",
+      "url": "https://fptnapl.o7l2d-gr6ew-tvgvep.xyz:16677/topic/349647.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头单",
+          "order": 2,
+          "position": 400,
+          "anchor_text": "半头",
+          "anchor_position": 408,
+          "block_id": "0:400:425",
+          "block_start": 400,
+          "block_end": 425,
+          "source": {
+            "url": "https://fptnapl.o7l2d-gr6ew-tvgvep.xyz:16677/topic/349647.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:[必杀半头][4头单]開:0000准",
+            "container_id": "rendered-page:https://fptnapl.o7l2d-gr6ew-tvgvep.xyz:16677/topic/349647.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "1头单",
+          "order": 2,
+          "position": 400,
+          "anchor_text": "半头",
+          "anchor_position": 408,
+          "block_id": "0:400:425",
+          "block_start": 400,
+          "block_end": 425,
+          "source": {
+            "url": "https://fptnapl.o7l2d-gr6ew-tvgvep.xyz:16677/topic/349647.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:[必杀半头][1头单]開:0000准",
+            "container_id": "rendered-page:https://fptnapl.o7l2d-gr6ew-tvgvep.xyz:16677/topic/349647.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "炯炯目光",
+      "url": "https://zwhzkjo.fc4fh-otded-nvhceu.xyz:16677/topic/472642.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "0头单",
+          "order": 409,
+          "position": 16842,
+          "anchor_text": "半头",
+          "anchor_position": 16849,
+          "block_id": "0:16842:16874",
+          "block_start": 16842,
+          "block_end": 16874,
+          "source": {
+            "url": "https://zwhzkjo.fc4fh-otded-nvhceu.xyz:16677/topic/472642.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "炯炯目光 发表于 06月14日 15:08:58",
+            "snippet": "216期:秒杀半头[0头单数]开？00准",
+            "container_id": "content:0:7403:16874",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "3头单",
+          "order": 410,
+          "position": 16865,
+          "anchor_text": "半头",
+          "anchor_position": 16872,
+          "block_id": "0:16865:16897",
+          "block_start": 16865,
+          "block_end": 16897,
+          "source": {
+            "url": "https://zwhzkjo.fc4fh-otded-nvhceu.xyz:16677/topic/472642.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "炯炯目光 发表于 06月14日 15:08:58",
+            "snippet": "217期:秒杀半头[3头单数]开？00准",
+            "container_id": "content:0:7403:16897",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "冰封三日",
+      "url": "https://cpvqejp.avdja-la48l-xnsdva.xyz:16677/topic/336839.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "1头双",
+          "order": 582,
+          "position": 19906,
+          "anchor_text": "半头",
+          "anchor_position": 19914,
+          "block_id": "0:19906:19931",
+          "block_start": 19906,
+          "block_end": 19931,
+          "source": {
+            "url": "https://cpvqejp.avdja-la48l-xnsdva.xyz:16677/topic/336839.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "作者:冰封三日",
+            "snippet": "216期:[稳杀半头][杀1头双]开0000准",
+            "container_id": "topic-content:0:5335:19931",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "4头双",
+          "order": 583,
+          "position": 19931,
+          "anchor_text": "半头",
+          "anchor_position": 19939,
+          "block_id": "0:19931:19956",
+          "block_start": 19931,
+          "block_end": 19956,
+          "source": {
+            "url": "https://cpvqejp.avdja-la48l-xnsdva.xyz:16677/topic/336839.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "作者:冰封三日",
+            "snippet": "217期:[稳杀半头][杀4头双]开0000准",
+            "container_id": "topic-content:0:5335:19956",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "风生水起",
+      "url": "https://kjkkzzg.eiu7u-3edk2-gjzmrl.xyz:16677/topic/446873.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头双",
+          "order": 211,
+          "position": 4609,
+          "anchor_text": "半头",
+          "anchor_position": 4616,
+          "block_id": "0:4609:4635",
+          "block_start": 4609,
+          "block_end": 4635,
+          "source": {
+            "url": "https://kjkkzzg.eiu7u-3edk2-gjzmrl.xyz:16677/topic/446873.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:必杀半头[4头双]？00对",
+            "container_id": "rendered-page:https://kjkkzzg.eiu7u-3edk2-gjzmrl.xyz:16677/topic/446873.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "0头双",
+          "order": 212,
+          "position": 4629,
+          "anchor_text": "半头",
+          "anchor_position": 4636,
+          "block_id": "0:4629:4655",
+          "block_start": 4629,
+          "block_end": 4655,
+          "source": {
+            "url": "https://kjkkzzg.eiu7u-3edk2-gjzmrl.xyz:16677/topic/446873.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:必杀半头[0头双]？00对",
+            "container_id": "rendered-page:https://kjkkzzg.eiu7u-3edk2-gjzmrl.xyz:16677/topic/446873.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "肥大丰满",
+      "url": "https://ntvjzt.gau41-qu6jy-sotyug.work:16677/topic/309356.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "1头单",
+          "order": 2,
+          "position": 8715,
+          "anchor_text": "半头",
+          "anchor_position": 8724,
+          "block_id": "0:8715:8742",
+          "block_start": 8715,
+          "block_end": 8742,
+          "source": {
+            "url": "https://ntvjzt.gau41-qu6jy-sotyug.work:16677/topic/309356.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "肥大丰满",
+            "author": "",
+            "snippet": "216期:〓[绝杀半头]〓[1头单]开0000准",
+            "container_id": "detail_info_forum2_item:0:8466:21047",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "4头单",
+          "order": 2,
+          "position": 8715,
+          "anchor_text": "半头",
+          "anchor_position": 8724,
+          "block_id": "0:8715:8742",
+          "block_start": 8715,
+          "block_end": 8742,
+          "source": {
+            "url": "https://ntvjzt.gau41-qu6jy-sotyug.work:16677/topic/309356.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "肥大丰满",
+            "author": "",
+            "snippet": "217期:〓[绝杀半头]〓[4头单]开0000准",
+            "container_id": "detail_info_forum2_item:0:8466:21073",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "飞狐外传",
+      "url": "https://dhqjbz.uxec9-jxs3h-fomubo.work:16677/topic/250855.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "3头单",
+          "order": 177,
+          "position": 4131,
+          "anchor_text": "半头",
+          "anchor_position": 4139,
+          "block_id": "0:4131:4220",
+          "block_start": 4131,
+          "block_end": 4220,
+          "source": {
+            "url": "https://dhqjbz.uxec9-jxs3h-fomubo.work:16677/topic/250855.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:(绝杀半头)[3头单]开00对",
+            "container_id": "rendered-page:https://dhqjbz.uxec9-jxs3h-fomubo.work:16677/topic/250855.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "3头双",
+          "order": 178,
+          "position": 4154,
+          "anchor_text": "半头",
+          "anchor_position": 4162,
+          "block_id": "0:4154:4243",
+          "block_start": 4154,
+          "block_end": 4243,
+          "source": {
+            "url": "https://dhqjbz.uxec9-jxs3h-fomubo.work:16677/topic/250855.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:(绝杀半头)[3头双]开00对",
+            "container_id": "rendered-page:https://dhqjbz.uxec9-jxs3h-fomubo.work:16677/topic/250855.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "静听年华",
+      "url": "https://whsbrmz.qclrc-4mk42-vnxbyg.work:16677/topic/248024.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "2头双",
+          "order": 8,
+          "position": 262,
+          "anchor_text": "半头",
+          "anchor_position": 269,
+          "block_id": "0:262:285",
+          "block_start": 262,
+          "block_end": 285,
+          "source": {
+            "url": "https://whsbrmz.qclrc-4mk42-vnxbyg.work:16677/topic/248024.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:绝杀半头[2头双数]开0000准",
+            "container_id": "rendered-page:https://whsbrmz.qclrc-4mk42-vnxbyg.work:16677/topic/248024.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "4头双",
+          "order": 8,
+          "position": 259,
+          "anchor_text": "半头",
+          "anchor_position": 266,
+          "block_id": "0:259:282",
+          "block_start": 259,
+          "block_end": 282,
+          "source": {
+            "url": "https://whsbrmz.qclrc-4mk42-vnxbyg.work:16677/topic/248024.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:绝杀半头[4头双数]开0000准",
+            "container_id": "rendered-page:https://whsbrmz.qclrc-4mk42-vnxbyg.work:16677/topic/248024.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "东海憨憨",
+      "url": "https://fhrtnoy.10cus-ki4mn-mlcyap.xyz:16677/topic/447346.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头单",
+          "order": 2,
+          "position": 418,
+          "anchor_text": "半头",
+          "anchor_position": 426,
+          "block_id": "0:418:439",
+          "block_start": 418,
+          "block_end": 439,
+          "source": {
+            "url": "https://fhrtnoy.10cus-ki4mn-mlcyap.xyz:16677/topic/447346.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:[稳杀半头]{4头单}开00准",
+            "container_id": "rendered-page:https://fhrtnoy.10cus-ki4mn-mlcyap.xyz:16677/topic/447346.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "0头单",
+          "order": 2,
+          "position": 418,
+          "anchor_text": "半头",
+          "anchor_position": 426,
+          "block_id": "0:418:439",
+          "block_start": 418,
+          "block_end": 439,
+          "source": {
+            "url": "https://fhrtnoy.10cus-ki4mn-mlcyap.xyz:16677/topic/447346.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:[稳杀半头]{0头单}开00准",
+            "container_id": "rendered-page:https://fhrtnoy.10cus-ki4mn-mlcyap.xyz:16677/topic/447346.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "南笙一梦",
+      "url": "https://sadoleu.rznla-fgwyr-nzqalp.xyz:16677/topic/287642.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头单",
+          "order": 2,
+          "position": 9418,
+          "anchor_text": "半头",
+          "anchor_position": 9425,
+          "block_id": "0:9418:9450",
+          "block_start": 9418,
+          "block_end": 9450,
+          "source": {
+            "url": "https://sadoleu.rznla-fgwyr-nzqalp.xyz:16677/topic/287642.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "南笙一梦",
+            "author": "",
+            "snippet": "216期 绝杀半头 : ==[4头单]==开 ?? 准",
+            "container_id": "detail_info_forum2_item:0:9167:22328",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "1头单",
+          "order": 2,
+          "position": 9418,
+          "anchor_text": "半头",
+          "anchor_position": 9425,
+          "block_id": "0:9418:9450",
+          "block_start": 9418,
+          "block_end": 9450,
+          "source": {
+            "url": "https://sadoleu.rznla-fgwyr-nzqalp.xyz:16677/topic/287642.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "南笙一梦",
+            "author": "",
+            "snippet": "217期 绝杀半头 : ==[1头单]==开 ?? 准",
+            "container_id": "detail_info_forum2_item:0:9167:22360",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "寥寥无几",
+      "url": "https://knhlnvo.zvdsi-8qf2t-wchuxk.xyz:16677/topic/437752.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头单",
+          "order": 1,
+          "position": 414,
+          "anchor_text": "半头",
+          "anchor_position": 423,
+          "block_id": "0:414:439",
+          "block_start": 414,
+          "block_end": 439,
+          "source": {
+            "url": "https://knhlnvo.zvdsi-8qf2t-wchuxk.xyz:16677/topic/437752.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:～～绝杀半头～～[4头单]开000对",
+            "container_id": "rendered-page:https://knhlnvo.zvdsi-8qf2t-wchuxk.xyz:16677/topic/437752.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "3头单",
+          "order": 1,
+          "position": 414,
+          "anchor_text": "半头",
+          "anchor_position": 423,
+          "block_id": "0:414:439",
+          "block_start": 414,
+          "block_end": 439,
+          "source": {
+            "url": "https://knhlnvo.zvdsi-8qf2t-wchuxk.xyz:16677/topic/437752.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:～～绝杀半头～～[3头单]开000对",
+            "container_id": "rendered-page:https://knhlnvo.zvdsi-8qf2t-wchuxk.xyz:16677/topic/437752.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "城下之辱",
+      "url": "https://bdxufda.po4ai-dqhr0-mljzdr.work:16655/topic/225370.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "1头单",
+          "order": 2,
+          "position": 109,
+          "anchor_text": "半头",
+          "anchor_position": 116,
+          "block_id": "0:109:129",
+          "block_start": 109,
+          "block_end": 129,
+          "source": {
+            "url": "https://bdxufda.po4ai-dqhr0-mljzdr.work:16655/topic/225370.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:必杀半头[1头单]开00对",
+            "container_id": "rendered-page:https://bdxufda.po4ai-dqhr0-mljzdr.work:16655/topic/225370.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "0头单",
+          "order": 2,
+          "position": 109,
+          "anchor_text": "半头",
+          "anchor_position": 116,
+          "block_id": "0:109:129",
+          "block_start": 109,
+          "block_end": 129,
+          "source": {
+            "url": "https://bdxufda.po4ai-dqhr0-mljzdr.work:16655/topic/225370.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:必杀半头[0头单]开00对",
+            "container_id": "rendered-page:https://bdxufda.po4ai-dqhr0-mljzdr.work:16655/topic/225370.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "澳门大联盟",
+      "url": "https://7.www113368a.com:2053/gengxin/58.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "1头双",
+          "order": 1,
+          "position": 1902,
+          "anchor_text": "半头",
+          "anchor_position": 1911,
+          "block_id": "0:1902:1960",
+          "block_start": 1902,
+          "block_end": 1960,
+          "source": {
+            "url": "https://7.www113368a.com:2053/gengxin/58.html",
+            "kind": "page",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:～～必杀半头～～[1头双]开00对",
+            "container_id": "page:https://7.www113368a.com:2053/gengxin/58.html:decoded:0:0",
+            "table_column": "",
+            "document_authority": "primary-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "4头单",
+          "order": 1,
+          "position": 1902,
+          "anchor_text": "半头",
+          "anchor_position": 1911,
+          "block_id": "0:1902:1960",
+          "block_start": 1902,
+          "block_end": 1960,
+          "source": {
+            "url": "https://7.www113368a.com:2053/gengxin/58.html",
+            "kind": "page",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:～～必杀半头～～[4头单]开00对",
+            "container_id": "page:https://7.www113368a.com:2053/gengxin/58.html:decoded:0:0",
+            "table_column": "",
+            "document_authority": "primary-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "恶气遮漫",
+      "url": "https://ripzotqz.prm9k-tor19-vowopt.xyz:16677/topic/210745.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "1头单",
+          "order": 316,
+          "position": 7964,
+          "anchor_text": "半头",
+          "anchor_position": 7973,
+          "block_id": "0:7964:11241",
+          "block_start": 7964,
+          "block_end": 11241,
+          "source": {
+            "url": "https://ripzotqz.prm9k-tor19-vowopt.xyz:16677/topic/210745.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:～～必杀半头～～[1头单]开？00对",
+            "container_id": "rendered-page:https://ripzotqz.prm9k-tor19-vowopt.xyz:16677/topic/210745.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "4头单",
+          "order": 317,
+          "position": 7989,
+          "anchor_text": "半头",
+          "anchor_position": 7998,
+          "block_id": "0:7989:11266",
+          "block_start": 7989,
+          "block_end": 11266,
+          "source": {
+            "url": "https://ripzotqz.prm9k-tor19-vowopt.xyz:16677/topic/210745.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:～～必杀半头～～[4头单]开？00对",
+            "container_id": "rendered-page:https://ripzotqz.prm9k-tor19-vowopt.xyz:16677/topic/210745.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "日新月着",
+      "url": "https://e7rzi6.ic890-g0deq-lbrbfs.work/topic/226265.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "2头单",
+          "order": 357,
+          "position": 7319,
+          "anchor_text": "半头",
+          "anchor_position": 7326,
+          "block_id": "0:7319:9279",
+          "block_start": 7319,
+          "block_end": 9279,
+          "source": {
+            "url": "https://e7rzi6.ic890-g0deq-lbrbfs.work/topic/226265.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:必杀半头[2头单]开00对",
+            "container_id": "rendered-page:https://e7rzi6.ic890-g0deq-lbrbfs.work/topic/226265.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "3头单",
+          "order": 358,
+          "position": 7339,
+          "anchor_text": "半头",
+          "anchor_position": 7346,
+          "block_id": "0:7339:9301",
+          "block_start": 7339,
+          "block_end": 9301,
+          "source": {
+            "url": "https://e7rzi6.ic890-g0deq-lbrbfs.work/topic/226265.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:必杀半头[3头单]开00对",
+            "container_id": "rendered-page:https://e7rzi6.ic890-g0deq-lbrbfs.work/topic/226265.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "弦外之响",
+      "url": "https://vbxl5.wp5pl-3ztz5-cwgbti.xyz/topic/216096.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "3头双",
+          "order": 2,
+          "position": 217,
+          "anchor_text": "半头",
+          "anchor_position": 224,
+          "block_id": "0:217:238",
+          "block_start": 217,
+          "block_end": 238,
+          "source": {
+            "url": "https://vbxl5.wp5pl-3ztz5-cwgbti.xyz/topic/216096.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:秒杀半头[3头双数]开00准",
+            "container_id": "rendered-page:https://vbxl5.wp5pl-3ztz5-cwgbti.xyz/topic/216096.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "3头单",
+          "order": 2,
+          "position": 214,
+          "anchor_text": "半头",
+          "anchor_position": 221,
+          "block_id": "0:214:235",
+          "block_start": 214,
+          "block_end": 235,
+          "source": {
+            "url": "https://vbxl5.wp5pl-3ztz5-cwgbti.xyz/topic/216096.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:秒杀半头[3头单数]开00准",
+            "container_id": "rendered-page:https://vbxl5.wp5pl-3ztz5-cwgbti.xyz/topic/216096.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "深切著明",
+      "url": "https://myvvqq.g25n3-cpae1-psslpy.work/topic/206462.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头双",
+          "order": 1,
+          "position": 246,
+          "anchor_text": "半头",
+          "anchor_position": 254,
+          "block_id": "0:246:270",
+          "block_start": 246,
+          "block_end": 270,
+          "source": {
+            "url": "https://myvvqq.g25n3-cpae1-psslpy.work/topic/206462.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:(绝杀半头)[4头双]开0000对",
+            "container_id": "rendered-page:https://myvvqq.g25n3-cpae1-psslpy.work/topic/206462.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "0头双",
+          "order": 1,
+          "position": 246,
+          "anchor_text": "半头",
+          "anchor_position": 254,
+          "block_id": "0:246:270",
+          "block_start": 246,
+          "block_end": 270,
+          "source": {
+            "url": "https://myvvqq.g25n3-cpae1-psslpy.work/topic/206462.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:(绝杀半头)[0头双]开0000对",
+            "container_id": "rendered-page:https://myvvqq.g25n3-cpae1-psslpy.work/topic/206462.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "一卧不起",
+      "url": "https://269x6s.k4x2w-1o62c-peefnm.work/topic/206456.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "秒杀"
+      ],
+      "records": {
+        "216": {
+          "value": "4头单",
+          "order": 1,
+          "position": 3109,
+          "anchor_text": "秒杀",
+          "anchor_position": 3114,
+          "block_id": "0:3109:3131",
+          "block_start": 3109,
+          "block_end": 3131,
+          "source": {
+            "url": "https://269x6s.k4x2w-1o62c-peefnm.work/topic/206456.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "作者:一卧不起",
+            "snippet": "216期ღ秒杀ღ[4头单]开0000对",
+            "container_id": "topic-content:0:3108:6506",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "0头双",
+          "order": 1,
+          "position": 3109,
+          "anchor_text": "秒杀",
+          "anchor_position": 3114,
+          "block_id": "0:3109:3131",
+          "block_start": 3109,
+          "block_end": 3131,
+          "source": {
+            "url": "https://269x6s.k4x2w-1o62c-peefnm.work/topic/206456.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "作者:一卧不起",
+            "snippet": "217期ღ秒杀ღ[0头双]开0000对",
+            "container_id": "topic-content:0:3108:6527",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "安然无恙",
+      "url": "https://vqyjnlug.qt1u6-vqjjl-vkdnzw.work:16655/topic/650194.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "0头单",
+          "order": 522,
+          "position": 20443,
+          "anchor_text": "半头",
+          "anchor_position": 20451,
+          "block_id": "0:20443:20476",
+          "block_start": 20443,
+          "block_end": 20476,
+          "source": {
+            "url": "https://vqyjnlug.qt1u6-vqjjl-vkdnzw.work:16655/topic/650194.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "安然无恙 发表于 08月04日 09:06:07",
+            "snippet": "216期 [绝杀半头](0头单)开？00准",
+            "container_id": "content:0:7872:20476",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "0头双",
+          "order": 523,
+          "position": 20467,
+          "anchor_text": "半头",
+          "anchor_position": 20475,
+          "block_id": "0:20467:20500",
+          "block_start": 20467,
+          "block_end": 20500,
+          "source": {
+            "url": "https://vqyjnlug.qt1u6-vqjjl-vkdnzw.work:16655/topic/650194.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "安然无恙 发表于 08月05日 09:02:41",
+            "snippet": "217期 [绝杀半头](0头双)开？00准",
+            "container_id": "content:0:7872:20500",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "缘起缘灭",
+      "url": "https://gt6.59197c.com:8443/tie1/t30.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头单",
+          "order": 34,
+          "position": 1525,
+          "anchor_text": "半头",
+          "anchor_position": 1534,
+          "block_id": "0:1525:1704",
+          "block_start": 1525,
+          "block_end": 1704,
+          "source": {
+            "url": "https://gt6.59197c.com:8443/tie1/t30.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "缘起缘灭",
+            "author": "",
+            "snippet": "216期:～～必杀半头～～[4头单]开00对",
+            "container_id": "page:0:0:10554",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "1头单",
+          "order": 35,
+          "position": 1550,
+          "anchor_text": "半头",
+          "anchor_position": 1559,
+          "block_id": "0:1550:1729",
+          "block_start": 1550,
+          "block_end": 1729,
+          "source": {
+            "url": "https://gt6.59197c.com:8443/tie1/t30.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "缘起缘灭",
+            "author": "",
+            "snippet": "217期:～～必杀半头～～[1头单]开00对",
+            "container_id": "page:0:0:10578",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "世外桃源",
+      "url": "https://667755.xn--q9ja6j.xn--q9jyb4c/gsb/030.html",
+      "pick": "bottom",
+      "parser": "sewai_taoyuan",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "3头双",
+          "order": 72,
+          "position": 2028,
+          "anchor_text": "半头",
+          "anchor_position": 2042,
+          "block_id": "sewai:2020:2272",
+          "block_start": 2020,
+          "block_end": 2272,
+          "source": {
+            "url": "https://667755.xn--q9ja6j.xn--q9jyb4c/gsb/030.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "世外桃源",
+            "author": "",
+            "snippet": "[3头双] 216期:🌹绝杀半头🌹开:00对",
+            "container_id": "content:0:98:2272",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "sewai_taoyuan"
+          }
+        },
+        "217": {
+          "value": "1头双",
+          "order": 73,
+          "position": 2054,
+          "anchor_text": "半头",
+          "anchor_position": 2068,
+          "block_id": "sewai:2046:2298",
+          "block_start": 2046,
+          "block_end": 2298,
+          "source": {
+            "url": "https://667755.xn--q9ja6j.xn--q9jyb4c/gsb/030.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "世外桃源",
+            "author": "",
+            "snippet": "[1头双] 217期:🌹绝杀半头🌹开:00对",
+            "container_id": "content:0:98:2298",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "sewai_taoyuan"
+          }
+        }
+      }
+    },
+    {
+      "name": "若隐若现",
+      "url": "https://pyjgoe.burj6-ovh80-gurlas.xyz:16677/topic/697235.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头双",
+          "order": 2,
+          "position": 106,
+          "anchor_text": "半头",
+          "anchor_position": 114,
+          "block_id": "0:106:130",
+          "block_start": 106,
+          "block_end": 130,
+          "source": {
+            "url": "https://pyjgoe.burj6-ovh80-gurlas.xyz:16677/topic/697235.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:(绝杀半头)[4头双]开0000准",
+            "container_id": "rendered-page:https://pyjgoe.burj6-ovh80-gurlas.xyz:16677/topic/697235.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "4头单",
+          "order": 2,
+          "position": 107,
+          "anchor_text": "半头",
+          "anchor_position": 115,
+          "block_id": "0:107:131",
+          "block_start": 107,
+          "block_end": 131,
+          "source": {
+            "url": "https://pyjgoe.burj6-ovh80-gurlas.xyz:16677/topic/697235.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:(绝杀半头)[4头单]开0000准",
+            "container_id": "rendered-page:https://pyjgoe.burj6-ovh80-gurlas.xyz:16677/topic/697235.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "交谈知悉",
+      "url": "https://xxn08n.w2jqr-rbl71-ngvkmq.work/topic/453964.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "2头双",
+          "order": 2,
+          "position": 108,
+          "anchor_text": "半头",
+          "anchor_position": 115,
+          "block_id": "0:108:129",
+          "block_start": 108,
+          "block_end": 129,
+          "source": {
+            "url": "https://xxn08n.w2jqr-rbl71-ngvkmq.work/topic/453964.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:秒杀半头[2头双数]开00准",
+            "container_id": "rendered-page:https://xxn08n.w2jqr-rbl71-ngvkmq.work/topic/453964.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "4头单",
+          "order": 2,
+          "position": 108,
+          "anchor_text": "半头",
+          "anchor_position": 115,
+          "block_id": "0:108:129",
+          "block_start": 108,
+          "block_end": 129,
+          "source": {
+            "url": "https://xxn08n.w2jqr-rbl71-ngvkmq.work/topic/453964.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:秒杀半头[4头单数]开00准",
+            "container_id": "rendered-page:https://xxn08n.w2jqr-rbl71-ngvkmq.work/topic/453964.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "长凌五代",
+      "url": "https://62cc.xn--cckc4dwc5inab2m.xn--q9jyb4c/6dgsb/0002.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "3头单",
+          "order": 1,
+          "position": 3315,
+          "anchor_text": "半头",
+          "anchor_position": 3322,
+          "block_id": "0:3315:3338",
+          "block_start": 3315,
+          "block_end": 3338,
+          "source": {
+            "url": "https://62cc.xn--cckc4dwc5inab2m.xn--q9jyb4c/6dgsb/0002.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "作者:长凌五代",
+            "snippet": "216期:绝杀半头→〖3头单〗开:？00准",
+            "container_id": "topic-content:0:3234:4283",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "1头单",
+          "order": 1,
+          "position": 3318,
+          "anchor_text": "半头",
+          "anchor_position": 3325,
+          "block_id": "0:3318:3341",
+          "block_start": 3318,
+          "block_end": 3341,
+          "source": {
+            "url": "https://62cc.xn--cckc4dwc5inab2m.xn--q9jyb4c/6dgsb/0002.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "作者:长凌五代",
+            "snippet": "217期:绝杀半头→〖1头单〗开:？00准",
+            "container_id": "topic-content:0:3234:4309",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "狀元紅",
+      "url": "https://3.www112291a.com:2053/gengxin/15.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "2头单",
+          "order": 1,
+          "position": 1836,
+          "anchor_text": "半头",
+          "anchor_position": 1844,
+          "block_id": "0:1836:1945",
+          "block_start": 1836,
+          "block_end": 1945,
+          "source": {
+            "url": "https://3.www112291a.com:2053/gengxin/15.html",
+            "kind": "page",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:Ω绝杀半头Ω[2头单]开:0000准",
+            "container_id": "page:https://3.www112291a.com:2053/gengxin/15.html:decoded:0:0",
+            "table_column": "",
+            "document_authority": "primary-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "0头单",
+          "order": 1,
+          "position": 1836,
+          "anchor_text": "半头",
+          "anchor_position": 1844,
+          "block_id": "0:1836:1943",
+          "block_start": 1836,
+          "block_end": 1943,
+          "source": {
+            "url": "https://3.www112291a.com:2053/gengxin/15.html",
+            "kind": "page",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:Ω绝杀半头Ω[0头单]开:0000准",
+            "container_id": "page:https://3.www112291a.com:2053/gengxin/15.html:decoded:0:0",
+            "table_column": "",
+            "document_authority": "primary-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "慈善网",
+      "url": "https://4.www337731a.com:2053/gsb/03.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头单",
+          "order": 1,
+          "position": 2036,
+          "anchor_text": "半头",
+          "anchor_position": 2042,
+          "block_id": "0:2036:2096",
+          "block_start": 2036,
+          "block_end": 2096,
+          "source": {
+            "url": "https://4.www337731a.com:2053/gsb/03.html",
+            "kind": "page",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期绝杀半头[4头单]开？00准",
+            "container_id": "page:https://4.www337731a.com:2053/gsb/03.html:decoded:0:0",
+            "table_column": "",
+            "document_authority": "primary-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "2头单",
+          "order": 1,
+          "position": 2036,
+          "anchor_text": "半头",
+          "anchor_position": 2042,
+          "block_id": "0:2036:2096",
+          "block_start": 2036,
+          "block_end": 2096,
+          "source": {
+            "url": "https://4.www337731a.com:2053/gsb/03.html",
+            "kind": "page",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期绝杀半头[2头单]开？00准",
+            "container_id": "page:https://4.www337731a.com:2053/gsb/03.html:decoded:0:0",
+            "table_column": "",
+            "document_authority": "primary-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "流合",
+      "url": "https://pvxiftuf.yumkw-u4s81-hpytyz.work:16677/",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头单",
+          "order": 823,
+          "position": 28491,
+          "anchor_text": "半头",
+          "anchor_position": 28497,
+          "block_id": "0:28491:28512",
+          "block_start": 28491,
+          "block_end": 28512,
+          "source": {
+            "url": "https://pvxiftuf.yumkw-u4s81-hpytyz.work:16677/",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期稳杀半头[4头单]开0000√",
+            "container_id": "rendered-page:https://pvxiftuf.yumkw-u4s81-hpytyz.work:16677/",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "2头双",
+          "order": 838,
+          "position": 28890,
+          "anchor_text": "半头",
+          "anchor_position": 28896,
+          "block_id": "0:28890:28911",
+          "block_start": 28890,
+          "block_end": 28911,
+          "source": {
+            "url": "https://pvxiftuf.yumkw-u4s81-hpytyz.work:16677/",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期稳杀半头[2头双]开0000√",
+            "container_id": "rendered-page:https://pvxiftuf.yumkw-u4s81-hpytyz.work:16677/",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "周公神算",
+      "url": "https://xxn08n.w2jqr-rbl71-ngvkmq.work/",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "2头单",
+          "order": 1,
+          "position": 128415,
+          "anchor_text": "半头",
+          "anchor_position": 128421,
+          "block_id": "0:128415:128444",
+          "block_start": 128415,
+          "block_end": 128444,
+          "source": {
+            "url": "https://xxn08n.w2jqr-rbl71-ngvkmq.work/",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "澳门周公神算",
+            "author": "",
+            "snippet": "216期稳杀半头[2头单]开？00√",
+            "container_id": "swiper-slide:0:128362:128805",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "4头单",
+          "order": 1,
+          "position": 127514,
+          "anchor_text": "半头",
+          "anchor_position": 127520,
+          "block_id": "0:127514:127543",
+          "block_start": 127514,
+          "block_end": 127543,
+          "source": {
+            "url": "https://xxn08n.w2jqr-rbl71-ngvkmq.work/",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "澳门周公神算",
+            "author": "",
+            "snippet": "217期稳杀半头[4头单]开？00√",
+            "container_id": "swiper-slide:0:127461:127933",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "贵人相助",
+      "url": "https://sqddimfu.evs71-kia2b-gshsdc.xyz:16677/topic/205530.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "0头双",
+          "order": 1,
+          "position": 5738,
+          "anchor_text": "半头",
+          "anchor_position": 5747,
+          "block_id": "0:5738:5765",
+          "block_start": 5738,
+          "block_end": 5765,
+          "source": {
+            "url": "https://sqddimfu.evs71-kia2b-gshsdc.xyz:16677/topic/205530.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "作者:贵人相助",
+            "snippet": "216期:✿✿必杀半头✿✿[0头双]开0000对",
+            "container_id": "topic-content:0:5737:20015",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "1头单",
+          "order": 1,
+          "position": 5738,
+          "anchor_text": "半头",
+          "anchor_position": 5747,
+          "block_id": "0:5738:5765",
+          "block_start": 5738,
+          "block_end": 5765,
+          "source": {
+            "url": "https://sqddimfu.evs71-kia2b-gshsdc.xyz:16677/topic/205530.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "作者:贵人相助",
+            "snippet": "217期:✿✿必杀半头✿✿[1头单]开0000对",
+            "container_id": "topic-content:0:5737:20041",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "纷纷张开",
+      "url": "https://kfsujebc.djiz8-4tqt6-hubani.xyz:16677/topic/280922.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "2头单",
+          "order": 553,
+          "position": 23522,
+          "anchor_text": "半头",
+          "anchor_position": 23531,
+          "block_id": "0:23522:23558",
+          "block_start": 23522,
+          "block_end": 23558,
+          "source": {
+            "url": "https://kfsujebc.djiz8-4tqt6-hubani.xyz:16677/topic/280922.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "纷纷张开 发表于 08月03日 22:24:04",
+            "snippet": "216期:〓[稳杀半头]〓 [2头单数]开00准",
+            "container_id": "content:0:7997:23558",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "0头双",
+          "order": 554,
+          "position": 23550,
+          "anchor_text": "半头",
+          "anchor_position": 23559,
+          "block_id": "0:23550:23586",
+          "block_start": 23550,
+          "block_end": 23586,
+          "source": {
+            "url": "https://kfsujebc.djiz8-4tqt6-hubani.xyz:16677/topic/280922.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "纷纷张开 发表于 08月04日 22:37:04",
+            "snippet": "217期:〓[稳杀半头]〓 [0头双数]开00准",
+            "container_id": "content:0:7997:23586",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "孙娘杀半头",
+      "url": "https://qzpwvvvb.a3qgk-l2h5k-opahdg.xyz:16677/topic/254838.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "3头双",
+          "order": 1,
+          "position": 109,
+          "anchor_text": "半头",
+          "anchor_position": 120,
+          "block_id": "0:109:136",
+          "block_start": 109,
+          "block_end": 136,
+          "source": {
+            "url": "https://qzpwvvvb.a3qgk-l2h5k-opahdg.xyz:16677/topic/254838.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:孙 娘☆绝杀半头☆[3头双]开0000准",
+            "container_id": "rendered-page:https://qzpwvvvb.a3qgk-l2h5k-opahdg.xyz:16677/topic/254838.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "4头单",
+          "order": 1,
+          "position": 109,
+          "anchor_text": "半头",
+          "anchor_position": 120,
+          "block_id": "0:109:136",
+          "block_start": 109,
+          "block_end": 136,
+          "source": {
+            "url": "https://qzpwvvvb.a3qgk-l2h5k-opahdg.xyz:16677/topic/254838.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:孙 娘☆绝杀半头☆[4头单]开0000准",
+            "container_id": "rendered-page:https://qzpwvvvb.a3qgk-l2h5k-opahdg.xyz:16677/topic/254838.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "郁保杀半头",
+      "url": "https://qzpwvvvb.a3qgk-l2h5k-opahdg.xyz:16677/topic/254821.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "3头单",
+          "order": 2,
+          "position": 109,
+          "anchor_text": "半头",
+          "anchor_position": 119,
+          "block_id": "0:109:134",
+          "block_start": 109,
+          "block_end": 134,
+          "source": {
+            "url": "https://qzpwvvvb.a3qgk-l2h5k-opahdg.xyz:16677/topic/254821.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:郁 保☆杀半头[3头单]开0000准",
+            "container_id": "rendered-page:https://qzpwvvvb.a3qgk-l2h5k-opahdg.xyz:16677/topic/254821.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "2头双",
+          "order": 2,
+          "position": 109,
+          "anchor_text": "半头",
+          "anchor_position": 119,
+          "block_id": "0:109:134",
+          "block_start": 109,
+          "block_end": 134,
+          "source": {
+            "url": "https://qzpwvvvb.a3qgk-l2h5k-opahdg.xyz:16677/topic/254821.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:郁 保☆杀半头[2头双]开0000准",
+            "container_id": "rendered-page:https://qzpwvvvb.a3qgk-l2h5k-opahdg.xyz:16677/topic/254821.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "招财猫",
+      "url": "https://cthvktrb.am9a6-vk0h6-lwbxab.xyz:16677/",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "1头单",
+          "order": 1,
+          "position": 29946,
+          "anchor_text": "半头",
+          "anchor_position": 29953,
+          "block_id": "0:29946:29967",
+          "block_start": 29946,
+          "block_end": 29967,
+          "source": {
+            "url": "https://cthvktrb.am9a6-vk0h6-lwbxab.xyz:16677/",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:绝杀半头[1头单]开？00赢",
+            "container_id": "rendered-page:https://cthvktrb.am9a6-vk0h6-lwbxab.xyz:16677/",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "4头单",
+          "order": 1,
+          "position": 30800,
+          "anchor_text": "半头",
+          "anchor_position": 30807,
+          "block_id": "0:30800:30821",
+          "block_start": 30800,
+          "block_end": 30821,
+          "source": {
+            "url": "https://cthvktrb.am9a6-vk0h6-lwbxab.xyz:16677/",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:绝杀半头[4头单]开？00赢",
+            "container_id": "rendered-page:https://cthvktrb.am9a6-vk0h6-lwbxab.xyz:16677/",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "尾尾动人",
+      "url": "https://ebhxngwb.2ljj5-vdh8s-gbvkgl.xyz:16677/topic/255949.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "0头单",
+          "order": 216,
+          "position": 4412,
+          "anchor_text": "半头",
+          "anchor_position": 4419,
+          "block_id": "0:4412:4438",
+          "block_start": 4412,
+          "block_end": 4438,
+          "source": {
+            "url": "https://ebhxngwb.2ljj5-vdh8s-gbvkgl.xyz:16677/topic/255949.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:必杀半头[0头单]开00对",
+            "container_id": "rendered-page:https://ebhxngwb.2ljj5-vdh8s-gbvkgl.xyz:16677/topic/255949.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "0头双",
+          "order": 217,
+          "position": 4432,
+          "anchor_text": "半头",
+          "anchor_position": 4439,
+          "block_id": "0:4432:4458",
+          "block_start": 4432,
+          "block_end": 4458,
+          "source": {
+            "url": "https://ebhxngwb.2ljj5-vdh8s-gbvkgl.xyz:16677/topic/255949.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:必杀半头[0头双]开00对",
+            "container_id": "rendered-page:https://ebhxngwb.2ljj5-vdh8s-gbvkgl.xyz:16677/topic/255949.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "锦衣师卫",
+      "url": "https://stkfbbns.yrfhc-z5x6i-ykoqqu.xyz:16677/topic/251258.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "1头单",
+          "order": 78,
+          "position": 1943,
+          "anchor_text": "半头",
+          "anchor_position": 1951,
+          "block_id": "0:1943:2034",
+          "block_start": 1943,
+          "block_end": 2034,
+          "source": {
+            "url": "https://stkfbbns.yrfhc-z5x6i-ykoqqu.xyz:16677/topic/251258.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:～绝杀半头～[1头单]～～开00对",
+            "container_id": "rendered-page:https://stkfbbns.yrfhc-z5x6i-ykoqqu.xyz:16677/topic/251258.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "1头双",
+          "order": 79,
+          "position": 1967,
+          "anchor_text": "半头",
+          "anchor_position": 1975,
+          "block_id": "0:1967:2058",
+          "block_start": 1967,
+          "block_end": 2058,
+          "source": {
+            "url": "https://stkfbbns.yrfhc-z5x6i-ykoqqu.xyz:16677/topic/251258.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:～绝杀半头～[1头双]～～开00对",
+            "container_id": "rendered-page:https://stkfbbns.yrfhc-z5x6i-ykoqqu.xyz:16677/topic/251258.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "孤独太子",
+      "url": "https://bb5.www87127b.com:8443/bbs/31.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "3头单",
+          "order": 16,
+          "position": 1322,
+          "anchor_text": "半头",
+          "anchor_position": 1331,
+          "block_id": "0:1322:2183",
+          "block_start": 1322,
+          "block_end": 2183,
+          "source": {
+            "url": "https://bb5.www87127b.com:8443/bbs/31.html",
+            "kind": "page",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:～～必杀半头～～[3头单]开？00对",
+            "container_id": "page:https://bb5.www87127b.com:8443/bbs/31.html:decoded:0:0",
+            "table_column": "",
+            "document_authority": "primary-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "4头单",
+          "order": 17,
+          "position": 1351,
+          "anchor_text": "半头",
+          "anchor_position": 1360,
+          "block_id": "0:1351:2212",
+          "block_start": 1351,
+          "block_end": 2212,
+          "source": {
+            "url": "https://bb5.www87127b.com:8443/bbs/31.html",
+            "kind": "page",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:～～必杀半头～～[4头单]开？00对",
+            "container_id": "page:https://bb5.www87127b.com:8443/bbs/31.html:decoded:0:0",
+            "table_column": "",
+            "document_authority": "primary-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "脾气鬼怪",
+      "url": "https://uwkzbx.2pgdu-vva8o-nkhrzz.xyz:16677/topic/308018.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "㊣秒杀"
+      ],
+      "records": {
+        "216": {
+          "value": "3头单",
+          "order": 335,
+          "position": 15092,
+          "anchor_text": "㊣秒杀",
+          "anchor_position": 15096,
+          "block_id": "0:15092:15148",
+          "block_start": 15092,
+          "block_end": 15148,
+          "source": {
+            "url": "https://uwkzbx.2pgdu-vva8o-nkhrzz.xyz:16677/topic/308018.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "脾气鬼怪",
+            "author": "",
+            "snippet": "216期㊣秒杀[3头单]开00对",
+            "container_id": "detail_info_forum2_item:0:8467:15148",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "1头单",
+          "order": 336,
+          "position": 15111,
+          "anchor_text": "㊣秒杀",
+          "anchor_position": 15115,
+          "block_id": "0:15111:15167",
+          "block_start": 15111,
+          "block_end": 15167,
+          "source": {
+            "url": "https://uwkzbx.2pgdu-vva8o-nkhrzz.xyz:16677/topic/308018.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "脾气鬼怪",
+            "author": "",
+            "snippet": "217期㊣秒杀[1头单]开00对",
+            "container_id": "detail_info_forum2_item:0:8467:15167",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "生意兴隆",
+      "url": "https://xuknerw.fu5qv-a7f7o-nxmebt.work:16633/topic/291093.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "0头单",
+          "order": 1,
+          "position": 2421,
+          "anchor_text": "半头",
+          "anchor_position": 2427,
+          "block_id": "0:2421:2441",
+          "block_start": 2421,
+          "block_end": 2441,
+          "source": {
+            "url": "https://xuknerw.fu5qv-a7f7o-nxmebt.work:16633/topic/291093.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "作者:生意兴隆",
+            "snippet": "216期绝杀半头《0头单》开00准",
+            "container_id": "topic-content:0:2420:14087",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "1头双",
+          "order": 1,
+          "position": 2421,
+          "anchor_text": "半头",
+          "anchor_position": 2427,
+          "block_id": "0:2421:2441",
+          "block_start": 2421,
+          "block_end": 2441,
+          "source": {
+            "url": "https://xuknerw.fu5qv-a7f7o-nxmebt.work:16633/topic/291093.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "作者:生意兴隆",
+            "snippet": "217期绝杀半头《1头双》开00准",
+            "container_id": "topic-content:0:2420:14108",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "一蹶不振",
+      "url": "https://vmfvzmh.7jh1y-qgjk8-lavfxb.work:16677/topic/782033.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头双",
+          "order": 1,
+          "position": 6263,
+          "anchor_text": "半头",
+          "anchor_position": 6270,
+          "block_id": "0:6263:6287",
+          "block_start": 6263,
+          "block_end": 6287,
+          "source": {
+            "url": "https://vmfvzmh.7jh1y-qgjk8-lavfxb.work:16677/topic/782033.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "作者:一蹶不振",
+            "snippet": "216期(必杀半头)[4头双]开0000准",
+            "container_id": "topic-content:0:6262:19061",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "1头双",
+          "order": 1,
+          "position": 6260,
+          "anchor_text": "半头",
+          "anchor_position": 6267,
+          "block_id": "0:6260:6284",
+          "block_start": 6260,
+          "block_end": 6284,
+          "source": {
+            "url": "https://vmfvzmh.7jh1y-qgjk8-lavfxb.work:16677/topic/782033.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "作者:一蹶不振",
+            "snippet": "217期(必杀半头)[1头双]开0000准",
+            "container_id": "topic-content:0:6259:19082",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "开几副辅",
+      "url": "https://bnvzafsk.nnmu7-qytv7-qjorxd.xyz:16677/topic/450973.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "3头单",
+          "order": 1,
+          "position": 471,
+          "anchor_text": "半头",
+          "anchor_position": 480,
+          "block_id": "0:471:495",
+          "block_start": 471,
+          "block_end": 495,
+          "source": {
+            "url": "https://bnvzafsk.nnmu7-qytv7-qjorxd.xyz:16677/topic/450973.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期 [绝杀㊣半头]3头单开:0000准",
+            "container_id": "rendered-page:https://bnvzafsk.nnmu7-qytv7-qjorxd.xyz:16677/topic/450973.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "1头单",
+          "order": 1,
+          "position": 471,
+          "anchor_text": "半头",
+          "anchor_position": 480,
+          "block_id": "0:471:495",
+          "block_start": 471,
+          "block_end": 495,
+          "source": {
+            "url": "https://bnvzafsk.nnmu7-qytv7-qjorxd.xyz:16677/topic/450973.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期 [绝杀㊣半头]1头单开:0000准",
+            "container_id": "rendered-page:https://bnvzafsk.nnmu7-qytv7-qjorxd.xyz:16677/topic/450973.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "把把论坛",
+      "url": "https://43666.886677a.app:2563/htm/bbs/top080.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "2头双",
+          "order": 58,
+          "position": 12017,
+          "anchor_text": "半头",
+          "anchor_position": 12025,
+          "block_id": "2:12017:13035",
+          "block_start": 12017,
+          "block_end": 13035,
+          "source": {
+            "url": "https://43666.886677a.app:2563/main/bbs/080.html",
+            "kind": "iframe",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:🍀瞬杀半头🍀开:00中 [2头双]",
+            "container_id": "iframe:https://43666.886677a.app:2563/main/bbs/080.html:decoded:0:0",
+            "table_column": "",
+            "document_authority": "declared-iframe",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "2头双",
+          "order": 59,
+          "position": 12190,
+          "anchor_text": "半头",
+          "anchor_position": 12198,
+          "block_id": "2:12190:13208",
+          "block_start": 12190,
+          "block_end": 13208,
+          "source": {
+            "url": "https://43666.886677a.app:2563/main/bbs/080.html",
+            "kind": "iframe",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:🍀瞬杀半头🍀开:00中 [2头双]",
+            "container_id": "iframe:https://43666.886677a.app:2563/main/bbs/080.html:decoded:0:0",
+            "table_column": "",
+            "document_authority": "declared-iframe",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "简单拖鞋",
+      "url": "https://wcvwpj.mb4i3-vwk1b-cadppa.work/#/users/1293",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "2头单",
+          "order": 1,
+          "position": 66,
+          "anchor_text": "半头",
+          "anchor_position": 74,
+          "block_id": "0:66:316",
+          "block_start": 66,
+          "block_end": 316,
+          "source": {
+            "url": "https://wcvwpj.mb4i3-vwk1b-cadppa.work/api/v1/users/1293/forums?per_page=1000",
+            "kind": "dynamic-record",
+            "record_id": "15747512",
+            "record_path": "root",
+            "route_type": "forum",
+            "url_record_id": "15747512",
+            "api_url": "https://wcvwpj.mb4i3-vwk1b-cadppa.work/api/v1/users/1293/forums?per_page=1000",
+            "title": "必杀半头",
+            "author": "简单拖鞋",
+            "snippet": "216期～～必杀半头～～[2头单]开0000对",
+            "container_id": "root",
+            "table_column": "",
+            "document_authority": "exact-dynamic-record",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "2头双",
+          "order": 1,
+          "position": 66,
+          "anchor_text": "半头",
+          "anchor_position": 74,
+          "block_id": "0:66:316",
+          "block_start": 66,
+          "block_end": 316,
+          "source": {
+            "url": "https://wcvwpj.mb4i3-vwk1b-cadppa.work/api/v1/users/1293/forums?per_page=1000",
+            "kind": "dynamic-record",
+            "record_id": "15753914",
+            "record_path": "root",
+            "route_type": "forum",
+            "url_record_id": "15753914",
+            "api_url": "https://wcvwpj.mb4i3-vwk1b-cadppa.work/api/v1/users/1293/forums?per_page=1000",
+            "title": "必杀半头",
+            "author": "简单拖鞋",
+            "snippet": "217期～～必杀半头～～[2头双]开0000对",
+            "container_id": "root",
+            "table_column": "",
+            "document_authority": "exact-dynamic-record",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "气义相投",
+      "url": "https://pkrcani.cm4li-554vw-zuncoa.xyz:16677/topic/469066.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头双",
+          "order": 1,
+          "position": 304,
+          "anchor_text": "半头",
+          "anchor_position": 312,
+          "block_id": "0:304:329",
+          "block_start": 304,
+          "block_end": 329,
+          "source": {
+            "url": "https://pkrcani.cm4li-554vw-zuncoa.xyz:16677/topic/469066.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:[稳杀半头]〖4头双〗开:0000准",
+            "container_id": "rendered-page:https://pkrcani.cm4li-554vw-zuncoa.xyz:16677/topic/469066.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "4头单",
+          "order": 1,
+          "position": 304,
+          "anchor_text": "半头",
+          "anchor_position": 312,
+          "block_id": "0:304:329",
+          "block_start": 304,
+          "block_end": 329,
+          "source": {
+            "url": "https://pkrcani.cm4li-554vw-zuncoa.xyz:16677/topic/469066.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:[稳杀半头]〖4头单〗开:0000准",
+            "container_id": "rendered-page:https://pkrcani.cm4li-554vw-zuncoa.xyz:16677/topic/469066.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "财富榜啊咯",
+      "url": "https://qvuuqqs.8imf7-hteuh-ylwuqv.xyz/#/users/11993/references/15358093",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "2头双",
+          "order": 1,
+          "position": 34,
+          "anchor_text": "半头",
+          "anchor_position": 41,
+          "block_id": "0:34:60",
+          "block_start": 34,
+          "block_end": 60,
+          "source": {
+            "url": "https://qvuuqqs.8imf7-hteuh-ylwuqv.xyz/api/v1/forums/15744592",
+            "kind": "dynamic-record",
+            "record_id": "15744592",
+            "record_path": "root",
+            "route_type": "reference",
+            "url_record_id": "15744592",
+            "api_url": "https://qvuuqqs.8imf7-hteuh-ylwuqv.xyz/api/v1/forums/15744592",
+            "title": "财富榜",
+            "author": "财富榜资料员",
+            "snippet": "216期:必杀半头[2头双]开？00对",
+            "container_id": "root",
+            "table_column": "",
+            "document_authority": "exact-dynamic-record",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "0头双",
+          "order": 1,
+          "position": 34,
+          "anchor_text": "半头",
+          "anchor_position": 41,
+          "block_id": "0:34:60",
+          "block_start": 34,
+          "block_end": 60,
+          "source": {
+            "url": "https://qvuuqqs.8imf7-hteuh-ylwuqv.xyz/api/v1/forums/15748611",
+            "kind": "dynamic-record",
+            "record_id": "15748611",
+            "record_path": "root",
+            "route_type": "reference",
+            "url_record_id": "15748611",
+            "api_url": "https://qvuuqqs.8imf7-hteuh-ylwuqv.xyz/api/v1/forums/15748611",
+            "title": "财富榜",
+            "author": "财富榜资料员",
+            "snippet": "217期:必杀半头[0头双]开？00对",
+            "container_id": "root",
+            "table_column": "",
+            "document_authority": "exact-dynamic-record",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "文物不变",
+      "url": "https://wojedcr.ltslh-5g80v-eeujep.xyz:16677/topic/805239.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "3头单",
+          "order": 27,
+          "position": 605,
+          "anchor_text": "半头",
+          "anchor_position": 613,
+          "block_id": "0:605:843",
+          "block_start": 605,
+          "block_end": 843,
+          "source": {
+            "url": "https://wojedcr.ltslh-5g80v-eeujep.xyz:16677/topic/805239.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:(绝杀半头)[3头单]开0000对",
+            "container_id": "rendered-page:https://wojedcr.ltslh-5g80v-eeujep.xyz:16677/topic/805239.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "0头单",
+          "order": 28,
+          "position": 628,
+          "anchor_text": "半头",
+          "anchor_position": 636,
+          "block_id": "0:628:962",
+          "block_start": 628,
+          "block_end": 962,
+          "source": {
+            "url": "https://wojedcr.ltslh-5g80v-eeujep.xyz:16677/topic/805239.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:(绝杀半头)[0头单]开0000对",
+            "container_id": "rendered-page:https://wojedcr.ltslh-5g80v-eeujep.xyz:16677/topic/805239.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "满脸春色",
+      "url": "https://a.ttss.vip/article.aspx?id=971661",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "满脸春色㊣精杀"
+      ],
+      "records": {
+        "216": {
+          "value": "1头单",
+          "order": 1,
+          "position": 2514,
+          "anchor_text": "满脸春色㊣精杀",
+          "anchor_position": 2520,
+          "block_id": "0:2514:2548",
+          "block_start": 2514,
+          "block_end": 2548,
+          "source": {
+            "url": "https://a.ttss.vip/article.aspx?id=971661",
+            "kind": "page",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期 ◆满脸春色㊣精杀 : [1头单]开 ?? 准",
+            "container_id": "page:https://a.ttss.vip/article.aspx?id=971661:decoded:0:0",
+            "table_column": "",
+            "document_authority": "primary-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "3头单",
+          "order": 1,
+          "position": 2514,
+          "anchor_text": "满脸春色㊣精杀",
+          "anchor_position": 2520,
+          "block_id": "0:2514:2548",
+          "block_start": 2514,
+          "block_end": 2548,
+          "source": {
+            "url": "https://a.ttss.vip/article.aspx?id=971661",
+            "kind": "page",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期 ◆满脸春色㊣精杀 : [3头单]开 ?? 准",
+            "container_id": "page:https://a.ttss.vip/article.aspx?id=971661:decoded:0:0",
+            "table_column": "",
+            "document_authority": "primary-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "白虎",
+      "url": "https://mkhomxq.gqmpb-vuxji-pfnheu.work:16677/topic/510826.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "1头单",
+          "order": 2,
+          "position": 237,
+          "anchor_text": "半头",
+          "anchor_position": 244,
+          "block_id": "0:237:258",
+          "block_start": 237,
+          "block_end": 258,
+          "source": {
+            "url": "https://mkhomxq.gqmpb-vuxji-pfnheu.work:16677/topic/510826.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:绝杀半头[1头单]开？00赢！",
+            "container_id": "rendered-page:https://mkhomxq.gqmpb-vuxji-pfnheu.work:16677/topic/510826.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "4头单",
+          "order": 2,
+          "position": 237,
+          "anchor_text": "半头",
+          "anchor_position": 244,
+          "block_id": "0:237:258",
+          "block_start": 237,
+          "block_end": 258,
+          "source": {
+            "url": "https://mkhomxq.gqmpb-vuxji-pfnheu.work:16677/topic/510826.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:绝杀半头[4头单]开？00赢！",
+            "container_id": "rendered-page:https://mkhomxq.gqmpb-vuxji-pfnheu.work:16677/topic/510826.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "彩运通",
+      "url": "https://fnulucd.s2569-p869e-eekdks.xyz:16677/",
+      "pick": "top",
+      "parser": "caiyuntong_macau",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "3头单",
+          "order": 1,
+          "position": 2495073,
+          "anchor_text": "澳门综合杀",
+          "anchor_position": 2493137,
+          "block_id": "2:macau:2493137:2501750:2494871:2495840",
+          "block_start": 2493137,
+          "block_end": 2501750,
+          "source": {
+            "url": "https://fnulucd.s2569-p869e-eekdks.xyz:16677/",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期 牛鼠 10合 3头单 0000准",
+            "container_id": "browser:https://fnulucd.s2569-p869e-eekdks.xyz:16677/:decoded:0:0",
+            "table_column": "macau-half-head",
+            "document_authority": "declared-browser",
+            "rule_id": "caiyuntong_macau"
+          }
+        },
+        "217": {
+          "value": "4头单",
+          "order": 1,
+          "position": 2460188,
+          "anchor_text": "澳门综合杀",
+          "anchor_position": 2458290,
+          "block_id": "2:macau:2458290:2467707:2459996:2460934",
+          "block_start": 2458290,
+          "block_end": 2467707,
+          "source": {
+            "url": "https://fnulucd.s2569-p869e-eekdks.xyz:16677/",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期 马蛇 12合 4头单 0000准",
+            "container_id": "browser:https://fnulucd.s2569-p869e-eekdks.xyz:16677/:decoded:0:0",
+            "table_column": "macau-half-head",
+            "document_authority": "declared-browser",
+            "rule_id": "caiyuntong_macau"
+          }
+        }
+      }
+    },
+    {
+      "name": "狗屁不通",
+      "url": "https://bzdolgna.0115r-u1nk5-zioots.xyz:16677/topic/250880.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "0头单",
+          "order": 284,
+          "position": 6605,
+          "anchor_text": "半头",
+          "anchor_position": 6612,
+          "block_id": "0:6605:6696",
+          "block_start": 6605,
+          "block_end": 6696,
+          "source": {
+            "url": "https://bzdolgna.0115r-u1nk5-zioots.xyz:16677/topic/250880.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:绝杀半头→〖0头单〗开:0000准",
+            "container_id": "rendered-page:https://bzdolgna.0115r-u1nk5-zioots.xyz:16677/topic/250880.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "4头单",
+          "order": 285,
+          "position": 6644,
+          "anchor_text": "半头",
+          "anchor_position": 6651,
+          "block_id": "0:6644:6735",
+          "block_start": 6644,
+          "block_end": 6735,
+          "source": {
+            "url": "https://bzdolgna.0115r-u1nk5-zioots.xyz:16677/topic/250880.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:绝杀半头→〖4头单〗开:0000准",
+            "container_id": "rendered-page:https://bzdolgna.0115r-u1nk5-zioots.xyz:16677/topic/250880.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "纵横交贯",
+      "url": "https://xoxtpupt.bvptr-i3mv8-pbjxin.work:17455/topic/257049.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "3头双",
+          "order": 2,
+          "position": 234,
+          "anchor_text": "半头",
+          "anchor_position": 242,
+          "block_id": "0:234:257",
+          "block_start": 234,
+          "block_end": 257,
+          "source": {
+            "url": "https://xoxtpupt.bvptr-i3mv8-pbjxin.work:17455/topic/257049.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:★必杀半头★[3头双]开000对",
+            "container_id": "rendered-page:https://xoxtpupt.bvptr-i3mv8-pbjxin.work:17455/topic/257049.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "0头双",
+          "order": 2,
+          "position": 231,
+          "anchor_text": "半头",
+          "anchor_position": 239,
+          "block_id": "0:231:254",
+          "block_start": 231,
+          "block_end": 254,
+          "source": {
+            "url": "https://xoxtpupt.bvptr-i3mv8-pbjxin.work:17455/topic/257049.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:★必杀半头★[0头双]开000对",
+            "container_id": "rendered-page:https://xoxtpupt.bvptr-i3mv8-pbjxin.work:17455/topic/257049.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "大概粗跟",
+      "url": "https://xoxtpupt.bvptr-i3mv8-pbjxin.work:17455/topic/393298.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头双",
+          "order": 2,
+          "position": 232,
+          "anchor_text": "半头",
+          "anchor_position": 239,
+          "block_id": "0:232:253",
+          "block_start": 232,
+          "block_end": 253,
+          "source": {
+            "url": "https://xoxtpupt.bvptr-i3mv8-pbjxin.work:17455/topic/393298.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:秒杀半头[4头双数]开00准",
+            "container_id": "rendered-page:https://xoxtpupt.bvptr-i3mv8-pbjxin.work:17455/topic/393298.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "1头双",
+          "order": 2,
+          "position": 230,
+          "anchor_text": "半头",
+          "anchor_position": 237,
+          "block_id": "0:230:251",
+          "block_start": 230,
+          "block_end": 251,
+          "source": {
+            "url": "https://xoxtpupt.bvptr-i3mv8-pbjxin.work:17455/topic/393298.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:秒杀半头[1头双数]开00准",
+            "container_id": "rendered-page:https://xoxtpupt.bvptr-i3mv8-pbjxin.work:17455/topic/393298.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "青春少女",
+      "url": "https://epsyvycz.ff10o-370zd-qssnum.xyz:16677/topic/328057.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "杀["
+      ],
+      "records": {
+        "216": {
+          "value": "0头单",
+          "order": 284,
+          "position": 18554,
+          "anchor_text": "杀[",
+          "anchor_position": 18558,
+          "block_id": "0:18554:18570",
+          "block_start": 18554,
+          "block_end": 18570,
+          "source": {
+            "url": "https://epsyvycz.ff10o-370zd-qssnum.xyz:16677/topic/328057.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "青春少女",
+            "author": "",
+            "snippet": "216期杀[0头单]开00准 216期杀[蓝单",
+            "container_id": "detail_info_forum2_item:0:9180:18624",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "4头单",
+          "order": 285,
+          "position": 18586,
+          "anchor_text": "杀[",
+          "anchor_position": 18590,
+          "block_id": "0:18586:18602",
+          "block_start": 18586,
+          "block_end": 18602,
+          "source": {
+            "url": "https://epsyvycz.ff10o-370zd-qssnum.xyz:16677/topic/328057.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "青春少女",
+            "author": "",
+            "snippet": "217期杀[4头单]开00准 217期杀[绿单",
+            "container_id": "detail_info_forum2_item:0:9180:18656",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "六神无主",
+      "url": "https://huqtzej.vvlq2-j4i8n-lisghq.xyz:16677/topic/281481.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "1头双",
+          "order": 55,
+          "position": 1700,
+          "anchor_text": "半头",
+          "anchor_position": 1708,
+          "block_id": "0:1700:3699",
+          "block_start": 1700,
+          "block_end": 3699,
+          "source": {
+            "url": "https://huqtzej.vvlq2-j4i8n-lisghq.xyz:16677/topic/281481.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:￥稳杀半头￥[1头双]开:0000准",
+            "container_id": "rendered-page:https://huqtzej.vvlq2-j4i8n-lisghq.xyz:16677/topic/281481.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "3头双",
+          "order": 56,
+          "position": 1724,
+          "anchor_text": "半头",
+          "anchor_position": 1732,
+          "block_id": "0:1724:3723",
+          "block_start": 1724,
+          "block_end": 3723,
+          "source": {
+            "url": "https://huqtzej.vvlq2-j4i8n-lisghq.xyz:16677/topic/281481.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:￥稳杀半头￥[3头双]开:0000准",
+            "container_id": "rendered-page:https://huqtzej.vvlq2-j4i8n-lisghq.xyz:16677/topic/281481.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "期期大赚",
+      "url": "https://oigqsvqs.2n3pw-mjk5d-wndmjh.xyz:16677/topic/287383.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "3头单",
+          "order": 1,
+          "position": 9435,
+          "anchor_text": "半头",
+          "anchor_position": 9444,
+          "block_id": "0:9435:9459",
+          "block_start": 9435,
+          "block_end": 9459,
+          "source": {
+            "url": "https://oigqsvqs.2n3pw-mjk5d-wndmjh.xyz:16677/topic/287383.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "期期大赚 发表于 08月03日 22:56:25",
+            "snippet": "216期:◆绝杀一半头◆[3头单]开？？准",
+            "container_id": "content:0:9421:20437",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "0头双",
+          "order": 1,
+          "position": 9435,
+          "anchor_text": "半头",
+          "anchor_position": 9444,
+          "block_id": "0:9435:9459",
+          "block_start": 9435,
+          "block_end": 9459,
+          "source": {
+            "url": "https://oigqsvqs.2n3pw-mjk5d-wndmjh.xyz:16677/topic/287383.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "期期大赚 发表于 08月04日 22:02:03",
+            "snippet": "217期:◆绝杀一半头◆[0头双]开？？准",
+            "container_id": "content:0:9421:20462",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "超级稳定",
+      "url": "https://xmdrbud.eqpr2-6tpvi-pjqztv.xyz:16677/topic/320718.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "1头双",
+          "order": 2,
+          "position": 228,
+          "anchor_text": "半头",
+          "anchor_position": 235,
+          "block_id": "0:228:251",
+          "block_start": 228,
+          "block_end": 251,
+          "source": {
+            "url": "https://xmdrbud.eqpr2-6tpvi-pjqztv.xyz:16677/topic/320718.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:绝杀半头[1头双]开:0000准",
+            "container_id": "rendered-page:https://xmdrbud.eqpr2-6tpvi-pjqztv.xyz:16677/topic/320718.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "4头单",
+          "order": 2,
+          "position": 228,
+          "anchor_text": "半头",
+          "anchor_position": 235,
+          "block_id": "0:228:251",
+          "block_start": 228,
+          "block_end": 251,
+          "source": {
+            "url": "https://xmdrbud.eqpr2-6tpvi-pjqztv.xyz:16677/topic/320718.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:绝杀半头[4头单]开:0000准",
+            "container_id": "rendered-page:https://xmdrbud.eqpr2-6tpvi-pjqztv.xyz:16677/topic/320718.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "意思意思",
+      "url": "https://cdsgyr.6xzb4-onz45-zlnoys.xyz:16677/topic/282008.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "1头双",
+          "order": 2,
+          "position": 419,
+          "anchor_text": "半头",
+          "anchor_position": 427,
+          "block_id": "0:419:443",
+          "block_start": 419,
+          "block_end": 443,
+          "source": {
+            "url": "https://cdsgyr.6xzb4-onz45-zlnoys.xyz:16677/topic/282008.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:[稳杀半头][1头双数]开000准",
+            "container_id": "rendered-page:https://cdsgyr.6xzb4-onz45-zlnoys.xyz:16677/topic/282008.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "3头双",
+          "order": 2,
+          "position": 419,
+          "anchor_text": "半头",
+          "anchor_position": 427,
+          "block_id": "0:419:443",
+          "block_start": 419,
+          "block_end": 443,
+          "source": {
+            "url": "https://cdsgyr.6xzb4-onz45-zlnoys.xyz:16677/topic/282008.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:[稳杀半头][3头双数]开000准",
+            "container_id": "rendered-page:https://cdsgyr.6xzb4-onz45-zlnoys.xyz:16677/topic/282008.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "时高时低",
+      "url": "https://cdsgyr.6xzb4-onz45-zlnoys.xyz:16677/topic/328425.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "杀["
+      ],
+      "records": {
+        "216": {
+          "value": "1头单",
+          "order": 1,
+          "position": 8304,
+          "anchor_text": "杀[",
+          "anchor_position": 8310,
+          "block_id": "0:8304:8330",
+          "block_start": 8304,
+          "block_end": 8330,
+          "source": {
+            "url": "https://cdsgyr.6xzb4-onz45-zlnoys.xyz:16677/topic/328425.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "时高时低",
+            "author": "",
+            "snippet": "216期: 杀[1头单][红单]开:0000准",
+            "container_id": "detail_info_forum2_item:0:8053:11555",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "3头单",
+          "order": 1,
+          "position": 8304,
+          "anchor_text": "杀[",
+          "anchor_position": 8310,
+          "block_id": "0:8304:8330",
+          "block_start": 8304,
+          "block_end": 8330,
+          "source": {
+            "url": "https://cdsgyr.6xzb4-onz45-zlnoys.xyz:16677/topic/328425.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "时高时低",
+            "author": "",
+            "snippet": "217期: 杀[3头单][绿单]开:0000准",
+            "container_id": "detail_info_forum2_item:0:8053:11580",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "广东八二",
+      "url": "https://besjbec.6328v-8pwlk-jzhgyz.work:16677/#am",
+      "pick": "top",
+      "parser": "guangdong_baer_left_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头双",
+          "order": 1,
+          "position": 1943947,
+          "anchor_text": "半波半头",
+          "anchor_position": 1938717,
+          "block_id": "2:guangdong-section:1938716:1948161:1943888:1945379",
+          "block_start": 1938716,
+          "block_end": 1948161,
+          "source": {
+            "url": "https://besjbec.6328v-8pwlk-jzhgyz.work:16677/#am",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期杀[4头双]开00准",
+            "container_id": "browser:https://besjbec.6328v-8pwlk-jzhgyz.work:16677/#am:decoded:0:0",
+            "table_column": "left:0",
+            "document_authority": "declared-browser",
+            "rule_id": "guangdong_baer_left_half_head"
+          }
+        },
+        "217": {
+          "value": "2头单",
+          "order": 1,
+          "position": 1939268,
+          "anchor_text": "半波半头",
+          "anchor_position": 1934036,
+          "block_id": "2:guangdong-section:1934035:1943669:1939209:1940792",
+          "block_start": 1934035,
+          "block_end": 1943669,
+          "source": {
+            "url": "https://besjbec.6328v-8pwlk-jzhgyz.work:16677/#am",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期杀[2头单]开00准",
+            "container_id": "browser:https://besjbec.6328v-8pwlk-jzhgyz.work:16677/#am:decoded:0:0",
+            "table_column": "left:0",
+            "document_authority": "declared-browser",
+            "rule_id": "guangdong_baer_left_half_head"
+          }
+        }
+      }
+    },
+    {
+      "name": "山野独行",
+      "url": "https://fbgbfg.www27521c.com:8443/gsb/am05.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头双",
+          "order": 21,
+          "position": 664,
+          "anchor_text": "半头",
+          "anchor_position": 671,
+          "block_id": "0:664:879",
+          "block_start": 664,
+          "block_end": 879,
+          "source": {
+            "url": "https://fbgbfg.www27521c.com:8443/gsb/am05.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "山野独行",
+            "author": "",
+            "snippet": "216期:必杀半头[4头双]开？00对",
+            "container_id": "page:0:0:879",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        },
+        "217": {
+          "value": "1头单",
+          "order": 22,
+          "position": 685,
+          "anchor_text": "半头",
+          "anchor_position": 692,
+          "block_id": "0:685:900",
+          "block_start": 685,
+          "block_end": 900,
+          "source": {
+            "url": "https://fbgbfg.www27521c.com:8443/gsb/am05.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "山野独行",
+            "author": "",
+            "snippet": "217期:必杀半头[1头单]开？00对",
+            "container_id": "page:0:0:900",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "structural"
+          }
+        }
+      }
+    },
+    {
+      "name": "虚情假意",
+      "url": "https://2.www39169b.com:888/gsbl/s23.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "3头单",
+          "order": 20,
+          "position": 9191,
+          "anchor_text": "半头",
+          "anchor_position": 9198,
+          "block_id": "0:9191:9359",
+          "block_start": 9191,
+          "block_end": 9359,
+          "source": {
+            "url": "https://2.www39169b.com:888/gsbl/s23.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "虚情假意",
+            "author": "",
+            "snippet": "216期:必杀半头[3头单]开？00对",
+            "container_id": "page:0:0:14437",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "4头单",
+          "order": 8,
+          "position": 8939,
+          "anchor_text": "半头",
+          "anchor_position": 8946,
+          "block_id": "0:8939:9107",
+          "block_start": 8939,
+          "block_end": 9107,
+          "source": {
+            "url": "https://2.www39169b.com:888/gsbl/s23.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "虚情假意",
+            "author": "",
+            "snippet": "217期:必杀半头[4头单]开？00对",
+            "container_id": "page:0:0:14185",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "荆棘丛生",
+      "url": "https://a.995546.com/gsb.aspx?id=amjyb089",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "1头双",
+          "order": 9,
+          "position": 3169,
+          "anchor_text": "半头",
+          "anchor_position": 3176,
+          "block_id": "0:3169:5143",
+          "block_start": 3169,
+          "block_end": 5143,
+          "source": {
+            "url": "https://a.995546.com/gsb.aspx?id=amjyb089",
+            "kind": "page",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:稳杀半头[1头双]开:？00准",
+            "container_id": "page:https://a.995546.com/gsb.aspx?id=amjyb089:decoded:0:0",
+            "table_column": "",
+            "document_authority": "primary-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "4头单",
+          "order": 10,
+          "position": 3308,
+          "anchor_text": "半头",
+          "anchor_position": 3315,
+          "block_id": "0:3308:5282",
+          "block_start": 3308,
+          "block_end": 5282,
+          "source": {
+            "url": "https://a.995546.com/gsb.aspx?id=amjyb089",
+            "kind": "page",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:稳杀半头[4头单]开:？00准",
+            "container_id": "page:https://a.995546.com/gsb.aspx?id=amjyb089:decoded:0:0",
+            "table_column": "",
+            "document_authority": "primary-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "手舞足蹈",
+      "url": "https://a.909922.com/bbs.aspx?id=amsmh058",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "3头单",
+          "order": 21,
+          "position": 3987,
+          "anchor_text": "半头",
+          "anchor_position": 3994,
+          "block_id": "0:3987:5624",
+          "block_start": 3987,
+          "block_end": 5624,
+          "source": {
+            "url": "https://a.909922.com/bbs.aspx?id=amsmh058",
+            "kind": "page",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:绝杀半头[3头单]开？00准",
+            "container_id": "page:https://a.909922.com/bbs.aspx?id=amsmh058:decoded:0:0",
+            "table_column": "",
+            "document_authority": "primary-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "0头双",
+          "order": 22,
+          "position": 4074,
+          "anchor_text": "半头",
+          "anchor_position": 4081,
+          "block_id": "0:4074:5711",
+          "block_start": 4074,
+          "block_end": 5711,
+          "source": {
+            "url": "https://a.909922.com/bbs.aspx?id=amsmh058",
+            "kind": "page",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:绝杀半头[0头双]开？00准",
+            "container_id": "page:https://a.909922.com/bbs.aspx?id=amsmh058:decoded:0:0",
+            "table_column": "",
+            "document_authority": "primary-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "跑狗论坛",
+      "url": "https://peubwtt.t3vdj-h3294-qpbmtj.work:16677/#am",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "1头单",
+          "order": 1,
+          "position": 284965,
+          "anchor_text": "半头",
+          "anchor_position": 284972,
+          "block_id": "0:284965:284993",
+          "block_start": 284965,
+          "block_end": 284993,
+          "source": {
+            "url": "https://peubwtt.t3vdj-h3294-qpbmtj.work:16677/#am",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "澳门跑狗",
+            "author": "",
+            "snippet": "216期:绝杀半头[1头单]开？00赢！",
+            "container_id": "dz_content08:0:284956:285323",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "4头单",
+          "order": 1,
+          "position": 284508,
+          "anchor_text": "半头",
+          "anchor_position": 284515,
+          "block_id": "0:284508:284535",
+          "block_start": 284508,
+          "block_end": 284535,
+          "source": {
+            "url": "https://peubwtt.t3vdj-h3294-qpbmtj.work:16677/#am",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "澳门跑狗",
+            "author": "",
+            "snippet": "217期:绝杀半头[4头单]开？00赢！",
+            "container_id": "dz_content08:0:284498:284893",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "全网独有",
+      "url": "https://njkzdcwj.nql6i-8t6su-hytife.xyz:16677/topic/324619.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "杀["
+      ],
+      "records": {
+        "216": {
+          "value": "4头单",
+          "order": 1,
+          "position": 8704,
+          "anchor_text": "杀[",
+          "anchor_position": 8708,
+          "block_id": "0:8704:8728",
+          "block_start": 8704,
+          "block_end": 8728,
+          "source": {
+            "url": "https://njkzdcwj.nql6i-8t6su-hytife.xyz:16677/topic/324619.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "全网独有",
+            "author": "",
+            "snippet": "216期杀[4头单]杀[红双]开0000准",
+            "container_id": "detail_info_forum2_item:0:8459:15719",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "1头双",
+          "order": 1,
+          "position": 8704,
+          "anchor_text": "杀[",
+          "anchor_position": 8708,
+          "block_id": "0:8704:8728",
+          "block_start": 8704,
+          "block_end": 8728,
+          "source": {
+            "url": "https://njkzdcwj.nql6i-8t6su-hytife.xyz:16677/topic/324619.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "全网独有",
+            "author": "",
+            "snippet": "217期杀[1头双]杀[红单]开0000准",
+            "container_id": "detail_info_forum2_item:0:8459:15742",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "相亲相爱",
+      "url": "https://993345.com/gsb.aspx?id=024",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "1头双",
+          "order": 21,
+          "position": 3592,
+          "anchor_text": "半头",
+          "anchor_position": 3600,
+          "block_id": "0:3592:5147",
+          "block_start": 3592,
+          "block_end": 5147,
+          "source": {
+            "url": "https://993345.com/gsb.aspx?id=024",
+            "kind": "page",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:✿稳杀半头✿[1头双]开？00对",
+            "container_id": "page:https://993345.com/gsb.aspx?id=024:decoded:0:0",
+            "table_column": "",
+            "document_authority": "primary-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "2头双",
+          "order": 22,
+          "position": 3676,
+          "anchor_text": "半头",
+          "anchor_position": 3684,
+          "block_id": "0:3676:5231",
+          "block_start": 3676,
+          "block_end": 5231,
+          "source": {
+            "url": "https://993345.com/gsb.aspx?id=024",
+            "kind": "page",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:✿稳杀半头✿[2头双]开？00对",
+            "container_id": "page:https://993345.com/gsb.aspx?id=024:decoded:0:0",
+            "table_column": "",
+            "document_authority": "primary-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "二肖八码",
+      "url": "https://eudkyp.luqv0-yf46s-xrnpkz.xyz:16677/topic/324148.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "杀["
+      ],
+      "records": {
+        "216": {
+          "value": "3头双",
+          "order": 1,
+          "position": 8713,
+          "anchor_text": "杀[",
+          "anchor_position": 8718,
+          "block_id": "0:8713:8737",
+          "block_start": 8713,
+          "block_end": 8737,
+          "source": {
+            "url": "https://eudkyp.luqv0-yf46s-xrnpkz.xyz:16677/topic/324148.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "内幕资料[半波半头]免费公开",
+            "author": "",
+            "snippet": "216期:杀[3头双][绿双]开0000准",
+            "container_id": "detail_info_forum2_item:0:8466:17114",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "2头双",
+          "order": 1,
+          "position": 8713,
+          "anchor_text": "杀[",
+          "anchor_position": 8718,
+          "block_id": "0:8713:8737",
+          "block_start": 8713,
+          "block_end": 8737,
+          "source": {
+            "url": "https://eudkyp.luqv0-yf46s-xrnpkz.xyz:16677/topic/324148.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "内幕资料[半波半头]免费公开",
+            "author": "",
+            "snippet": "217期:杀[2头双][绿单]开0000准",
+            "container_id": "detail_info_forum2_item:0:8466:17137",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "嗜此不疲",
+      "url": "https://alvjak.uh1h2-ru1qt-cyscbt.xyz:16677/topic/328416.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "杀["
+      ],
+      "records": {
+        "216": {
+          "value": "3头单",
+          "order": 1,
+          "position": 8295,
+          "anchor_text": "杀[",
+          "anchor_position": 8299,
+          "block_id": "0:8295:8319",
+          "block_start": 8295,
+          "block_end": 8319,
+          "source": {
+            "url": "https://alvjak.uh1h2-ru1qt-cyscbt.xyz:16677/topic/328416.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "嗜此不疲",
+            "author": "",
+            "snippet": "216期杀[3头单]杀[红单]开0000准",
+            "container_id": "detail_info_forum2_item:0:8038:24343",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "0头双",
+          "order": 1,
+          "position": 8295,
+          "anchor_text": "杀[",
+          "anchor_position": 8299,
+          "block_id": "0:8295:8319",
+          "block_start": 8295,
+          "block_end": 8319,
+          "source": {
+            "url": "https://alvjak.uh1h2-ru1qt-cyscbt.xyz:16677/topic/328416.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "嗜此不疲",
+            "author": "",
+            "snippet": "217期杀[0头双]杀[蓝双]开0000准",
+            "container_id": "detail_info_forum2_item:0:8038:24366",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "奶香萌男",
+      "url": "https://rqvvaxwq.w30m7-xd23l-ebrbbj.xyz/topic/768624.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "2头单",
+          "order": 1,
+          "position": 59,
+          "anchor_text": "半头",
+          "anchor_position": 67,
+          "block_id": "0:59:83",
+          "block_start": 59,
+          "block_end": 83,
+          "source": {
+            "url": "https://rqvvaxwq.w30m7-xd23l-ebrbbj.xyz/topic/768624.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:[绝杀半头][2头单]开0000准",
+            "container_id": "rendered-page:https://rqvvaxwq.w30m7-xd23l-ebrbbj.xyz/topic/768624.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "2头双",
+          "order": 1,
+          "position": 59,
+          "anchor_text": "半头",
+          "anchor_position": 67,
+          "block_id": "0:59:83",
+          "block_start": 59,
+          "block_end": 83,
+          "source": {
+            "url": "https://rqvvaxwq.w30m7-xd23l-ebrbbj.xyz/topic/768624.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:[绝杀半头][2头双]开0000准",
+            "container_id": "rendered-page:https://rqvvaxwq.w30m7-xd23l-ebrbbj.xyz/topic/768624.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "一本万利秒杀半头",
+      "url": "https://mflmcobome.26222hi.app:2569/htm/bbs/top080.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头单",
+          "order": 22,
+          "position": 4416,
+          "anchor_text": "半头",
+          "anchor_position": 4425,
+          "block_id": "0:4416:4796",
+          "block_start": 4416,
+          "block_end": 4796,
+          "source": {
+            "url": "https://mflmcobome.26222hi.app:2569/htm/tz/bbs/080.html",
+            "kind": "page",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:❄️绝杀半头❄️开:00准 [4头单]",
+            "container_id": "page:https://mflmcobome.26222hi.app:2569/htm/tz/bbs/080.html:decoded:0:0",
+            "table_column": "",
+            "document_authority": "primary-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "4头单",
+          "order": 23,
+          "position": 4562,
+          "anchor_text": "半头",
+          "anchor_position": 4571,
+          "block_id": "0:4562:4942",
+          "block_start": 4562,
+          "block_end": 4942,
+          "source": {
+            "url": "https://mflmcobome.26222hi.app:2569/htm/tz/bbs/080.html",
+            "kind": "page",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:❄️绝杀半头❄️开:00准 [4头单]",
+            "container_id": "page:https://mflmcobome.26222hi.app:2569/htm/tz/bbs/080.html:decoded:0:0",
+            "table_column": "",
+            "document_authority": "primary-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "山高水厂",
+      "url": "https://opfeal.zbwno-faau4-zilwkd.xyz:16677/topic/930772.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "4头单",
+          "order": 1,
+          "position": 72,
+          "anchor_text": "半头",
+          "anchor_position": 81,
+          "block_id": "0:72:97",
+          "block_start": 72,
+          "block_end": 97,
+          "source": {
+            "url": "https://opfeal.zbwno-faau4-zilwkd.xyz:16677/topic/930772.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:～～绝杀半头～～[4头单]开000对",
+            "container_id": "rendered-page:https://opfeal.zbwno-faau4-zilwkd.xyz:16677/topic/930772.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "3头单",
+          "order": 1,
+          "position": 72,
+          "anchor_text": "半头",
+          "anchor_position": 81,
+          "block_id": "0:72:97",
+          "block_start": 72,
+          "block_end": 97,
+          "source": {
+            "url": "https://opfeal.zbwno-faau4-zilwkd.xyz:16677/topic/930772.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:～～绝杀半头～～[3头单]开000对",
+            "container_id": "rendered-page:https://opfeal.zbwno-faau4-zilwkd.xyz:16677/topic/930772.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "诸葛亮",
+      "url": "https://fflkqo.fvi38-kyblx-znvboh.work:17466/topic/1008749.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "0头单",
+          "order": 1,
+          "position": 13004,
+          "anchor_text": "半头",
+          "anchor_position": 13011,
+          "block_id": "0:13004:13028",
+          "block_start": 13004,
+          "block_end": 13028,
+          "source": {
+            "url": "https://fflkqo.fvi38-kyblx-znvboh.work:17466/topic/1008749.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "诸葛亮",
+            "author": "",
+            "snippet": "216期[绝杀半头][0头单]开0000准",
+            "container_id": "topic-content:0:13003:21782",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "1头单",
+          "order": 1,
+          "position": 13004,
+          "anchor_text": "半头",
+          "anchor_position": 13011,
+          "block_id": "0:13004:13028",
+          "block_start": 13004,
+          "block_end": 13028,
+          "source": {
+            "url": "https://fflkqo.fvi38-kyblx-znvboh.work:17466/topic/1008749.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "诸葛亮",
+            "author": "",
+            "snippet": "217期[绝杀半头][1头单]开0000准",
+            "container_id": "topic-content:0:13003:21805",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "凌杂米盐",
+      "url": "https://sadoleu.rznla-fgwyr-nzqalp.xyz:16677/topic/656863.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "+++杀"
+      ],
+      "records": {
+        "216": {
+          "value": "3头单",
+          "order": 1,
+          "position": 9418,
+          "anchor_text": "+++杀",
+          "anchor_position": 9428,
+          "block_id": "0:9418:9443",
+          "block_start": 9418,
+          "block_end": 9443,
+          "source": {
+            "url": "https://sadoleu.rznla-fgwyr-nzqalp.xyz:16677/topic/656863.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "凌杂米盐",
+            "author": "",
+            "snippet": "216期杀[3头单]+++杀[绿双]开00准",
+            "container_id": "detail_info_forum2_item:0:9167:16528",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "1头单",
+          "order": 1,
+          "position": 9418,
+          "anchor_text": "+++杀",
+          "anchor_position": 9428,
+          "block_id": "0:9418:9443",
+          "block_start": 9418,
+          "block_end": 9443,
+          "source": {
+            "url": "https://sadoleu.rznla-fgwyr-nzqalp.xyz:16677/topic/656863.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "凌杂米盐",
+            "author": "",
+            "snippet": "217期杀[1头单]+++杀[蓝双]开00准",
+            "container_id": "detail_info_forum2_item:0:9167:16554",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "餐云卧石",
+      "url": "https://kxglojup.fao5v-9u0oz-okhubb.work:16677/topic/782068.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "0头单",
+          "order": 337,
+          "position": 6919,
+          "anchor_text": "半头",
+          "anchor_position": 6926,
+          "block_id": "0:6919:8716",
+          "block_start": 6919,
+          "block_end": 8716,
+          "source": {
+            "url": "https://kxglojup.fao5v-9u0oz-okhubb.work:16677/topic/782068.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:必杀半头[0头单]开00对",
+            "container_id": "rendered-page:https://kxglojup.fao5v-9u0oz-okhubb.work:16677/topic/782068.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "1头单",
+          "order": 338,
+          "position": 6941,
+          "anchor_text": "半头",
+          "anchor_position": 6948,
+          "block_id": "0:6941:8738",
+          "block_start": 6941,
+          "block_end": 8738,
+          "source": {
+            "url": "https://kxglojup.fao5v-9u0oz-okhubb.work:16677/topic/782068.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:必杀半头[1头单]开00对",
+            "container_id": "rendered-page:https://kxglojup.fao5v-9u0oz-okhubb.work:16677/topic/782068.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "正法眼藏",
+      "url": "https://xuknerw.fu5qv-a7f7o-nxmebt.work:16633/topic/272899.html",
+      "pick": "top",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "3头单",
+          "order": 1,
+          "position": 2419,
+          "anchor_text": "半头",
+          "anchor_position": 2427,
+          "block_id": "0:2419:2444",
+          "block_start": 2419,
+          "block_end": 2444,
+          "source": {
+            "url": "https://xuknerw.fu5qv-a7f7o-nxmebt.work:16633/topic/272899.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "作者:正法眼藏",
+            "snippet": "216期:★必杀半头★[3头单]开0000对",
+            "container_id": "topic-content:0:2418:11625",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "0头单",
+          "order": 1,
+          "position": 2419,
+          "anchor_text": "半头",
+          "anchor_position": 2427,
+          "block_id": "0:2419:2444",
+          "block_start": 2419,
+          "block_end": 2444,
+          "source": {
+            "url": "https://xuknerw.fu5qv-a7f7o-nxmebt.work:16633/topic/272899.html",
+            "kind": "browser",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "作者:正法眼藏",
+            "snippet": "217期:★必杀半头★[0头单]开0000对",
+            "container_id": "topic-content:0:2418:11649",
+            "table_column": "",
+            "document_authority": "declared-rendered-container",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "以血洗血",
+      "url": "https://xuknerw.fu5qv-a7f7o-nxmebt.work:16633/topic/272856.html",
+      "pick": "bottom",
+      "parser": "strict_half_head",
+      "anchors": [
+        "半头"
+      ],
+      "records": {
+        "216": {
+          "value": "3头双",
+          "order": 215,
+          "position": 4658,
+          "anchor_text": "半头",
+          "anchor_position": 4665,
+          "block_id": "0:4658:4685",
+          "block_start": 4658,
+          "block_end": 4685,
+          "source": {
+            "url": "https://xuknerw.fu5qv-a7f7o-nxmebt.work:16633/topic/272856.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:必杀半头[3头双]开？00准",
+            "container_id": "rendered-page:https://xuknerw.fu5qv-a7f7o-nxmebt.work:16633/topic/272856.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        },
+        "217": {
+          "value": "0头单",
+          "order": 216,
+          "position": 4679,
+          "anchor_text": "半头",
+          "anchor_position": 4686,
+          "block_id": "0:4679:4706",
+          "block_start": 4679,
+          "block_end": 4706,
+          "source": {
+            "url": "https://xuknerw.fu5qv-a7f7o-nxmebt.work:16633/topic/272856.html",
+            "kind": "browser-text",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:必杀半头[0头单]开？00准",
+            "container_id": "rendered-page:https://xuknerw.fu5qv-a7f7o-nxmebt.work:16633/topic/272856.html",
+            "table_column": "",
+            "document_authority": "declared-rendered-page",
+            "rule_id": "declared_special"
+          }
+        }
+      }
+    },
+    {
+      "name": "深圳福坛",
+      "url": "https://128.241.252.220:9201/tz/bbsjs/080.html",
+      "pick": "bottom",
+      "parser": "shenzhen_futan_half_head",
+      "anchors": [
+        "深圳福坛",
+        "绝杀半头"
+      ],
+      "records": {
+        "216": {
+          "value": "0头单",
+          "order": 63,
+          "position": 11916,
+          "anchor_text": "深圳福坛【绝杀半头】",
+          "anchor_position": 1463,
+          "block_id": "shenzhen-futan:1434:12061",
+          "block_start": 1434,
+          "block_end": 12061,
+          "source": {
+            "url": "https://128.241.252.220:9201/tz/bbsjs/080.html",
+            "kind": "page",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "216期:🔥绝杀半头🔥开:00准 [0头单]",
+            "container_id": "page:https://128.241.252.220:9201/tz/bbsjs/080.html:decoded:0:0",
+            "table_column": "target-table:0",
+            "document_authority": "primary-page",
+            "rule_id": "shenzhen_futan_half_head"
+          }
+        },
+        "217": {
+          "value": "0头双",
+          "order": 64,
+          "position": 12083,
+          "anchor_text": "深圳福坛【绝杀半头】",
+          "anchor_position": 1463,
+          "block_id": "shenzhen-futan:1434:12228",
+          "block_start": 1434,
+          "block_end": 12228,
+          "source": {
+            "url": "https://128.241.252.220:9201/tz/bbsjs/080.html",
+            "kind": "page",
+            "record_id": "",
+            "record_path": "",
+            "route_type": "",
+            "url_record_id": "",
+            "api_url": "",
+            "title": "",
+            "author": "",
+            "snippet": "217期:🔥绝杀半头🔥开:00准 [0头双]",
+            "container_id": "page:https://128.241.252.220:9201/tz/bbsjs/080.html:decoded:0:0",
+            "table_column": "target-table:0",
+            "document_authority": "primary-page",
+            "rule_id": "shenzhen_futan_half_head"
+          }
+        }
+      }
+    }
+  ],
+  "failures": [
+    {
+      "name": "完颜打顷",
+      "error": "解析失败:TimeoutError:",
+      "url": "https://e7rzi6.t5ti5-at6k5-fugxpa.work/topic/206464.html"
+    },
+    {
+      "name": "一言为定",
+      "error": "解析失败:TimeoutError:",
+      "url": "https://e7rzi6.vkzoy-tj5wf-umxqmx.work/topic/453616.html"
+    },
+    {
+      "name": "萌小萌",
+      "error": "单站总超时:已停止后续请求",
+      "url": "https://xmdrbud.eqpr2-6tpvi-pjqztv.xyz:16677/"
+    },
+    {
+      "name": "星移物换",
+      "error": "解析失败:TimeoutError:",
+      "url": "https://ocnrhq.du156-vb27w-tmhsed.xyz:16677/"
+    }
+  ]
+}
