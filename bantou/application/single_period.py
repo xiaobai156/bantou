@@ -79,6 +79,7 @@ def _merge_retry_rows(
             existing_success.append(row)
             existing_success_names.add(row[0])
     retry_success_names = {row[0] for row in retry_rows}
+    retry_success_urls = {canonical_url(row[3]) for row in retry_rows}
     retry_failures = {
         name: (name, category, reason, url)
         for name, category, reason, url in read_fail_entries_from_lines(retry_fail_lines)
@@ -86,7 +87,7 @@ def _merge_retry_rows(
     existing_failures = {
         name: (name, category, reason, url)
         for name, category, reason, url in read_fail_entries(fail_path)
-        if name not in retry_success_names
+        if name not in retry_success_names and canonical_url(url) not in retry_success_urls
     }
     existing_failures.update(retry_failures)
     lines = ["网站名称\t分类\t原因\t网址"]
@@ -136,7 +137,25 @@ def _prepare_cache_payload(
             payload, issues[0], sites, success_rows, failures
         )
     if args.retry_fail:
-        return merge_cache_updates(payload, success_rows, failures)
+        updated, conflicts = merge_cache_updates(payload, success_rows, failures)
+        if conflicts:
+            details = "；".join(f"{name}：{reason}" for name, reason in sorted(conflicts.items()))
+            raise CacheValidationError(f"重抓成功但缓存更新未完成：{details}")
+        period_text = str(issues[0])
+        missing = [
+            name for name, (_site, records) in success_rows.items()
+            if not any(
+                isinstance(item, dict)
+                and period_text in item.get("records", {})
+                for item in updated.get("sites", [])
+                if item.get("name") == name
+            )
+        ]
+        if missing:
+            raise CacheValidationError(
+                "重抓成功但缓存缺少目标期记录：" + "、".join(sorted(missing))
+            )
+        return updated, {}
     if len(issues) == 1:
         return roll_cache_payload(payload, issues[0], sites, success_rows, failures)
     raise CacheValidationError(
