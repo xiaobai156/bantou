@@ -12,26 +12,26 @@ if not defined PY_CMD (
   pause
   exit /b 1
 )
-setlocal
+setlocal EnableDelayedExpansion
 cd /d "%~dp0"
 set "PYTHONUTF8=1"
 set "PYTHONIOENCODING=utf-8"
 
 echo Input one period to retry its failed sites, for example 251
 set /p ISSUE=
-if "%ISSUE%"=="" (
+if not defined ISSUE (
   echo Period is required.
   pause
   exit /b 1
 )
-echo %ISSUE%| findstr /r /x "[0-9][0-9]*" >nul
+echo(!ISSUE!| findstr /r /x "[0-9][0-9]*" >nul
 if errorlevel 1 (
   echo Period must contain digits only.
   pause
   exit /b 1
 )
 
-%PY_CMD% "%~dp0bantou_crawler.py" "%ISSUE%" --retry-fail --write-backup --workers 1
+%PY_CMD% "%~dp0bantou_crawler.py" "!ISSUE!" --retry-fail --write-backup --workers 1
 if errorlevel 1 (
   echo.
   echo Failed-site retry did not complete. Check the output above.

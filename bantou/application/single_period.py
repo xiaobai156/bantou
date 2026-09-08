@@ -8,6 +8,7 @@ import json
 import sys
 import time
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from ..cache.builders import build_bootstrap_cache_payload
 from ..cache.legacy import migrate_legacy_cache_roll_payload
@@ -56,6 +57,12 @@ def _success_bytes(rows: list[tuple[str, str, str, str]]) -> bytes:
     return ("\n".join(build_success_output_lines(rows)) + "\n").encode("utf-8-sig")
 
 
+def _failure_url_identity(url: str) -> str:
+    parsed = urlsplit(url.strip())
+    base = canonical_url(url)
+    return base + (f"#{parsed.fragment}" if parsed.fragment else "")
+
+
 def _failure_bytes(lines: list[str]) -> bytes | None:
     formatted = spaced_failure_lines(lines)
     if len(formatted) <= 1:
@@ -79,7 +86,7 @@ def _merge_retry_rows(
             existing_success.append(row)
             existing_success_names.add(row[0])
     retry_success_names = {row[0] for row in retry_rows}
-    retry_success_urls = {canonical_url(row[3]) for row in retry_rows}
+    retry_success_urls = {_failure_url_identity(row[3]) for row in retry_rows}
     retry_failures = {
         name: (name, category, reason, url)
         for name, category, reason, url in read_fail_entries_from_lines(retry_fail_lines)
@@ -87,7 +94,7 @@ def _merge_retry_rows(
     existing_failures = {
         name: (name, category, reason, url)
         for name, category, reason, url in read_fail_entries(fail_path)
-        if name not in retry_success_names and canonical_url(url) not in retry_success_urls
+        if name not in retry_success_names and _failure_url_identity(url) not in retry_success_urls
     }
     existing_failures.update(retry_failures)
     lines = ["网站名称\t分类\t原因\t网址"]
@@ -138,9 +145,6 @@ def _prepare_cache_payload(
         )
     if args.retry_fail:
         updated, conflicts = merge_cache_updates(payload, success_rows, failures)
-        if conflicts:
-            details = "；".join(f"{name}：{reason}" for name, reason in sorted(conflicts.items()))
-            raise CacheValidationError(f"重抓成功但缓存更新未完成：{details}")
         period_text = str(issues[0])
         missing = [
             name for name, (_site, records) in success_rows.items()
@@ -152,10 +156,8 @@ def _prepare_cache_payload(
             )
         ]
         if missing:
-            raise CacheValidationError(
-                "重抓成功但缓存缺少目标期记录：" + "、".join(sorted(missing))
-            )
-        return updated, {}
+            conflicts.update({name: "缓存缺少目标期记录" for name in missing})
+        return updated, conflicts
     if len(issues) == 1:
         return roll_cache_payload(payload, issues[0], sites, success_rows, failures)
     raise CacheValidationError(
@@ -170,7 +172,7 @@ def _prepare_cache_update(
     rank_rows: list[tuple[str, str, str, str]],
     cache_rows: dict[str, tuple[Site, dict[int, Match]]],
     fail_lines: list[str],
-) -> tuple[list[tuple[str, str, str, str]], dict[str, tuple[Site, dict[int, Match]]], list[str], dict[str, object] | None]:
+) -> tuple[list[tuple[str, str, str, str]], dict[str, tuple[Site, dict[int, Match]]], list[str], dict[str, object] | None, dict[str, str]]:
     payload, conflicts = _prepare_cache_payload(
         args, issues, sites, cache_rows, _failure_rows(fail_lines)
     )
@@ -180,7 +182,7 @@ def _prepare_cache_update(
             + "；".join(f"{name}：{reason}" for name, reason in sorted(conflicts.items())),
             file=sys.stderr,
         )
-    return rank_rows, cache_rows, fail_lines, payload
+    return rank_rows, cache_rows, fail_lines, payload, conflicts
 
 
 def _run_sites(
@@ -270,9 +272,17 @@ def _finalize_run(
     with formal_write_lock():
         cache_update_error: CacheValidationError | None = None
         try:
-            rank_rows, cache_rows, fail_lines, cache_payload = _prepare_cache_update(
+            rank_rows, cache_rows, fail_lines, cache_payload, cache_conflicts = _prepare_cache_update(
                 args, issues, sites, rank_rows, cache_rows, fail_lines
             )
+            if cache_conflicts:
+                cache_update_error = CacheValidationError(
+                    "缓存更新未完成："
+                    + "；".join(
+                        f"{name}：{reason}"
+                        for name, reason in sorted(cache_conflicts.items())
+                    )
+                )
         except CacheValidationError as exc:
             cache_payload = None
             cache_update_error = exc
