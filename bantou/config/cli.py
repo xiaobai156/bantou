@@ -1,20 +1,7 @@
 import argparse
 
-from ..site_profiles import DEFAULT_KEYWORDS
 from ..text import VALUE_RE, normalize_text
 from .sites import DEFAULT_SITES_FILE
-
-
-def prompt_if_missing(value: str | None, message: str, default: str | None = None) -> str:
-    if value:
-        return value
-    suffix = f"（默认 {default}）" if default else ""
-    answer = input(f"{message}{suffix}: ").strip()
-    if answer:
-        return answer
-    if default is not None:
-        return default
-    raise ValueError(f"{message}不能为空")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -29,14 +16,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("-t", "--target", help="可选筛选目标，例如：2头双；不填就抓网站实际写的头")
     parser.add_argument("-i", "--issues", help="期数，例如：120 或 094-120")
     parser.add_argument("-s", "--sites", help="网站列表 JSON")
-    parser.add_argument("--period", type=int, help="重复检测模式：当前期数 N，例如 123")
-    parser.add_argument("--periods", type=int, default=6, help="重复检测模式：对比多少期，默认 6")
     parser.add_argument("--success-out", default="", help="成功结果 txt；不填则自动生成 N期-半头.txt")
     parser.add_argument("--fail-out", default="", help="失败结果 txt；不填则自动生成 N期-半头-失败.txt")
     parser.add_argument("--retry-fail", action="store_true", help="只重跑上次失败结果里的网站")
     parser.add_argument("--retry-fail-file", default="", help="指定要重跑的失败结果 txt；默认使用本期半头失败文件")
-    parser.add_argument("--debug-dir", default="debug", help=argparse.SUPPRESS)
-    parser.add_argument("--no-debug", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--timeout", type=int, default=20, help="单个请求超时秒数")
     parser.add_argument("--site-timeout", type=int, default=60, help="单站总超时秒数，默认 60")
     parser.add_argument("--delay", type=float, default=0.0, help="每个网站之间暂停秒数，默认 0")
@@ -50,11 +33,6 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--rebuild-cache", action="store_true", help="已停用：缓存只允许按当天单期顺序滚动")
     parser.add_argument("--diagnose", action="store_true", help="全站真实抓取但不写成功TXT、失败TXT或缓存")
     parser.add_argument("--multi-mode", action="store_true", help=argparse.SUPPRESS)
-    parser.add_argument(
-        "--keywords",
-        default=",".join(DEFAULT_KEYWORDS),
-        help="栏目关键词，逗号分隔；传空字符串可关闭关键词过滤",
-    )
     parser.set_defaults(verify_ssl=True)
     parser.add_argument("--verify-ssl", dest="verify_ssl", action="store_true", help="校验证书（默认开启）")
     parser.add_argument("--no-verify-ssl", dest="verify_ssl", action="store_false", help="不校验证书；仅人工确认需要时使用")

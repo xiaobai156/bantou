@@ -12,15 +12,14 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-from bantou.cache import (
+from bantou.cache.validation import (
     CacheValidationError,
     validate_cache_payload,
 )
-from bantou.config import read_sites
-from bantou.domain import Site
-from bantou.outputs import write_transaction
+from bantou.config.sites import read_sites
+from bantou.domain.models import Site
+from bantou.outputs.transaction import write_transaction
 from bantou.paths import DEFAULT_SITES_FILE, DUPLICATE_BACKUP_FILE, RESULT_DIR
-
 
 SEPARATE_DUPLICATE_STAT_NAMES = {"山高水厂", "跑狗论坛"}
 
@@ -159,7 +158,8 @@ def evaluate_cache(
     all_issues = tuple(int(issue) for issue in validated["issues"])
     issues = all_issues[-window:]
     cached_items = validated["sites"]
-    assert isinstance(cached_items, list)
+    if not isinstance(cached_items, list):
+        raise CacheValidationError("缓存 sites 必须是数组")
     by_name = {str(item["name"]): item for item in cached_items}
     configured_names = {site.name for site in sites}
     missing_sites: list[str] = []
@@ -181,7 +181,6 @@ def evaluate_cache(
             missing_sites.append(
                 f"{site.name}：缓存缺少 {','.join(f'{issue}期' for issue in absent)}"
             )
-            continue
         eligible[site.name] = records
 
     for cached_name in sorted(set(by_name) - configured_names):

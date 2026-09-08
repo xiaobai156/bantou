@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 import base64
+import binascii
 import html
 import json
 import re
 from urllib.parse import urlparse
 
-from ...domain import Site, SourceDocument
-from ...site_profiles import (
+from ...domain.models import Site, SourceDocument
+from ...site_profiles.registry import (
     DYNAMIC_RECORD_AUTHOR_ALIASES,
     DYNAMIC_RECORD_SUBTOPIC_ALIASES,
     DYNAMIC_RECORD_TOPIC_ALIASES,
@@ -15,6 +16,11 @@ from ...text import html_to_text, normalize_text
 from .routes import dynamic_record_scope
 
 DEFAULT_KEYWORDS = ("杀半头", "秒杀半头", "必杀半头", "绝杀半头", "稳杀半头")
+
+
+class DynamicBrowserFallbackRequired(ValueError):
+    """Exact dynamic API is absent or empty, so browser rendering is allowed."""
+
 
 def iter_target_records(value, target_id: str, path: str = "root"):
     if isinstance(value, dict):
@@ -64,7 +70,7 @@ def iter_json_payloads(document: SourceDocument):
 
 
 def dynamic_browser_fallback_allowed(error: Exception) -> bool:
-    return "未找到唯一结构化记录" in str(error)
+    return isinstance(error, DynamicBrowserFallbackRequired) or "缺少正文内容" in str(error)
 
 
 def decode_article_field(value: object, field_name: str) -> str:
@@ -73,7 +79,7 @@ def decode_article_field(value: object, field_name: str) -> str:
     try:
         raw = base64.b64decode(value, validate=True)
         return raw.decode("utf-8", errors="strict")
-    except Exception as exc:
+    except (binascii.Error, UnicodeDecodeError, ValueError) as exc:
         raise ValueError(f"动态记录 {field_name} 不是有效 Base64 UTF-8") from exc
 
 
@@ -83,7 +89,9 @@ def target_record_content(record: dict, record_kind: str) -> str:
         if isinstance(value, str) and value.strip():
             return value
     if record_kind == "article":
-        return decode_article_field(record.get("html"), "html")
+        encoded_html = record.get("html")
+        if isinstance(encoded_html, str) and encoded_html.strip():
+            return decode_article_field(encoded_html, "html")
     return ""
 
 

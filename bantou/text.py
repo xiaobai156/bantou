@@ -3,7 +3,6 @@ import html
 import re
 from html.parser import HTMLParser
 
-
 ANY_VALUE_RE = re.compile(r"(?<!\d)(\d{1,2})\s*头\s*(单|双)")
 VALUE_RE = re.compile(r"(?<!\d)([0-4])\s*头\s*(单|双)")
 ISSUE_RE = re.compile(r"(?<!\d)(\d{1,4})\s*期")
@@ -14,7 +13,7 @@ TABLE_ROW_RE = re.compile(r"<tr\b[^>]*>(.*?)</tr>", re.I | re.S)
 TABLE_RE = re.compile(r"<table\b[^>]*>(.*?)</table>", re.I | re.S)
 TABLE_CELL_RE = re.compile(r"<t[dh]\b[^>]*>(.*?)</t[dh]>", re.I | re.S)
 FULLWIDTH_DIGITS = str.maketrans("０１２３４５６７８９", "0123456789")
-FULLWIDTH_DIGIT_BY_ASCII = dict(zip("0123456789", "０１２３４５６７８９"))
+FULLWIDTH_DIGIT_BY_ASCII = dict(zip("0123456789", "０１２３４５６７８９", strict=True))
 CHAR_TRANS = str.maketrans(
     {
         "【": "[",
@@ -301,7 +300,8 @@ def extract_half_head_table_texts(document: str) -> list[str]:
                 continue
 
             issue_match = ISSUE_RE.search(issue_cell)
-            assert issue_match is not None
+            if issue_match is None:
+                continue
 
             for index in half_head_indexes:
                 if index >= len(cells):

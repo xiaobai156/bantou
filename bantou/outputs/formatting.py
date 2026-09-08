@@ -3,14 +3,14 @@
 
 from __future__ import annotations
 
-import re
 import sys
 from pathlib import Path
 
-from ..domain import Site
+from ..domain.models import Site
 from ..paths import FAILURE_RESULT_DIR, RESULT_DIR
 from ..text import VALUE_RE, normalize_text
-from .transaction import write_transaction
+
+LEGACY_SUCCESS_FOOTER_LINES = ("帅铁", "白少华")
 
 
 def failure_category(reason: str) -> str:
@@ -77,9 +77,18 @@ def read_success_data(path: Path, issue_text: str) -> list[tuple[str, str, str, 
     rows: list[tuple[str, str, str, str]] = []
     for line in path.read_text(encoding="utf-8-sig").splitlines():
         stripped = line.strip()
-        if not stripped or stripped == "帅铁" or stripped.startswith("======") or stripped.startswith("排名\t"):
+        if stripped.startswith("======") or stripped in {
+            "内容\t次数\t排名",
+            "排名\t内容\t数量",
+        }:
+            break
+        if (
+            not stripped
+            or stripped in LEGACY_SUCCESS_FOOTER_LINES
+            or stripped.startswith("排名\t")
+        ):
             continue
-        parts = line.split("\t")
+        parts = stripped.split(maxsplit=1)
         if len(parts) >= 2 and VALUE_RE.fullmatch(normalize_text(parts[0])):
             rows.append((parts[1].strip(), issue_text, parts[0].strip(), ""))
     return rows
@@ -113,14 +122,6 @@ def spaced_failure_lines(lines: list[str]) -> list[str]:
     return formatted
 
 
-def write_failure_lines(path: Path, lines: list[str]) -> None:
-    formatted = spaced_failure_lines(lines)
-    if len(formatted) <= 1:
-        write_transaction({path: None})
-        return
-    write_transaction({path: ("\n".join(formatted) + "\n").encode("utf-8-sig")})
-
-
 def output_path(value: str, base_dir: Path = RESULT_DIR) -> Path:
     path = Path(value)
     if path.is_absolute():
@@ -138,29 +139,30 @@ def default_fail_path_for_issues(issues_label: str, override: str = "") -> Path:
     return output_path(override or fail_name, FAILURE_RESULT_DIR)
 
 
-def issue_sort_key(issue_text: str) -> int:
-    match = re.search(r"\d+", issue_text)
-    return int(match.group(0)) if match else 0
-
-
-def build_rank_lines(rows: list[tuple[str, str, str, str]], title: str = "当前排行榜") -> list[str]:
+def build_rank_lines(rows: list[tuple[str, str, str, str]]) -> list[str]:
     if not rows:
         return []
     by_value: dict[str, list[str]] = {}
     for site_name, _issue_text, value, _url in rows:
         by_value.setdefault(value, []).append(site_name)
-    lines = [f"====== {title} ======", "排名\t内容\t数量"]
-    for rank, (value, site_names) in enumerate(
-        sorted(by_value.items(), key=lambda item: (-len(item[1]), item[0])), start=1
+    lines = ["内容\t次数\t排名"]
+    rank = 0
+    previous_count = None
+    for value, site_names in sorted(
+        by_value.items(), key=lambda item: (-len(item[1]), item[0])
     ):
-        lines.append(f"{rank}\t{value}\t{len(site_names)}")
+        count = len(site_names)
+        if count != previous_count:
+            rank += 1
+            previous_count = count
+        lines.append(f"{value}\t{count}\t{rank}")
     return lines
 
 
 def build_success_output_lines(rows: list[tuple[str, str, str, str]]) -> list[str]:
-    data_lines = [f"{value}\t{site_name}" for site_name, _issue_text, value, _url in rows]
+    data_lines = [f"{value} {site_name}" for site_name, _issue_text, value, _url in rows]
     rankings = build_rank_lines(rows)
-    return data_lines + (["帅铁"] + rankings if rankings else [])
+    return data_lines + ([""] + rankings if rankings else [])
 
 
 def configure_console_encoding() -> None:

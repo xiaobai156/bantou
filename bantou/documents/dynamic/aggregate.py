@@ -3,11 +3,12 @@ import json
 import re
 from urllib.parse import urlparse
 
-from ...domain import Site
-from ...fetching import fetch_text
+from ...domain.models import Site
+from ...fetching.policy import FetchError, fetch_text
 from ...text import html_to_text, normalize_text
 from .records import DEFAULT_KEYWORDS, target_record_content
 from .routes import extra_api_urls, user_aggregate_scope
+
 
 def iter_user_aggregate_records(value, path: str = "root"):
     if isinstance(value, dict):
@@ -64,7 +65,7 @@ def resolve_user_aggregate_detail_url(
                 payload = json.loads(
                     fetch_text(api_url, timeout, verify_ssl, deadline=deadline)
                 )
-            except Exception as exc:
+            except (FetchError, json.JSONDecodeError) as exc:
                 errors.append(f"{api_url}: {type(exc).__name__}: {exc}")
                 continue
             for path, record in iter_user_aggregate_records(payload):
@@ -90,10 +91,15 @@ def resolve_user_aggregate_detail_url(
         if expanded_api_urls != api_urls:
             scan_api_urls(expanded_api_urls)
 
-    if not records_by_id:
-        suffix = f"；接口错误：{'；'.join(errors[:2])}" if errors else ""
+    if errors:
         raise ValueError(
-            f"用户聚合接口未找到 {requested_issue}期 + 半头栏目 + 唯一详情记录{suffix}"
+            "用户聚合接口抓取或JSON校验未完成，无法证明详情记录唯一："
+            + "；".join(errors[:2])
+        )
+
+    if not records_by_id:
+        raise ValueError(
+            f"用户聚合接口未找到 {requested_issue}期 + 半头栏目 + 唯一详情记录"
         )
     if len(records_by_id) != 1:
         details = ",".join(

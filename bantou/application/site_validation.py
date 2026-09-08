@@ -12,11 +12,12 @@ import argparse
 import sys
 from pathlib import Path
 
-from bantou.config import DEFAULT_SITES_FILE, parse_issue_range, read_sites
-from bantou.fetching import canonical_url, run_transport_scope
-from bantou.domain import Site, SiteResult
-from bantou.site_profiles import DEFAULT_KEYWORDS
 from bantou.application.site_crawl import crawl_site
+from bantou.config.issues import parse_issue_range
+from bantou.config.sites import DEFAULT_SITES_FILE, read_sites
+from bantou.domain.models import Site, SiteResult
+from bantou.fetching.policy import run_transport_scope
+from bantou.fetching.transport import canonical_url
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -109,7 +110,6 @@ def main(argv: list[str] | None = None) -> int:
                 site,
                 wanted_issues,
                 None,
-                DEFAULT_KEYWORDS,
                 args.timeout,
                 True,
                 args.retries,

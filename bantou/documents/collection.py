@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
-import json
 import html
+import json
 import re
 from urllib.parse import urljoin, urlparse
 
-from ..domain import Site, SourceDocument
-from ..fetching import (
+from ..domain.models import Site, SourceDocument
+from ..fetching.policy import (
+    FetchError,
     fetch_interactive_rendered_html,
     fetch_rendered_html,
     fetch_rendered_text,
     fetch_resource_group,
     fetch_text,
 )
-from ..site_profiles import (
-    DEDICATED_RENDERED_SITE_RULES,
+from ..site_profiles.registry import (
+    BABA_FORUM_URL,
     DEDICATED_RENDERED_SITE_RULES,
     DYNAMIC_RECORD_SUBTOPIC_ALIASES,
     DYNAMIC_RECORD_TOPIC_ALIASES,
@@ -22,8 +23,6 @@ from ..site_profiles import (
     SCRIPT_SRC_RE,
     SITE_BROWSER_HTML_URLS,
     SITE_BROWSER_HTML_WAIT_UNTIL,
-    SITE_BROWSER_RENDER_URLS,
-    BABA_FORUM_URL,
     SITE_RENDERED_PAGE_AUTHORITY_URLS,
     WUZHUANXINGYI_URL,
 )
@@ -35,11 +34,68 @@ from .content import (
     should_fetch_iframe,
     should_fetch_script,
 )
+from .dynamic.records import DynamicBrowserFallbackRequired
 from .dynamic.routes import (
+    dynamic_record_scope,
     extra_api_urls,
     is_user_aggregate_api_url,
     reference_forum_urls_from_document,
 )
+
+
+def collect_dynamic_api_documents(
+    url: str,
+    timeout: int,
+    verify_ssl: bool,
+    *,
+    deadline: float | None = None,
+) -> tuple[list[SourceDocument], list[str]]:
+    """Fetch an exact dynamic record API before any browser page."""
+    api_urls = extra_api_urls(url)
+    if not api_urls:
+        raise ValueError("动态记录缺少专属接口")
+
+    exact_api_url, *auxiliary_urls = api_urls
+    try:
+        exact_text = fetch_text(
+            exact_api_url, timeout, verify_ssl, deadline=deadline
+        )
+    except FetchError as exc:
+        if str(exc).startswith("HTTP 404"):
+            raise DynamicBrowserFallbackRequired(
+                f"动态记录专属接口返回404：{exact_api_url}"
+            ) from exc
+        raise
+    if not exact_text.strip():
+        raise DynamicBrowserFallbackRequired(
+            f"动态记录专属接口正文为空：{exact_api_url}"
+        )
+    try:
+        json.loads(exact_text)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"动态记录专属接口不是可信JSON：{exact_api_url}") from exc
+
+    documents: list[SourceDocument] = []
+    seen_docs: set[tuple[str, str, str]] = set()
+    script_errors: list[str] = []
+    add_document_with_decoded(
+        exact_text,
+        documents,
+        seen_docs,
+        source_url=exact_api_url,
+        source_kind="api",
+    )
+    add_fetched_resources(
+        auxiliary_urls,
+        timeout,
+        verify_ssl,
+        documents,
+        seen_docs,
+        script_errors,
+        "api",
+        deadline=deadline,
+    )
+    return documents, script_errors
 
 def add_fetched_resources(
     urls: list[str],
@@ -108,16 +164,6 @@ def collect_documents(
     add_document_with_decoded(
         page_html, documents, seen_docs, source_url=url, source_kind="page"
     )
-
-    if url in SITE_BROWSER_RENDER_URLS:
-        try:
-            rendered_text = fetch_rendered_text(url, timeout, verify_ssl, deadline=deadline)
-        except Exception as exc:
-            script_errors.append(f"浏览器渲染失败：{exc}")
-        else:
-            add_document_with_decoded(
-                rendered_text, documents, seen_docs, source_url=url, source_kind="browser"
-            )
 
     if url in SITE_BROWSER_HTML_URLS:
         try:
@@ -256,7 +302,7 @@ def resolve_mengxiaomeng_detail_url(
             compact = re.sub(r"\s+", "", anchor_text)
             if not issue_re.search(compact):
                 continue
-            if "绝杀半头" not in compact:
+            if "半头" not in compact:
                 continue
             if site.name not in compact:
                 continue
@@ -268,10 +314,10 @@ def resolve_mengxiaomeng_detail_url(
         return next(iter(candidates))
     if len(candidates) > 1:
         raise ValueError(
-            f"找到多个指定期数入口：{requested_issue}期 + 绝杀半头 + {site.name}；"
+            f"找到多个指定期数入口：{requested_issue}期 + 半头 + {site.name}；"
             + "；".join(sorted(candidates))
         )
-    raise ValueError(f"找不到指定期数入口：{requested_issue}期 + 绝杀半头 + {site.name}")
+    raise ValueError(f"找不到指定期数入口：{requested_issue}期 + 半头 + {site.name}")
 
 
 def resolve_wealth_reference_detail_url(
@@ -345,6 +391,10 @@ def collect_site_documents(
     *,
     deadline: float | None = None,
 ) -> tuple[list[SourceDocument], list[str]]:
+    if dynamic_record_scope(fetch_url) is not None:
+        return collect_dynamic_api_documents(
+            fetch_url, timeout, verify_ssl, deadline=deadline
+        )
     if site.url == BABA_FORUM_URL:
         return collect_documents(fetch_url, timeout, verify_ssl, deadline=deadline)
     if site.url == WUZHUANXINGYI_URL:

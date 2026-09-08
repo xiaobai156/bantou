@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 import base64
-import html
+import binascii
 import re
 from urllib.parse import urlparse
 
-from ..domain import Site, SourceDocument
-from ..site_profiles import (
+from ..domain.models import Site, SourceDocument
+from ..site_profiles.registry import (
     DEDICATED_RENDERED_ALTERNATE_DATA_ANCHORS,
     DEDICATED_RENDERED_AUTHOR_CONTEXT_URLS,
     DEDICATED_RENDERED_CURRENT_SERIES_URLS,
     DEDICATED_RENDERED_PAGE_IDENTITIES,
     DEDICATED_RENDERED_SITE_RULES,
     HALF_HEAD_KEYWORD_RE,
-    HALF_HEAD_LINK_RE,
     STRDECODE_RE,
 )
 from ..text import (
@@ -24,9 +23,6 @@ from ..text import (
     normalize_text,
 )
 
-def decode_strdecode_blocks(text: str) -> list[str]:
-    return [decoded for decoded, _position in decode_strdecode_blocks_with_positions(text)]
-
 
 def decode_strdecode_blocks_with_positions(text: str) -> list[tuple[str, int]]:
     decoded: list[tuple[str, int]] = []
@@ -35,7 +31,7 @@ def decode_strdecode_blocks_with_positions(text: str) -> list[tuple[str, int]]:
         try:
             padded = payload + ("=" * (-len(payload) % 4))
             raw = base64.b64decode(padded)
-        except Exception:
+        except (binascii.Error, ValueError):
             continue
         for encoding in ("utf-8", "gb18030", "big5"):
             try:
@@ -96,7 +92,7 @@ def should_fetch_script(script_url: str) -> bool:
 
 def should_fetch_iframe(frame_url: str) -> bool:
     path = urlparse(frame_url).path.lower()
-    return path.startswith("/main/bbs/") or path.startswith("/htm/bbs/")
+    return path.startswith(("/main/bbs/", "/htm/bbs/"))
 
 
 def should_fetch_half_head_link(link_url: str) -> bool:

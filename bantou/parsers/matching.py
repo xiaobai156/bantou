@@ -2,19 +2,19 @@
 import re
 from dataclasses import replace
 
-from ..documents import author_context_matches_site, iter_search_texts
-from ..domain import Match, Site
-from ..site_profiles import (
-    DEFAULT_KEYWORDS,
+from ..documents.content import author_context_matches_site, iter_search_texts
+from ..domain.models import Match, Site
+from ..site_profiles.registry import (
     DEDICATED_RENDERED_AUTHOR_CONTEXT_URLS,
     DEDICATED_RENDERED_PAGE_IDENTITIES,
     DEDICATED_RENDERED_SITE_RULES,
+    DEFAULT_KEYWORDS,
     SITE_BROWSER_HTML_URLS,
-    SITE_BROWSER_RENDER_URLS,
     SITE_CURRENT_SERIES_PLACEHOLDER_URLS,
     SITE_IFRAME_PAGE_AUTHORITY_URLS,
     SITE_RENDERED_PAGE_AUTHORITY_URLS,
     SITE_SPECIAL_VALUE_PATTERNS,
+    SITE_TARGET_PLACEHOLDER_URLS,
 )
 from ..text import (
     ISSUE_RE,
@@ -26,7 +26,6 @@ from ..text import (
 )
 from .dedicated import special_matches_in_documents
 from .segments import (
-    contains_non_half_head_column,
     focused_half_head_block,
     iter_issue_segments,
     segment_has_body_locator,
@@ -35,10 +34,13 @@ from .segments import (
     strict_values_in_segment,
 )
 
+
 def special_matches_in_text(
     text: str,
     wanted_issues: set[int],
     site: Site | None,
+    *,
+    placeholder_issues: set[int] | None = None,
 ) -> list[tuple[int, str, str, int]]:
     if site is None:
         return []
@@ -62,7 +64,15 @@ def special_matches_in_text(
             if key in seen:
                 continue
             matched_text = match.group(0)
-            if not segment_has_body_locator(matched_text):
+            is_placeholder = re.search(r"[?？]{2,}", matched_text) is not None
+            placeholder_allowed = (
+                is_placeholder
+                and placeholder_issues is not None
+                and issue in placeholder_issues
+            )
+            if is_placeholder and not placeholder_allowed:
+                continue
+            if not placeholder_allowed and not segment_has_body_locator(matched_text):
                 continue
             issues = {int(item.group(1)) for item in ISSUE_RE.finditer(normalize_text(matched_text))}
             if issues != {issue}:
@@ -117,7 +127,8 @@ def find_matches(
     wanted_issues: set[int],
     site: Site | None = None,
     target: str | None = None,
-    keywords: tuple[str, ...] = DEFAULT_KEYWORDS,
+    *,
+    placeholder_issues: set[int] | None = None,
 ) -> list[Match]:
     if site is not None and site.parser_id in {
         "caiyuntong_macau",
@@ -149,7 +160,10 @@ def find_matches(
         for text in iter_search_texts(document):
             normalized_search_text = normalize_text(text)
             for issue, value, snippet, parsed_position in special_matches_in_text(
-                text, wanted_issues, site
+                text,
+                wanted_issues,
+                site,
+                placeholder_issues=placeholder_issues,
             ):
                 if target is not None and value != target:
                     continue
@@ -281,7 +295,6 @@ def site_scoped_raw_matches(
     documents: list[str],
     wanted_issues: set[int],
     site: Site,
-    keywords: tuple[str, ...],
     *,
     region_issues: set[int] | None = None,
 ) -> list[Match]:
@@ -289,7 +302,9 @@ def site_scoped_raw_matches(
         documents,
         wanted_issues,
         site=site,
-        keywords=keywords,
+        placeholder_issues=(
+            region_issues if site.url in SITE_TARGET_PLACEHOLDER_URLS else None
+        ),
     )
     return raw_matches
 
@@ -442,7 +457,6 @@ def apply_direction_source_scope(
         authority = "declared-embedded-parser"
     elif (
         site.url in SITE_BROWSER_HTML_URLS
-        or site.url in SITE_BROWSER_RENDER_URLS
         or site.url in SITE_RENDERED_PAGE_AUTHORITY_URLS
     ):
         preferred_kinds = {"browser", "browser-text"}

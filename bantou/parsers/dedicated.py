@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
-import html
 import re
 from dataclasses import replace
 
-from ..domain import Match, Site
-from ..site_profiles import (
+from ..domain.models import Match, Site
+from ..site_profiles.registry import (
     CAIYUNTONG_URL,
     GUANGDONG_BAER_URL,
-    SHENZHEN_FUTAN_URL,
     SEWAI_TAOYUAN_URL,
+    SHENZHEN_FUTAN_URL,
     WUZHUANXINGYI_CARD_LABELS,
     WUZHUANXINGYI_URL,
 )
@@ -23,7 +22,6 @@ from ..text import (
     normalize_half_head_value,
     normalize_text,
 )
-
 
 SEWAI_TAOYUAN_ROW_RE = re.compile(
     r"(?:【|\[)\s*(?P<head>[0-4０-４])\s*头\s*"

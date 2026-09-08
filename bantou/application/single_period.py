@@ -9,19 +9,21 @@ import sys
 import time
 from pathlib import Path
 
-from ..cache import (
+from ..cache.builders import build_bootstrap_cache_payload
+from ..cache.legacy import migrate_legacy_cache_roll_payload
+from ..cache.updates import merge_cache_updates, roll_cache_payload
+from ..cache.validation import (
     CACHE_STATE_RESET,
     CacheValidationError,
-    build_bootstrap_cache_payload,
-    merge_cache_updates,
-    migrate_legacy_cache_roll_payload,
     read_cache_for_update,
-    roll_cache_payload,
 )
-from ..config import build_parser, parse_issue_range, read_failed_sites, read_sites, resolve_inputs
-from ..fetching import INSECURE_TLS_COMPATIBILITY_URLS, canonical_url, run_transport_scope
-from ..domain import Match, Site, SiteResult
-from ..outputs import (
+from ..config.cli import build_parser, resolve_inputs
+from ..config.issues import parse_issue_range
+from ..config.sites import read_failed_sites, read_sites
+from ..domain.models import Match, Site, SiteResult
+from ..fetching.policy import INSECURE_TLS_COMPATIBILITY_URLS, run_transport_scope
+from ..fetching.transport import canonical_url
+from ..outputs.formatting import (
     append_script_error,
     build_success_output_lines,
     configure_console_encoding,
@@ -32,10 +34,9 @@ from ..outputs import (
     read_fail_entries_from_lines,
     read_success_data,
     spaced_failure_lines,
-    write_transaction,
 )
+from ..outputs.transaction import formal_write_lock, write_transaction
 from ..paths import DUPLICATE_BACKUP_FILE, FAILURE_RESULT_DIR
-from ..parsers import parse_keywords
 from ..text import normalize_target
 from .site_crawl import crawl_site, format_progress_line, print_failure_summary
 
@@ -71,8 +72,12 @@ def _merge_retry_rows(
     success_path = Path(default_success_name_path(success_name))
     fail_path = Path(default_failure_name_path(fail_name))
     issue_text = f"{issues_label}期"
-    existing_success = {row[0]: row for row in read_success_data(success_path, issue_text)}
-    existing_success.update({row[0]: row for row in retry_rows})
+    existing_success = read_success_data(success_path, issue_text)
+    existing_success_names = {row[0] for row in existing_success}
+    for row in retry_rows:
+        if row[0] not in existing_success_names:
+            existing_success.append(row)
+            existing_success_names.add(row[0])
     retry_success_names = {row[0] for row in retry_rows}
     retry_failures = {
         name: (name, category, reason, url)
@@ -89,7 +94,7 @@ def _merge_retry_rows(
         f"{name}\t{category}\t{reason}\t{url}"
         for name, category, reason, url in existing_failures.values()
     )
-    return list(existing_success.values()), lines
+    return existing_success, lines
 
 
 def default_success_name_path(name: str) -> Path:
@@ -159,7 +164,9 @@ def _prepare_cache_update(
     return rank_rows, cache_rows, fail_lines, payload
 
 
-def _run_sites(args, sites: list[Site], wanted_issues: set[int], target: str | None, keywords: tuple[str, ...]) -> list[SiteResult]:
+def _run_sites(
+    args, sites: list[Site], wanted_issues: set[int], target: str | None
+) -> list[SiteResult]:
     worker_count = max(1, min(args.workers, len(sites)))
     print(f"并发线程数：{worker_count}", flush=True)
     results: list[SiteResult] = []
@@ -196,7 +203,6 @@ def _run_sites(args, sites: list[Site], wanted_issues: set[int], target: str | N
                     site,
                     wanted_issues,
                     target,
-                    keywords,
                     args.timeout,
                     args.verify_ssl,
                     args.retries,
@@ -227,12 +233,90 @@ def _run_sites(args, sites: list[Site], wanted_issues: set[int], target: str | N
     return results
 
 
+def _finalize_run(
+    args,
+    issues: list[int],
+    sites: list[Site],
+    issues_label: str,
+    rank_rows: list[tuple[str, str, str, str]],
+    cache_rows: dict[str, tuple[Site, dict[int, Match]]],
+    fail_lines: list[str],
+) -> int:
+    if args.diagnose:
+        print(f"完成：成功 {len(rank_rows)} 条，失败 {len(fail_lines) - 1} 条")
+        print_failure_summary(fail_lines)
+        print("无写入诊断完成：未更新成功TXT、失败TXT或 recent_10_cache.json")
+        return 0
+
+    with formal_write_lock():
+        cache_update_error: CacheValidationError | None = None
+        try:
+            rank_rows, cache_rows, fail_lines, cache_payload = _prepare_cache_update(
+                args, issues, sites, rank_rows, cache_rows, fail_lines
+            )
+        except CacheValidationError as exc:
+            cache_payload = None
+            cache_update_error = exc
+
+        print(f"完成：成功 {len(rank_rows)} 条，失败 {len(fail_lines) - 1} 条")
+        print_failure_summary(fail_lines)
+        if cache_update_error is not None:
+            print(
+                f"缓存更新未完成（不影响本次抓取结果）：{cache_update_error}",
+                file=sys.stderr,
+            )
+
+        default_success_name, default_fail_name = default_output_names(issues_label)
+        success_path = default_success_name_path(args.success_out or default_success_name)
+        fail_path = default_failure_name_path(args.fail_out or default_fail_name)
+        if args.retry_fail:
+            rank_rows, fail_lines = _merge_retry_rows(
+                issues_label, rank_rows, fail_lines
+            )
+
+        try:
+            write_transaction(
+                {
+                    success_path: _success_bytes(rank_rows),
+                    fail_path: _failure_bytes(fail_lines),
+                }
+            )
+        except Exception as exc:
+            print(f"结果输出事务失败：{exc}", file=sys.stderr)
+            return 2
+
+        cache_write_error: Exception | None = None
+        if cache_payload is not None:
+            try:
+                write_transaction(
+                    {
+                        DUPLICATE_BACKUP_FILE: (
+                            json.dumps(cache_payload, ensure_ascii=False, indent=2)
+                            + "\n"
+                        ).encode("utf-8-sig")
+                    }
+                )
+            except Exception as exc:
+                cache_write_error = exc
+
+        print(f"成功结果：{success_path.resolve()}")
+        print(
+            f"失败结果：{fail_path.resolve() if fail_path.exists() else '无失败，不生成失败文件'}"
+        )
+        if cache_payload is not None:
+            if cache_write_error is None:
+                print(f"最近10期缓存已独立同步：{DUPLICATE_BACKUP_FILE.resolve()}")
+            else:
+                print(
+                    f"缓存写入失败（结果文件已保留）：{cache_write_error}",
+                    file=sys.stderr,
+                )
+        return 2 if cache_update_error is not None or cache_write_error is not None else 0
+
+
 def main(argv: list[str] | None = None) -> int:
     configure_console_encoding()
     args = build_parser().parse_args(argv)
-    if args.period is not None:
-        print("输入错误：重复检测只能通过 detect_8_consecutive.py 与 recent_10_cache.json 运行", file=sys.stderr)
-        return 2
     if args.diagnose and (args.write_backup or args.rebuild_cache):
         print("输入错误：--diagnose 不允许写入 TXT 或 recent_10_cache.json", file=sys.stderr)
         return 2
@@ -251,6 +335,8 @@ def main(argv: list[str] | None = None) -> int:
         target_input, issues_input, sites_input = resolve_inputs(args)
         target = normalize_target(target_input) if target_input else None
         issues, issue_width, issues_label = parse_issue_range(issues_input)
+        if args.retry_fail and len(issues) != 1:
+            raise ValueError("失败站点重跑一次只能指定一期")
         if args.rebuild_cache:
             raise ValueError("缓存重建已停用；缓存只允许每天单期顺序滚动")
         if not args.diagnose and not args.multi_mode and len(issues) == 1:
@@ -278,7 +364,6 @@ def main(argv: list[str] | None = None) -> int:
                     "--no-verify-ssl 只允许明确登记的TLS兼容站；未登记："
                     + "、".join(unregistered)
                 )
-        keywords = parse_keywords(args.keywords)
     except Exception as exc:
         print(f"输入错误：{exc}", file=sys.stderr)
         return 2
@@ -287,7 +372,7 @@ def main(argv: list[str] | None = None) -> int:
     rank_rows: list[tuple[str, str, str, str]] = []
     cache_rows: dict[str, tuple[Site, dict[int, Match]]] = {}
     with run_transport_scope():
-        results = _run_sites(args, sites, wanted_issues, target, keywords)
+        results = _run_sites(args, sites, wanted_issues, target)
 
     for result in sorted(results, key=lambda item: item.index):
         site = result.site
@@ -301,60 +386,6 @@ def main(argv: list[str] | None = None) -> int:
         for match in matches:
             rank_rows.append((site.name, f"{match.issue:0{issue_width}d}期", match.value, site.url))
 
-    cache_update_error: CacheValidationError | None = None
-    try:
-        rank_rows, cache_rows, fail_lines, cache_payload = _prepare_cache_update(
-            args, issues, sites, rank_rows, cache_rows, fail_lines
-        )
-    except CacheValidationError as exc:
-        cache_payload = None
-        cache_update_error = exc
-
-    success_count = len(rank_rows)
-    fail_count = len(fail_lines) - 1
-    print(f"完成：成功 {success_count} 条，失败 {fail_count} 条")
-    print_failure_summary(fail_lines)
-    if args.diagnose:
-        print("无写入诊断完成：未更新成功TXT、失败TXT或 recent_10_cache.json")
-        return 0
-
-    if cache_update_error is not None:
-        print(f"缓存更新未完成（不影响本次抓取结果）：{cache_update_error}", file=sys.stderr)
-
-    default_success_name, default_fail_name = default_output_names(issues_label)
-    success_path = default_success_name_path(args.success_out or default_success_name)
-    fail_path = default_failure_name_path(args.fail_out or default_fail_name)
-    if args.retry_fail:
-        rank_rows, fail_lines = _merge_retry_rows(issues_label, rank_rows, fail_lines)
-
-    result_writes: dict[Path, bytes | None] = {
-        success_path: _success_bytes(rank_rows),
-        fail_path: _failure_bytes(fail_lines),
-    }
-    try:
-        write_transaction(result_writes)
-    except Exception as exc:
-        print(f"结果输出事务失败：{exc}", file=sys.stderr)
-        return 2
-
-    cache_write_error: Exception | None = None
-    if cache_payload is not None:
-        try:
-            write_transaction(
-                {
-                    DUPLICATE_BACKUP_FILE: (
-                        json.dumps(cache_payload, ensure_ascii=False, indent=2) + "\n"
-                    ).encode("utf-8-sig")
-                }
-            )
-        except Exception as exc:
-            cache_write_error = exc
-
-    print(f"成功结果：{success_path.resolve()}")
-    print(f"失败结果：{fail_path.resolve() if fail_path.exists() else '无失败，不生成失败文件'}")
-    if cache_payload is not None:
-        if cache_write_error is None:
-            print(f"最近10期缓存已独立同步：{DUPLICATE_BACKUP_FILE.resolve()}")
-        else:
-            print(f"缓存写入失败（结果文件已保留）：{cache_write_error}", file=sys.stderr)
-    return 2 if cache_update_error is not None or cache_write_error is not None else 0
+    return _finalize_run(
+        args, issues, sites, issues_label, rank_rows, cache_rows, fail_lines
+    )

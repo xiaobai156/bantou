@@ -5,34 +5,35 @@ from __future__ import annotations
 
 import time
 
-from ..documents import (
+from ..documents.collection import (
     collect_dynamic_browser_documents,
     collect_site_documents,
     resolve_mengxiaomeng_detail_url,
     resolve_wealth_reference_detail_url,
 )
-from ..documents.dynamic import (
+from ..documents.dynamic.aggregate import resolve_user_aggregate_detail_url
+from ..documents.dynamic.records import (
     dynamic_browser_fallback_allowed,
-    dynamic_record_scope,
-    is_user_aggregate_page_without_record_id,
-    resolve_user_aggregate_detail_url,
     target_record_document,
 )
-from ..fetching import FetchError, should_retry_fetch_error
-from ..domain import Site, SiteResult
-from ..parsers import (
+from ..documents.dynamic.routes import (
+    dynamic_record_scope,
+    is_user_aggregate_page_without_record_id,
+)
+from ..domain.models import Site, SiteResult
+from ..fetching.policy import FetchError, should_retry_fetch_error
+from ..outputs.formatting import failure_category
+from ..parsers.matching import (
     apply_direction_source_scope,
     apply_secondary_site_scope,
-    candidate_issue_set,
-    format_issue_list,
     site_scoped_raw_matches,
 )
-from ..selection import (
+from ..parsers.segments import candidate_issue_set, format_issue_list
+from ..selection.engine import (
     conflicting_issue_values,
     select_direction_window_matches,
     select_requested_matches,
 )
-from ..outputs import failure_category
 from ..text import html_to_text, normalize_text
 
 
@@ -61,11 +62,9 @@ def debug_sample_from_documents(
     return "\n\n-----\n\n".join(samples)[:limit]
 
 
-def _site_deadline(timeout: int, site_timeout: int | None) -> float | None:
+def _site_deadline(timeout: int, site_timeout: int | None) -> float:
     if site_timeout is None:
         site_timeout = max(45, timeout * 3)
-    if site_timeout <= 0:
-        return None
     return time.monotonic() + site_timeout
 
 
@@ -107,15 +106,15 @@ def _documents_for_requested_issues(
         if time.monotonic() >= deadline:
             raise FetchError("单站总超时：停止继续抓取期数入口")
         fetch_url = _fetch_url_for_issue(site, issue, timeout, verify_ssl, deadline)
-        loaded, errors = collect_site_documents(
-            site,
-            fetch_url,
-            {issue} if issue_specific else wanted_issues,
-            timeout,
-            verify_ssl,
-            deadline=deadline,
-        )
         try:
+            loaded, errors = collect_site_documents(
+                site,
+                fetch_url,
+                {issue} if issue_specific else wanted_issues,
+                timeout,
+                verify_ssl,
+                deadline=deadline,
+            )
             scoped = target_record_document(loaded, fetch_url, site)
         except ValueError as exc:
             if dynamic_record_scope(fetch_url) is None or not dynamic_browser_fallback_allowed(exc):
@@ -124,6 +123,7 @@ def _documents_for_requested_issues(
                 fetch_url, timeout, verify_ssl, deadline=deadline
             )
             scoped = target_record_document(browser_documents, fetch_url, site)
+            errors = []
         documents.extend(scoped)
         script_errors.extend(errors)
     return documents, script_errors
@@ -134,7 +134,6 @@ def crawl_site(
     site: Site,
     wanted_issues: set[int],
     target: str | None,
-    keywords: tuple[str, ...],
     timeout: int,
     verify_ssl: bool,
     retries: int,
@@ -150,7 +149,6 @@ def crawl_site(
         time.sleep(start_delay)
 
     deadline = _site_deadline(timeout, site_timeout)
-    assert deadline is not None
     last_error: str | None = None
     last_script_errors = 0
     debug_sample = ""
@@ -171,7 +169,6 @@ def crawl_site(
                 documents,
                 candidate_issues,
                 site,
-                keywords,
                 region_issues=wanted_issues,
             )
             direction_candidates, source_reason = apply_direction_source_scope(
@@ -295,10 +292,4 @@ def format_progress_line(
     return (
         f"[进度 {completed}/{total} {percent}% 成功 {success_count} "
         f"失败 {fail_count} 用时 {elapsed_seconds:.1f}s] 当前: {site_name}"
-    )
-
-
-def run_duplicate_detection(*_args, **_kwargs) -> int:
-    raise RuntimeError(
-        "旧实时重复检测入口已停用；请使用 detect_8_consecutive.py 的 schema=2 缓存检测"
     )

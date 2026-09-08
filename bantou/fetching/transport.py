@@ -3,14 +3,13 @@
 
 from __future__ import annotations
 
-import threading
 import concurrent.futures
 import re
+import threading
 from dataclasses import dataclass
 from urllib.parse import urlsplit, urlunsplit
 
 import requests
-
 
 DEFAULT_HEADERS = {
     "User-Agent": (
@@ -181,10 +180,6 @@ class RunTransport:
         self._domains: dict[str, threading.BoundedSemaphore] = {}
         self._render_cache: dict[tuple[str, str, bool], str] = {}
         self._render_flights: dict[tuple[str, str, bool], _Flight] = {}
-        self._browser_executor: concurrent.futures.ThreadPoolExecutor | None = None
-        self._browser = None
-        self._browser_contexts: dict[bool, object] = {}
-        self._playwright = None
         self._browser_workers: list[_BrowserWorker] = []
         self._browser_worker_index = 0
 
@@ -265,33 +260,6 @@ class RunTransport:
             raise RuntimeError(f"URL 单飞未返回结果：{normalized}")
         return flight.text
 
-    def _render_on_owner(
-        self,
-        url: str,
-        timeout: int,
-        verify_ssl: bool,
-        html: bool,
-        wait_until: str = "networkidle",
-        interaction: tuple[int, str] | None = None,
-    ) -> str:
-        from playwright.sync_api import sync_playwright
-
-        if self._playwright is None:
-            self._playwright = sync_playwright().start()
-            self._browser = self._playwright.chromium.launch(headless=True)
-        context = self._browser_contexts.get(verify_ssl)
-        if context is None:
-            context = self._browser.new_context(ignore_https_errors=not verify_ssl)
-            self._browser_contexts[verify_ssl] = context
-        page = context.new_page()
-        try:
-            page.goto(url, wait_until=wait_until, timeout=timeout * 1000)
-            if interaction is not None:
-                _click_interactive_card(page, *interaction, timeout=timeout)
-            return page.content() if html else page.inner_text("body", timeout=timeout * 1000)
-        finally:
-            page.close()
-
     def _render_once(
         self,
         url: str,
@@ -301,16 +269,6 @@ class RunTransport:
         wait_until: str = "networkidle",
         interaction: tuple[int, str] | None = None,
     ) -> str:
-        legacy_owner = self.__dict__.get("_render_on_owner")
-        if legacy_owner is not None:
-            with self._lock:
-                if self._browser_executor is None:
-                    self._browser_executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
-                executor = self._browser_executor
-            future = executor.submit(
-                legacy_owner, url, timeout, verify_ssl, html, wait_until, interaction
-            )
-            return future.result(timeout=timeout + 10)
         with self._lock:
             if not self._browser_workers:
                 self._browser_workers = [_BrowserWorker() for _ in range(4)]
@@ -421,30 +379,8 @@ class RunTransport:
         with self._lock:
             browser_workers = self._browser_workers
             self._browser_workers = []
-            executor = self._browser_executor
-            self._browser_executor = None
         for worker in browser_workers:
             worker.close()
-        if executor is None:
-            return
-
-        def close_owner() -> None:
-            for context in self._browser_contexts.values():
-                context.close()
-            self._browser_contexts.clear()
-            if self._browser is not None:
-                self._browser.close()
-                self._browser = None
-            if self._playwright is not None:
-                self._playwright.stop()
-                self._playwright = None
-
-        try:
-            executor.submit(close_owner).result(timeout=10)
-        except concurrent.futures.TimeoutError:
-            executor.shutdown(wait=False, cancel_futures=True)
-        else:
-            executor.shutdown(wait=True, cancel_futures=True)
 
 
 DEFAULT_TRANSPORT = RunTransport()

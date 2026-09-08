@@ -3,12 +3,11 @@
 
 from __future__ import annotations
 
-import datetime as dt
 import json
 from pathlib import Path
 
-from ..domain import Match, Site
-
+from ..domain.models import Match
+from ..text import VALUE_RE, normalize_half_head_value, normalize_text
 
 CACHE_SCHEMA = 2
 CACHE_KIND = "bantou_recent_duplicate_backup"
@@ -23,7 +22,17 @@ class CacheValidationError(ValueError):
     pass
 
 
+def _validate_half_head_value(value: object, label: str) -> None:
+    if not isinstance(value, str):
+        raise CacheValidationError(f"{label}无效")
+    normalized = normalize_text(value)
+    match = VALUE_RE.fullmatch(normalized)
+    if match is None or normalize_half_head_value(match.group(1), match.group(2)) != normalized:
+        raise CacheValidationError(f"{label}无效")
+
+
 def _validate_match_evidence(match: Match) -> None:
+    _validate_half_head_value(match.value, "证据数据值")
     required = {
         "来源URL": match.source_url,
         "来源类型": match.source_kind,
@@ -155,7 +164,8 @@ def compare_cached_match(cached: dict[str, object], current: Match) -> str | Non
             return f"缓存数据冲突：{label}缓存为{cached_value}，本次为{current_value}"
 
     current_source = expected["source"]
-    assert isinstance(current_source, dict)
+    if not isinstance(current_source, dict):
+        return "本次来源证据无效"
     for label, field in (
         ("来源URL", "url"),
         ("来源类型", "kind"),
@@ -189,9 +199,7 @@ def _validate_entry(
         raise CacheValidationError(
             f"{issue}期缓存只有用户确认历史，没有原始来源证据，不能用于正式判重"
         )
-    value = _entry_value(entry, "value")
-    if not isinstance(value, str) or not value:
-        raise CacheValidationError(f"{issue}期缓存 value 无效")
+    _validate_half_head_value(_entry_value(entry, "value"), f"{issue}期缓存 value ")
     for field in (
         "order", "position", "anchor_position", "block_start", "block_end"
     ):
@@ -244,6 +252,7 @@ def _validate_cache_payload(
     if not isinstance(sites, list):
         raise CacheValidationError("缓存 sites 必须是数组")
     identities: set[tuple[str, str, str, str]] = set()
+    site_names: set[str] = set()
     issue_keys = {str(issue) for issue in issues}
     for item in sites:
         if not isinstance(item, dict):
@@ -257,19 +266,57 @@ def _validate_cache_payload(
         if identity in identities:
             raise CacheValidationError(f"缓存站点身份重复：{identity[0]}")
         identities.add(identity)
-        if not isinstance(item["anchors"], list) or not item["anchors"]:
+        if identity[0] in site_names:
+            raise CacheValidationError(f"缓存站点名称重复：{identity[0]}")
+        site_names.add(identity[0])
+        if identity[2] not in {"top", "bottom"}:
+            raise CacheValidationError(f"缓存站点方向无效：{identity[0]}")
+        anchors = item["anchors"]
+        if (
+            not isinstance(anchors, list)
+            or not anchors
+            or any(not isinstance(anchor, str) or not anchor.strip() for anchor in anchors)
+            or len(set(anchors)) != len(anchors)
+        ):
             raise CacheValidationError(f"缓存站点 anchors 无效：{identity[0]}")
         records = item["records"]
-        if not isinstance(records, dict) or set(records) != issue_keys:
-            raise CacheValidationError(f"缓存站点不是完整10期：{identity[0]}")
-        for issue in issues:
+        record_keys = set(records) if isinstance(records, dict) else set()
+        if not isinstance(records, dict) or not records or not record_keys <= issue_keys:
+            raise CacheValidationError(f"缓存站点 records 无效：{identity[0]}")
+        site_failures = item.get("failures", {})
+        if not isinstance(site_failures, dict):
+            raise CacheValidationError(f"缓存站点 failures 无效：{identity[0]}")
+        failure_keys = set(site_failures)
+        if (
+            not failure_keys <= issue_keys
+            or record_keys & failure_keys
+            or record_keys | failure_keys != issue_keys
+            or any(not isinstance(reason, str) or not reason.strip() for reason in site_failures.values())
+        ):
+            raise CacheValidationError(f"缓存站点逐期成功/失败状态不完整：{identity[0]}")
+        for issue_text, entry in records.items():
+            issue = int(issue_text)
             _validate_entry(
-                records[str(issue)],
+                entry,
                 issue,
                 allow_confirmed_legacy=allow_confirmed_legacy,
             )
-    if not isinstance(payload.get("failures", []), list):
+    failures = payload.get("failures", [])
+    if not isinstance(failures, list):
         raise CacheValidationError("缓存 failures 必须是数组")
+    failure_names: set[str] = set()
+    for failure in failures:
+        if not isinstance(failure, dict):
+            raise CacheValidationError("缓存 failure 必须是对象")
+        values = tuple(failure.get(field) for field in ("name", "error", "url"))
+        if any(not isinstance(value, str) or not value.strip() for value in values):
+            raise CacheValidationError("缓存 failure 缺少 name/error/url")
+        name = str(values[0])
+        if name in failure_names:
+            raise CacheValidationError(f"缓存失败站点重复：{name}")
+        if name in site_names:
+            raise CacheValidationError(f"缓存站点同时成功和失败：{name}")
+        failure_names.add(name)
     return payload
 
 
@@ -367,10 +414,9 @@ def validate_legacy_cache_payload(payload: object) -> dict[str, object]:
             )
         for issue_text in issue_keys:
             value = data.get(issue_text)
-            if not isinstance(value, str) or not value.strip():
-                raise CacheValidationError(
-                    f"{item.get('name', '未知站点')} {issue_text}期旧缓存值无效"
-                )
+            _validate_half_head_value(
+                value, f"{item.get('name', '未知站点')} {issue_text}期旧缓存值"
+            )
     failures = payload.get("failures", [])
     if failures is not None and not isinstance(failures, list):
         raise CacheValidationError("旧缓存 failures 必须是数组")
@@ -386,8 +432,8 @@ def validate_legacy_cache_payload(payload: object) -> dict[str, object]:
         data = item["data"]
         if not isinstance(data, dict) or not data:
             raise CacheValidationError("旧缓存待恢复站点 data 无效")
-        if not all(isinstance(value, str) and value.strip() for value in data.values()):
-            raise CacheValidationError("旧缓存待恢复站点 data 值无效")
+        for value in data.values():
+            _validate_half_head_value(value, "旧缓存待恢复站点 data 值")
     return payload
 
 

@@ -1,18 +1,18 @@
 import json
 import re
 from pathlib import Path
-from urllib.parse import urlparse, urlsplit, urlunsplit
+from urllib.parse import urlsplit, urlunsplit
 
-from ..domain import Site
+from ..domain.models import Site
 from ..paths import PROJECT_DIR
-from ..site_profiles import (
+from ..site_profiles.registry import (
     CAIYUNTONG_URL,
     GUANGDONG_BAER_URL,
-    SHENZHEN_FUTAN_URL,
-    WUZHUANXINGYI_URL,
     SEWAI_TAOYUAN_URL,
+    SHENZHEN_FUTAN_URL,
     SUPPORTED_PARSER_IDS,
     URL_RE,
+    WUZHUANXINGYI_URL,
 )
 
 SCRIPT_DIR = PROJECT_DIR
@@ -43,54 +43,6 @@ def parse_pick(words: list[str]) -> tuple[str, list[str]]:
         else:
             kept.append(word)
     return pick, kept
-
-
-def parse_site_lines(lines: list[str], source: str) -> list[Site]:
-    sites: list[Site] = []
-    seen_names: set[str] = set()
-    seen_urls: set[str] = set()
-    for line_no, raw_line in enumerate(lines, start=1):
-        line = raw_line.strip()
-        if not line or line.startswith("#"):
-            continue
-
-        match = URL_RE.search(line)
-        if not match:
-            raise ValueError(f"{source}:{line_no} 没有找到网址")
-
-        url = match.group(0).rstrip("，,;；")
-        before = line[: match.start()].strip()
-        after = line[match.end() :].strip()
-        words = (before + " " + after).split()
-        pick, name_words = parse_pick(words)
-        name = " ".join(name_words).strip()
-        if not name:
-            parsed = urlparse(url)
-            name = parsed.netloc or f"第{line_no}行"
-        if pick not in {"top", "bottom"}:
-            raise ValueError(
-                f"{source}:{line_no} 缺少或无法识别 pick，只允许 top/bottom/顶部/尾部/上/下"
-            )
-        if name in seen_names:
-            raise ValueError(f"{source}:{line_no} 网站名称重复：{name}")
-        normalized_url = normalized_site_url(url)
-        if normalized_url in seen_urls:
-            raise ValueError(f"{source}:{line_no} 网站 URL 重复：{url}")
-        seen_names.add(name)
-        seen_urls.add(normalized_url)
-        sites.append(Site(name=name, url=url, pick=pick, line_no=line_no))
-
-    if not sites:
-        raise ValueError(f"网站列表为空：{source}")
-    return sites
-
-
-def pick_to_text(pick: str) -> str:
-    if pick == "top":
-        return "顶部"
-    if pick == "bottom":
-        return "下"
-    return ""
 
 
 def parse_json_sites(text: str, source: str) -> list[Site]:
@@ -191,10 +143,6 @@ def parse_json_sites(text: str, source: str) -> list[Site]:
     return sites
 
 
-def write_default_sites_json(path: Path) -> None:
-    raise RuntimeError(f"禁止自动生成默认 sites.json，必须使用人工维护的正式配置：{path}")
-
-
 def read_sites(path: Path, *, script_dir: Path = SCRIPT_DIR) -> list[Site]:
     if not path.is_absolute() and not path.exists():
         script_side_path = script_dir / path
@@ -208,14 +156,6 @@ def read_sites(path: Path, *, script_dir: Path = SCRIPT_DIR) -> list[Site]:
         return parse_json_sites(text, str(path))
 
     raise FileNotFoundError(f"找不到网站列表：{path}")
-
-
-def reject_new_sites_with_existing_names(existing_sites: list[Site], new_sites: list[Site]) -> None:
-    existing_names = {site.name for site in existing_sites}
-    conflicts = [site.name for site in new_sites if site.name in existing_names]
-    if conflicts:
-        names = "、".join(dict.fromkeys(conflicts))
-        raise ValueError(f"新增网站名称与已有站点同名，直接拒收：{names}")
 
 
 def read_failed_sites(path: Path, all_sites: list[Site]) -> list[Site]:

@@ -3,9 +3,59 @@
 
 from __future__ import annotations
 
+import hashlib
+import msvcrt
 import os
 import tempfile
+import threading
+import time
+from contextlib import contextmanager
 from pathlib import Path
+
+_PROCESS_LOCK = threading.RLock()
+_PROJECT_KEY = hashlib.sha256(
+    str(Path(__file__).resolve().parents[2]).encode("utf-8")
+).hexdigest()[:16]
+_LOCK_PATH = Path(tempfile.gettempdir()) / f"bantou-{_PROJECT_KEY}-output.lock"
+_LOCK_STATE = threading.local()
+
+
+@contextmanager
+def formal_write_lock():
+    """Serialize cache read-modify-write and formal outputs for this project."""
+    with _PROCESS_LOCK:
+        depth = int(getattr(_LOCK_STATE, "depth", 0))
+        if depth:
+            _LOCK_STATE.depth = depth + 1
+            try:
+                yield
+            finally:
+                _LOCK_STATE.depth = depth
+            return
+
+        with _LOCK_PATH.open("a+b") as handle:
+            _lock_handle(handle)
+            _LOCK_STATE.depth = 1
+            try:
+                yield
+            finally:
+                _LOCK_STATE.depth = 0
+                handle.seek(0)
+                msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+
+
+def _lock_handle(handle) -> None:
+    handle.seek(0, os.SEEK_END)
+    if handle.tell() == 0:
+        handle.write(b"\0")
+        handle.flush()
+    while True:
+        try:
+            handle.seek(0)
+            msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+            return
+        except OSError:
+            time.sleep(0.05)
 
 
 def _replace(source: Path, destination: Path) -> None:
@@ -39,7 +89,7 @@ def _restore(target: Path, previous: bytes | None) -> None:
     _replace(temporary, target)
 
 
-def write_transaction(writes: dict[Path, str | bytes | None]) -> None:
+def _write_transaction_unlocked(writes: dict[Path, str | bytes | None]) -> None:
     """Commit all files together or restore the exact prior bytes.
 
     ``None`` means that the file must not exist after a successful commit.
@@ -72,8 +122,16 @@ def write_transaction(writes: dict[Path, str | bytes | None]) -> None:
         if rollback_errors:
             raise RuntimeError(
                 f"输出事务失败且回滚不完整：{rollback_errors[0]}"
-            )
+            ) from rollback_errors[0]
         raise
     finally:
         for temporary in temporaries.values():
             temporary.unlink(missing_ok=True)
+
+
+def write_transaction(writes: dict[Path, str | bytes | None]) -> None:
+    """Commit one validated file set under the project-wide write lock."""
+    if not writes:
+        return
+    with formal_write_lock():
+        _write_transaction_unlocked(writes)

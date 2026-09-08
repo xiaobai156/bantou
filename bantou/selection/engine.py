@@ -3,7 +3,7 @@
 
 from dataclasses import dataclass
 
-from ..domain import Match
+from ..domain.models import Match
 
 
 @dataclass(frozen=True)
@@ -78,20 +78,6 @@ def _document_identity(match: Match) -> tuple[object, ...]:
         match.url_record_id,
         match.api_url,
     )
-
-
-def _source_document_identity(match: Match) -> tuple[object, ...] | None:
-    """Identify one physical source without treating separate documents as one."""
-    identity = (
-        match.source_url,
-        match.source_kind,
-        match.record_id,
-        match.record_path,
-        match.route_type,
-        match.url_record_id,
-        match.api_url,
-    )
-    return identity if any(identity) else None
 
 
 def _validated_representatives(

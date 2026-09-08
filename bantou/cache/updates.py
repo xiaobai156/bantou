@@ -4,7 +4,7 @@ from __future__ import annotations
 import datetime as dt
 import json
 
-from ..domain import Match, Site
+from ..domain.models import Match, Site
 from .builders import (
     _site_cache_item_for_issues,
     _site_identity_from_item,
@@ -23,6 +23,7 @@ from .validation import (
     validate_cache_for_update,
 )
 
+
 def merge_cache_updates(
     payload: dict[str, object],
     incoming: dict[str, tuple[Site, dict[int, Match]]],
@@ -37,24 +38,26 @@ def merge_cache_updates(
     updated = json.loads(json.dumps(original, ensure_ascii=False))
     issues = {int(issue) for issue in updated["issues"]}
     items = {str(item["name"]): item for item in updated["sites"]}
-    bootstrap = updated.get("state") == CACHE_STATE_BOOTSTRAP
+    failure_names = {name for name, _reason, _url in failures}
+    cache_incoming = {
+        name: item
+        for name, item in incoming.items()
+        if name not in failure_names
+    }
     conflicts: dict[str, str] = {}
 
-    for name, (site, by_issue) in incoming.items():
+    for name, (site, by_issue) in cache_incoming.items():
         item = items.get(name)
         if item is None:
-            if bootstrap and set(by_issue) == issues:
-                try:
-                    item = _site_cache_item_for_issues(
-                        site, by_issue, [int(issue) for issue in updated["issues"]]
-                    )
-                except CacheValidationError as exc:
-                    conflicts[name] = str(exc)
-                    continue
-                updated["sites"].append(item)
-                items[name] = item
+            try:
+                item = _site_cache_item_for_issues(
+                    site, by_issue, [int(issue) for issue in updated["issues"]]
+                )
+            except CacheValidationError as exc:
+                conflicts[name] = str(exc)
                 continue
-            conflicts[name] = "缓存中没有该站完整10期来源证据，拒绝补写"
+            updated["sites"].append(item)
+            items[name] = item
             continue
         if _site_identity_from_item(item) != _site_identity_from_site(site):
             conflicts[name] = "缓存站点身份与正式配置不一致，拒绝混合历史"
@@ -63,37 +66,46 @@ def merge_cache_updates(
             conflicts[name] = "重跑期数不在最近10期缓存窗口，拒绝写入"
             continue
         records = item["records"]
-        assert isinstance(records, dict)
+        if not isinstance(records, dict):
+            conflicts[name] = "缓存 records 缺失"
+            continue
         conflict_reason = None
         for issue, match in sorted(by_issue.items()):
             cached = records.get(str(issue))
-            if not isinstance(cached, dict):
-                conflict_reason = f"{issue}期缓存来源证据缺失"
-                break
-            reason = compare_cached_match(cached, match)
-            if reason is not None:
-                conflict_reason = f"{issue}期{reason}"
-                break
+            if isinstance(cached, dict):
+                reason = compare_cached_match(cached, match)
+                if reason is not None:
+                    conflict_reason = f"{issue}期{reason}"
+                    break
         if conflict_reason is not None:
             conflicts[name] = conflict_reason
             continue
         for issue, match in by_issue.items():
             records[str(issue)] = cache_entry_from_match(match)
+        site_failures = item.get("failures", {})
+        if isinstance(site_failures, dict):
+            for issue in by_issue:
+                site_failures.pop(str(issue), None)
+            if not site_failures:
+                item.pop("failures", None)
 
-    accepted_names = set(incoming) - set(conflicts)
+    accepted_names = set(cache_incoming) - set(conflicts)
     existing_failures = [
         item for item in updated.get("failures", [])
         if str(item.get("name") or "") not in accepted_names
     ]
-    failure_names = {name for name, _reason, _url in failures}
     existing_failures = [
         item for item in existing_failures
         if str(item.get("name") or "") not in failure_names
     ]
-    existing_failures.extend(
-        {"name": name, "error": reason, "url": url}
-        for name, reason, url in failures
-    )
+    for name, reason, url in failures:
+        item = items.get(name)
+        if item is None:
+            existing_failures.append({"name": name, "error": reason, "url": url})
+            continue
+        records = item.get("records", {})
+        if str(updated["period"]) not in records:
+            item.setdefault("failures", {})[str(updated["period"])] = reason
     updated["failures"] = existing_failures
     return validate_cache_for_update(updated), conflicts
 
@@ -115,7 +127,7 @@ def roll_cache_payload(
         return merge_cache_updates(original, incoming, failures)
     if period != old_period + 1:
         raise CacheValidationError(
-            f"缓存最后一期是 {old_period}，当前期是 {period}，不能跨期滚动；请真实抓取连续10期并使用 --rebuild-cache"
+            f"缓存最后一期是 {old_period}，当前期是 {period}，不能跨期滚动；只能按下一期顺序滚动"
         )
 
     old_issues = [int(issue) for issue in original["issues"]]
@@ -123,54 +135,60 @@ def roll_cache_payload(
     new_issues = retained_issues + [period]
     old_items = {str(item["name"]): item for item in original["sites"]}
     current_by_name = {site.name: site for site in all_sites}
+    failure_names = {name for name, _reason, _url in failures}
+    failure_by_name = {name: (reason, url) for name, reason, url in failures}
+    cache_incoming = {
+        name: item
+        for name, item in incoming.items()
+        if name not in failure_names
+    }
     conflicts: dict[str, str] = {}
     new_items: list[dict[str, object]] = []
-    failure_names = {name for name, _reason, _url in failures}
 
+    cached_failures: list[dict[str, str]] = []
     for name, site in current_by_name.items():
-        current = incoming.get(name)
-        if current is None:
-            continue
-        incoming_site, by_issue = current
-        if set(by_issue) != {period}:
+        current = cache_incoming.get(name)
+        incoming_site, by_issue = current if current is not None else (site, {})
+        if current is not None and set(by_issue) != {period}:
             conflicts[name] = "单期缓存滚动必须只包含当前指定期数"
-            continue
+            current = None
+            by_issue = {}
         old_item = old_items.get(name)
-        if old_item is None:
-            conflicts[name] = "缓存中没有该站完整10期来源证据，拒绝跨期混合"
-            continue
-        if _site_identity_from_item(old_item) != _site_identity_from_site(incoming_site):
+        if old_item is not None and _site_identity_from_item(old_item) != _site_identity_from_site(incoming_site):
             conflicts[name] = "缓存站点身份与正式配置不一致，拒绝混合历史"
-            continue
-        old_records = old_item.get("records")
-        if not isinstance(old_records, dict):
-            conflicts[name] = "缓存 records 缺失"
-            continue
+            old_item = None
+        old_records = old_item.get("records", {}) if old_item is not None else {}
+        old_failures = old_item.get("failures", {}) if old_item is not None else {}
         try:
-            records = {str(issue): old_records[str(issue)] for issue in retained_issues}
-            records[str(period)] = cache_entry_from_match(by_issue[period])
-            new_items.append(_site_cache_item_for_issues(
-                incoming_site,
-                {
-                    issue: by_issue[period] if issue == period else _match_from_cache(issue, records[str(issue)])
-                    for issue in new_issues
-                },
-                new_issues,
-            ))
+            matches = {
+                issue: _match_from_cache(issue, old_records[str(issue)])
+                for issue in retained_issues
+                if str(issue) in old_records
+            }
+            period_failures = {
+                issue: str(old_failures.get(str(issue)) or "该期没有可信来源数据")
+                for issue in retained_issues
+                if issue not in matches
+            }
+            if current is not None:
+                matches[period] = by_issue[period]
+            else:
+                period_failures[period] = failure_by_name.get(
+                    name, ("当前期没有抓取结果", site.url)
+                )[0]
+            if matches:
+                new_items.append(
+                    _site_cache_item_for_issues(
+                        incoming_site, matches, new_issues, period_failures
+                    )
+                )
+            else:
+                reason, url = failure_by_name.get(
+                    name, ("当前窗口没有任何可信来源数据", site.url)
+                )
+                cached_failures.append({"name": name, "error": reason, "url": url})
         except CacheValidationError as exc:
             conflicts[name] = str(exc)
-
-    accepted_names = {str(item["name"]) for item in new_items}
-    cached_failures = [
-        item for item in original.get("failures", [])
-        if str(item.get("name") or "") in current_by_name
-        and str(item.get("name") or "") not in accepted_names
-        and str(item.get("name") or "") not in failure_names
-    ]
-    cached_failures.extend(
-        {"name": name, "error": reason, "url": url}
-        for name, reason, url in failures
-    )
     state = (
         CACHE_STATE_READY
         if len(new_issues) == 10
@@ -183,7 +201,7 @@ def roll_cache_payload(
         "period": period,
         "window": 10,
         "issues": new_issues,
-        "updated_at": dt.datetime.now().isoformat(timespec="seconds"),
+        "updated_at": dt.datetime.now().astimezone().isoformat(timespec="seconds"),
         "sites": new_items,
         "failures": cached_failures,
     }

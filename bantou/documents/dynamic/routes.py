@@ -96,7 +96,7 @@ def reference_forum_urls_from_document(url: str, document: str) -> list[str]:
     base = f"{parsed.scheme}://{parsed.netloc}"
     try:
         data = json.loads(document)
-    except Exception:
+    except json.JSONDecodeError:
         return []
 
     items: list[dict] = []

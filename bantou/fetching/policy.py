@@ -9,13 +9,11 @@ import subprocess
 import threading
 import time
 from contextlib import contextmanager
-from pathlib import Path
 from urllib.parse import urlparse
 
 import requests
 
 from .transport import DEFAULT_TRANSPORT, canonical_url
-
 
 # Compatibility transport is opt-in by exact normalized URL only. New sites
 # must be verified before being added here; all other URLs keep strict TLS.
@@ -152,7 +150,7 @@ def fetch_with_curl(
 ) -> str:
     request_timeout = _request_timeout(timeout, deadline)
     try:
-        completed = subprocess.run(
+        completed = subprocess.run(  # noqa: S603 - fixed argv, no shell
             curl_command(url, request_timeout, verify_ssl),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -202,12 +200,9 @@ def fetch_text(
             return fetch_with_curl(normalized, timeout, verify_ssl, deadline=deadline)
         except FetchError as curl_error:
             raise curl_error from last_error
-    assert last_error is not None
+    if last_error is None:
+        raise FetchError("网络抓取失败：未知错误")
     raise FetchError(_failure_message(last_error)) from last_error
-
-
-def clear_fetch_cache() -> None:
-    DEFAULT_TRANSPORT.clear()
 
 
 def fetch_resource_group(

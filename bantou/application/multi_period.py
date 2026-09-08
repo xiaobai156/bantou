@@ -2,13 +2,14 @@
 import sys
 from pathlib import Path
 
-from ..config import parse_issue_range, read_sites
-from ..domain import Site
-from ..fetching import run_transport_scope
-from ..outputs import spaced_failure_lines, write_transaction
+from ..config.issues import parse_issue_range
+from ..config.sites import read_sites
+from ..domain.models import Site
+from ..fetching.policy import run_transport_scope
+from ..outputs.formatting import spaced_failure_lines
+from ..outputs.transaction import write_transaction
 from ..paths import FAILURE_RESULT_DIR, PROJECT_DIR, RESULT_DIR
 from .single_period import main as run_single_period
-
 
 SCRIPT_DIR = PROJECT_DIR
 

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
 
-
 URL_RE = re.compile(r"https?://\S+", re.I)
 SCRIPT_SRC_RE = re.compile(r"<script\b[^>]*\bsrc\s*=\s*([\"']?)([^\"'\s>]+)\1", re.I)
 IFRAME_SRC_RE = re.compile(r"<iframe\b[^>]*\bsrc\s*=\s*([\"']?)([^\"'\s>]+)\1", re.I)
@@ -22,24 +21,6 @@ STRICT_HALF_HEAD_RE = re.compile(
     re.I,
 )
 DEFAULT_KEYWORDS = ("杀半头", "秒杀半头", "必杀半头", "绝杀半头", "稳杀半头")
-DEFAULT_ISSUES = "125"
-
-SITE_EXTRA_KEYWORDS = {
-    "https://jbh00.sl5b3-86ncq-fjhqtt.xyz/topic/206543.html": ("秒杀",),
-    "https://tulprhfc.wghcb-bnmgm-hyymaz.work:16655/topic/324701.html": ("秒杀",),
-    "https://269x6s.k4x2w-1o62c-peefnm.work/topic/206456.html": ("秒杀",),
-    "https://uwkzbx.2pgdu-vva8o-nkhrzz.xyz:16677/topic/308018.html": ("正秒杀", "㊣秒杀"),
-    "https://vkjwinyt.fvpzl-4ijc5-cdcyle.xyz:16677/": ("综合杀",),
-    "https://cthvktrb.am9a6-vk0h6-lwbxab.xyz:16677/": ("绝杀",),
-    "https://epsyvycz.ff10o-370zd-qssnum.xyz:16677/topic/328057.html": ("杀[", "杀【"),
-    "https://hhsmgw.rcl5b-akta2-ylzzwv.xyz:16677/topic/328425.html": ("杀[", "杀【"),
-    "https://cdsgyr.6xzb4-onz45-zlnoys.xyz:16677/topic/328425.html": ("杀[", "杀【"),
-    "https://njkzdcwj.nql6i-8t6su-hytife.xyz:16677/topic/324619.html": ("杀[", "杀【"),
-    "https://eudkyp.luqv0-yf46s-xrnpkz.xyz:16677/topic/324148.html": ("杀[", "杀【"),
-    "https://alvjak.uh1h2-ru1qt-cyscbt.xyz:16677/topic/328416.html": ("杀[", "杀【"),
-    "https://sadoleu.rznla-fgwyr-nzqalp.xyz:16677/topic/656863.html": ("+++杀",),
-}
-SITE_BROWSER_RENDER_URLS = {"https://vkjwinyt.fvpzl-4ijc5-cdcyle.xyz:16677/"}
 
 SITE_RENDERED_PAGE_AUTHORITY_URLS = {
     "https://hbwtl.7xzry-2gul3-olawdt.xyz/topic/227014.html",
@@ -96,9 +77,11 @@ SITE_RENDERED_PAGE_AUTHORITY_URLS = {
 CAIYUNTONG_URL = "https://fnulucd.s2569-p869e-eekdks.xyz:16677/"
 GUANGDONG_BAER_URL = "https://besjbec.6328v-8pwlk-jzhgyz.work:16677/#am"
 SEWAI_TAOYUAN_URL = "https://667755.xn--q9ja6j.xn--q9jyb4c/gsb/030.html"
-SITE_BROWSER_HTML_URLS = {CAIYUNTONG_URL, GUANGDONG_BAER_URL}
+MENGXIAOMENG_URL = "https://xmdrbud.eqpr2-6tpvi-pjqztv.xyz:16677/"
+SITE_BROWSER_HTML_URLS = {CAIYUNTONG_URL, GUANGDONG_BAER_URL, MENGXIAOMENG_URL}
 SITE_BROWSER_HTML_WAIT_UNTIL = {
     GUANGDONG_BAER_URL: "load",
+    MENGXIAOMENG_URL: "domcontentloaded",
     "https://sadoleu.rznla-fgwyr-nzqalp.xyz:16677/topic/287642.html": "domcontentloaded",
     "https://vqyjnlug.qt1u6-vqjjl-vkdnzw.work:16655/topic/650194.html": "domcontentloaded",
     "https://sqddimfu.evs71-kia2b-gshsdc.xyz:16677/topic/205530.html": "domcontentloaded",
@@ -106,6 +89,7 @@ SITE_BROWSER_HTML_WAIT_UNTIL = {
     "https://xuknerw.fu5qv-a7f7o-nxmebt.work:16633/topic/291093.html": "domcontentloaded",
     "https://vmfvzmh.7jh1y-qgjk8-lavfxb.work:16677/topic/782033.html": "domcontentloaded",
     "https://oigqsvqs.2n3pw-mjk5d-wndmjh.xyz:16677/topic/287383.html": "domcontentloaded",
+    "https://tlwggkde.dp86b-grpqw-uiiazp.work:17466/topic/247714.html": "domcontentloaded",
 }
 DEDICATED_RENDERED_SITE_RULES = {
     "https://s4wqb.p2b6h-0xj4v-suxrzo.xyz/topic/206519.html": "topic-content",
@@ -129,7 +113,6 @@ DEDICATED_RENDERED_SITE_RULES = {
     "https://cdsgyr.6xzb4-onz45-zlnoys.xyz:16677/topic/328425.html": "detail_info_forum2_item",
     "https://njkzdcwj.nql6i-8t6su-hytife.xyz:16677/topic/324619.html": "detail_info_forum2_item",
     "https://eudkyp.luqv0-yf46s-xrnpkz.xyz:16677/topic/324148.html": "detail_info_forum2_item",
-    "https://alvjak.uh1h2-ru1qt-cyscbt.xyz:16677/topic/328416.html": "detail_info_forum2_item",
     "https://sadoleu.rznla-fgwyr-nzqalp.xyz:16677/topic/656863.html": "detail_info_forum2_item",
     "https://ntvjzt.gau41-qu6jy-sotyug.work:16677/topic/309356.html": "detail_info_forum2_item",
     "https://gt6.59197c.com:8443/tie1/t30.html": "page",
@@ -137,6 +120,7 @@ DEDICATED_RENDERED_SITE_RULES = {
     "https://62cc.xn--cckc4dwc5inab2m.xn--q9jyb4c/6dgsb/0002.html": "topic-content",
     "https://fbgbfg.www27521c.com:8443/gsb/am05.html": "page",
     "https://2.www39169b.com:888/gsbl/s23.html": "page",
+    "https://tlwggkde.dp86b-grpqw-uiiazp.work:17466/topic/247714.html": "page",
 }
 DEDICATED_RENDERED_AUTHOR_CONTEXT_URLS = {
     "https://s4wqb.p2b6h-0xj4v-suxrzo.xyz/topic/206519.html",
@@ -160,6 +144,7 @@ DEDICATED_RENDERED_PAGE_IDENTITIES = {
     "https://gt6.59197c.com:8443/tie1/t30.html": "缘起缘灭",
     "https://fbgbfg.www27521c.com:8443/gsb/am05.html": "山野独行",
     "https://2.www39169b.com:888/gsbl/s23.html": "虚情假意",
+    "https://tlwggkde.dp86b-grpqw-uiiazp.work:17466/topic/247714.html": "澳门聚宝盆",
 }
 DEDICATED_RENDERED_ALTERNATE_DATA_ANCHORS = {
     "https://269x6s.k4x2w-1o62c-peefnm.work/topic/206456.html": ("秒杀",),
@@ -277,17 +262,11 @@ SITE_SPECIAL_VALUE_PATTERNS = {
     "https://43666.886677a.app:2563/htm/bbs/top080.html": (
         _special_pattern(r"(?<!\d)(\d{1,4})期\s*[:：]\s*🍀?\s*瞬杀半头\s*🍀?\s*开\s*[:：?？]?\s*(?:[鼠牛虎兔龙蛇马羊猴鸡狗猪]\s*)?[?？]?\s*\d{2,4}\s*[对准中√错×xX]\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])"),
     ),
-    "https://vkjwinyt.fvpzl-4ijc5-cdcyle.xyz:16677/": (
-        _special_pattern(r"(?<!\d)(\d{1,4})期[^\n]{0,30}?杀半头\s*([0-4])\s*头\s*(单|双)[^\n]{0,30}?开[^\n]{0,12}"),
-    ),
     "https://cthvktrb.am9a6-vk0h6-lwbxab.xyz:16677/": (
         _special_pattern(r"(?<!\d)(\d{1,4})期\s*[:：]\s*绝杀半头\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])\s*开\s*[:：?？]?\s*(?:[鼠牛虎兔龙蛇马羊猴鸡狗猪]\s*)?[?？]?\s*\d{2,4}\s*[对准中赢√错×xX]"),
     ),
     "https://epsyvycz.ff10o-370zd-qssnum.xyz:16677/topic/328057.html": (
         _special_pattern(r"(?<!\d)(\d{1,4})期\s*杀\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])[^\n]{0,20}?开[^\n]{0,12}"),
-    ),
-    "https://hhsmgw.rcl5b-akta2-ylzzwv.xyz:16677/topic/328425.html": (
-        _special_pattern(r"(?<!\d)(\d{1,4})期[:：]?\s*杀\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])(?:【|\[)[^\]\n]{1,8}(?:】|\])[^\n]{0,20}?开[^\n]{0,12}"),
     ),
     "https://cdsgyr.6xzb4-onz45-zlnoys.xyz:16677/topic/328425.html": (
         _special_pattern(r"(?<!\d)(\d{1,4})期[:：]?\s*杀\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])(?:【|\[)[^\]\n]{1,8}(?:】|\])[^\n]{0,20}?开[^\n]{0,12}"),
@@ -319,9 +298,6 @@ SITE_SPECIAL_VALUE_PATTERNS = {
     "https://opfeal.zbwno-faau4-zilwkd.xyz:16677/topic/930772.html": (
         _special_pattern(r"(?<!\d)(\d{1,4})期\s*[:：]?\s*～～绝杀半头～～\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])[^\n]{0,20}?开[^\n]{0,12}"),
     ),
-    "https://dbnarf.qklj2-etjtd-eaqmqk.work:17466/topic/1008875.html": (
-        _special_pattern(r"(?<!\d)(\d{1,4})期\s*(?:【|\[)\s*绝杀半头\s*(?:】|\])\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])[^\n]{0,20}?开[^\n]{0,12}"),
-    ),
     "https://fflkqo.fvi38-kyblx-znvboh.work:17466/topic/1008749.html": (
         _special_pattern(r"(?<!\d)(\d{1,4})期\s*(?:【|\[)\s*绝杀半头\s*(?:】|\])\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])[^\n]{0,20}?开[^\n]{0,12}"),
     ),
@@ -334,9 +310,41 @@ SITE_SPECIAL_VALUE_PATTERNS = {
     "https://xuknerw.fu5qv-a7f7o-nxmebt.work:16633/topic/272856.html": (
         _special_pattern(r"(?<!\d)(\d{1,4})期\s*[:：]?\s*必杀半头\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])[^\n]{0,20}?开[^\n]{0,12}"),
     ),
-    "https://a.ttss.vip/article.aspx?id=971661": (
+    "https://a.ttss.vip/list.aspx?id=33": (
         _special_pattern(r"(?<!\d)(\d{1,4})期\s*◆\s*满脸春色\s*㊣\s*精杀\s*[:：]\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])\s*开[^\n]{0,12}"),
+    ),
+    "https://4.48kk49.com:1888/Article/ar_content/id/209/tid/3.html": (
+        _special_pattern(
+            r"(?<!\d)(\d{1,4})期\s*白姐杀半头\s*[:：]?\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])\s*开\s*(?:[鼠牛虎兔龙蛇马羊猴鸡狗猪]\s*)?(?:\d{2,4}|[?？]{2,})(?:\s*[对准中√错×xX])?"
+        ),
+    ),
+    "https://4.48kk49.com:1888/Article/ar_content/id/198/tid/4.html": (
+        _special_pattern(
+            r"(?<!\d)(\d{1,4})期\s*杀\s*[:：]?\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])\s*开\s*(?:[鼠牛虎兔龙蛇马羊猴鸡狗猪]\s*)?(?:\d{2,4}|[?？]{2,})(?:\s*[对准中√错×xX])?"
+        ),
+    ),
+    "https://4.48kk49.com:1888/Article/ar_content/id/145/tid/8.html": (
+        _special_pattern(
+            r"(?<!\d)(\d{1,4})期\s*杀\s*[:：]?\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])\s*开\s*(?:[鼠牛虎兔龙蛇马羊猴鸡狗猪]\s*)?(?:\d{2,4}|[?？]{2,})(?:\s*[对准中√错×xX])?"
+        ),
+    ),
+    "https://4.48kk49.com:1888/Article/ar_content/id/134/tid/9.html": (
+        _special_pattern(
+            r"(?<!\d)(\d{1,4})期\s*杀半头[\s★☆*]*[:：]?\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])\s*开\s*(?:[鼠牛虎兔龙蛇马羊猴鸡狗猪]\s*)?(?:\d{2,4}|[?？]{2,})(?:\s*[对准中√错×xX])?"
+        ),
+    ),
+    "https://4.48kk49.com:1888/Article/ar_content/id/545/tid/35.html": (
+        _special_pattern(
+            r"(?<!\d)(\d{1,4})期\s*财神爷㊣秒杀\s*[:：]?\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])\s*开\s*(?:[鼠牛虎兔龙蛇马羊猴鸡狗猪]\s*)?(?:\d{2,4}|[?？]{2,})(?:\s*[对准中√错×xX])?"
+        ),
     ),
 }
 
-SITE_DOCUMENT_MARKERS = {}
+SITE_TARGET_PLACEHOLDER_URLS = {
+    "https://a.ttss.vip/list.aspx?id=33",
+    "https://4.48kk49.com:1888/Article/ar_content/id/209/tid/3.html",
+    "https://4.48kk49.com:1888/Article/ar_content/id/198/tid/4.html",
+    "https://4.48kk49.com:1888/Article/ar_content/id/145/tid/8.html",
+    "https://4.48kk49.com:1888/Article/ar_content/id/134/tid/9.html",
+    "https://4.48kk49.com:1888/Article/ar_content/id/545/tid/35.html",
+}

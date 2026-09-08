@@ -89,16 +89,6 @@ class Match:
 
 
 @dataclass(frozen=True)
-class PreviousInfo:
-    issue: int
-    value: str
-    open_info: str
-    status: str
-    rank_ok: bool
-    reason: str
-
-
-@dataclass(frozen=True)
 class SiteResult:
     index: int
     site: Site

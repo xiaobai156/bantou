@@ -1,26 +1,21 @@
 # -*- coding: utf-8 -*-
 import re
 
-from ..documents import iter_search_texts
-from ..domain import Match, PreviousInfo, Site
-from ..site_profiles import (
+from ..documents.content import iter_search_texts
+from ..site_profiles.registry import (
     DEFAULT_KEYWORDS,
     HALF_HEAD_KEYWORD_RE,
     NON_HALF_HEAD_COLUMN_RE,
     OPEN_INFO_RE,
-    SITE_EXTRA_KEYWORDS,
     STRICT_HALF_HEAD_RE,
 )
 from ..text import (
-    ANY_VALUE_RE,
     ISSUE_RE,
     VALUE_RE,
     compact_line,
-    html_to_text,
-    normalize_half_head_value,
     normalize_text,
-    valid_half_head_no,
 )
+
 
 def values_in_segment(segment: str) -> list[str]:
     values: list[str] = []
@@ -31,86 +26,11 @@ def values_in_segment(segment: str) -> list[str]:
     return values
 
 
-def previous_rank_status(segment: str) -> tuple[str, str]:
-    text = normalize_text(segment)
-    open_match = re.search(
-        r"开\s*[:：?？]?\s*([鼠牛虎兔龙蛇马羊猴鸡狗猪]?\s*\d{2,4})",
-        text,
-    )
-    open_info = ""
-    if open_match:
-        open_info = re.sub(r"\s+", "", open_match.group(1))
-        digits_match = re.search(r"\d+", open_info)
-        digits = digits_match.group(0) if digits_match else ""
-        if not digits or set(digits) <= {"0"}:
-            open_info = ""
-
-    markers = list(re.finditer(r"[对准中√错×xX]", text))
-    marker = markers[-1].group(0) if markers else ""
-
-    if not open_info:
-        return "前一期没开奖号", ""
-    if not marker:
-        return "前一期没对错", open_info
-    if marker in {"错", "×", "x", "X"}:
-        return "前一期错", f"{open_info}{marker}"
-    return "前一期对", f"{open_info}{marker}"
-
-
-def previous_info_for(issue: int, match: Match | None) -> PreviousInfo:
-    previous_issue = issue - 1
-    if match is None:
-        return PreviousInfo(previous_issue, "", "", "", False, "前一期没找到")
-
-    reason, open_info = previous_rank_status(match.snippet)
-    rank_ok = reason == "前一期对"
-    return PreviousInfo(
-        previous_issue,
-        match.value,
-        open_info or "未找到",
-        reason,
-        rank_ok,
-        reason,
-    )
-
-
-def site_keywords(site: Site, keywords: tuple[str, ...]) -> tuple[str, ...]:
-    if site.anchors:
-        return site.anchors
-    extras = SITE_EXTRA_KEYWORDS.get(site.url, ())
-    if not extras:
-        return keywords
-    return keywords + tuple(keyword for keyword in extras if keyword not in keywords)
-
-
 def strict_segment_has_keyword(segment: str, keywords: tuple[str, ...]) -> bool:
     compact = re.sub(r"\s+", "", normalize_text(segment))
     if HALF_HEAD_KEYWORD_RE.search(compact) or "半头" in compact:
         return True
-    if any(keyword in compact for keyword in keywords):
-        return True
-    return False
-
-
-def segment_matches_site_rule(
-    segment: str,
-    site: Site | None,
-    fallback_keywords: tuple[str, ...],
-) -> bool:
-    compact = re.sub(r"\s+", "", normalize_text(segment))
-    if site is not None and site.anchors:
-        return any(anchor in compact for anchor in site.anchors)
-    return strict_segment_has_keyword(compact, fallback_keywords)
-
-
-def loose_segment_has_site_keyword(segment: str, site: Site | None) -> bool:
-    if site is None:
-        return False
-    extras = SITE_EXTRA_KEYWORDS.get(site.url, ())
-    if not extras:
-        return False
-    compact = re.sub(r"\s+", "", normalize_text(segment))
-    return any(keyword in compact for keyword in extras)
+    return any(keyword in compact for keyword in keywords)
 
 
 def contains_non_half_head_column(segment: str) -> bool:
@@ -193,22 +113,6 @@ def strict_values_in_segment(segment: str) -> list[str]:
 
     return generic_values
 
-def parse_keywords(value: str | None) -> tuple[str, ...]:
-    if value is None:
-        return DEFAULT_KEYWORDS
-    normalized = normalize_text(value)
-    if not normalized:
-        return ()
-    return tuple(part.strip() for part in re.split(r"[,，、\s]+", normalized) if part.strip())
-
-
-def segment_has_keyword(segment: str, keywords: tuple[str, ...]) -> bool:
-    if not keywords:
-        return True
-    compact = re.sub(r"\s+", "", normalize_text(segment))
-    return any(keyword in compact for keyword in keywords)
-
-
 def iter_issue_segments(text: str, wanted_issues: set[int]):
     normalized = normalize_text(text)
     lines: list[tuple[str, int]] = []
@@ -287,68 +191,3 @@ def format_issue_list(issues: set[int] | list[int], width: int = 0) -> str:
     if width <= 0:
         width = max(3, max(len(str(issue)) for issue in ordered))
     return ",".join(f"{issue:0{width}d}期" for issue in ordered)
-
-
-def explain_missing_reason(
-    documents: list[str],
-    wanted_issues: set[int],
-    site: Site,
-    target: str | None,
-    keywords: tuple[str, ...],
-    issue_width: int,
-) -> str:
-    texts = [normalize_text(html_to_text(document)) for document in documents]
-    whole_text = "\n".join(text for text in texts if text)
-    all_issues = {int(match.group(1)) for match in ISSUE_RE.finditer(whole_text)}
-
-    present_issues = sorted(issue for issue in wanted_issues if issue in all_issues)
-    missing_issues = sorted(issue for issue in wanted_issues if issue not in all_issues)
-    if not present_issues:
-        return f"页面打开成功，但没找到目标期数：{format_issue_list(wanted_issues, issue_width)}"
-    if missing_issues:
-        return (
-            f"只找到部分期数；已找到：{format_issue_list(present_issues, issue_width)}；"
-            f"缺少：{format_issue_list(missing_issues, issue_width)}"
-        )
-
-    site_level_keywords = site_keywords(site, keywords)
-    issue_segments: list[str] = []
-    keyword_segments: list[str] = []
-    value_segments: list[tuple[str, list[str]]] = []
-    for text in texts:
-        for _, _, segment, _position in iter_issue_segments(text, wanted_issues):
-            segment = focused_half_head_block(segment)
-            issue_segments.append(segment)
-            if strict_segment_has_keyword(segment, site_level_keywords):
-                keyword_segments.append(segment)
-                values = strict_values_in_segment(segment)
-                if values:
-                    value_segments.append((segment, values))
-
-    if not issue_segments:
-        return "找到了目标期数，但没有拿到对应期数的正文内容"
-    if not keyword_segments:
-        return "找到了目标期数，但没找到半头栏目词"
-    if not value_segments:
-        invalid_values: list[str] = []
-        for segment in keyword_segments:
-            for match in ANY_VALUE_RE.finditer(segment):
-                if valid_half_head_no(match.group(1)):
-                    continue
-                value = f"{int(match.group(1))}头{match.group(2)}"
-                if value not in invalid_values:
-                    invalid_values.append(value)
-        if invalid_values:
-            return f"找到了半头栏目词，但半头数字超出 0-4 范围：{','.join(invalid_values)}"
-        return "找到了半头栏目词，但没提取到头单双结果"
-
-    if target is not None:
-        found_values: list[str] = []
-        for _, values in value_segments:
-            for value in values:
-                if value not in found_values:
-                    found_values.append(value)
-        if target not in found_values:
-            return f"找到了半头栏目词，但没找到目标内容：{target}"
-
-    return "页面结构变化，当前规则未匹配到有效结果"
