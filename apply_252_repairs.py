@@ -24,68 +24,6 @@ replace_once(
     'BABA_FORUM_URL = "https://43666.886677a.app:2563/htm/bbs/top080.html"\nBABA_FORUM_DATA_URL = "https://43666.886677a.app:2563/main/bbs/080.html"\nSHENZHEN_FUTAN_URL',
 )
 
-# Bound the aggregate response while retaining enough rows to cross the current-year boundary.
-replace_once(
-    "bantou/documents/dynamic/routes.py",
-    'f"{base}/api/v1/users/{user_id}/forums?per_page=5000",',
-    'f"{base}/api/v1/users/{user_id}/forums?per_page=500",',
-)
-
-# Some aggregate endpoints ignore page=2. Accept page 1 as complete only when it proves
-# a strictly ordered current-year prefix followed by older years and no current-year row after that boundary.
-aggregate_path = Path("bantou/documents/dynamic/aggregate.py")
-aggregate = aggregate_path.read_text(encoding="utf-8-sig")
-marker = "\n\ndef _pages(api_url, timeout, verify_ssl, deadline):\n"
-if aggregate.count(marker) != 1:
-    raise RuntimeError("aggregate.py: _pages marker mismatch")
-helper = '''
-
-def _current_year_prefix_complete(rows) -> bool:
-    if not rows:
-        return False
-    current_year = date.today().year
-    years: list[int] = []
-    ids: list[int] = []
-    for row in rows:
-        if not isinstance(row, dict):
-            return False
-        try:
-            year = int(row.get("year"))
-            record_id = int(row.get("id"))
-        except (TypeError, ValueError):
-            return False
-        if year > current_year:
-            return False
-        years.append(year)
-        ids.append(record_id)
-    try:
-        first_old = next(index for index, year in enumerate(years) if year < current_year)
-    except StopIteration:
-        return False
-    if first_old == 0:
-        return False
-    if any(year != current_year for year in years[:first_old]):
-        return False
-    if any(year == current_year for year in years[first_old:]):
-        return False
-    if any(left <= right for left, right in zip(ids, ids[1:])):
-        return False
-    return True
-'''
-aggregate = aggregate.replace(marker, helper + marker, 1)
-old_end = '        yield rows\n        if (last is not None and page == last) or (last is None and len(rows) < page_size):\n            return\n'
-new_end = '''        yield rows
-        if (
-            (last is not None and page == last)
-            or (last is None and len(rows) < page_size)
-            or (last is None and page == 1 and _current_year_prefix_complete(rows))
-        ):
-            return
-'''
-if aggregate.count(old_end) != 1:
-    raise RuntimeError("aggregate.py: page termination block mismatch")
-aggregate_path.write_text(aggregate.replace(old_end, new_end, 1), encoding="utf-8")
-
 # Allow rendered-text sites to select a stable browser readiness event.
 replace_once(
     "bantou/fetching/policy.py",
@@ -200,23 +138,6 @@ Path("tests/test_issue252_repairs.py").write_text(
     '''from __future__ import annotations
 
 
-def test_current_year_prefix_complete():
-    from bantou.documents.dynamic import aggregate
-
-    current = aggregate.date.today().year
-    assert aggregate._current_year_prefix_complete([
-        {"id": 30, "year": current},
-        {"id": 29, "year": current},
-        {"id": 28, "year": current - 1},
-        {"id": 27, "year": current - 1},
-    ])
-    assert not aggregate._current_year_prefix_complete([
-        {"id": 30, "year": current},
-        {"id": 29, "year": current - 1},
-        {"id": 28, "year": current},
-    ])
-
-
 def test_meng_resolver_uses_exact_same_origin_anchor(monkeypatch):
     from bantou.documents import collection
     from bantou.domain.models import Site
@@ -298,4 +219,4 @@ def test_rendered_text_forwards_wait_until(monkeypatch):
     encoding="utf-8",
 )
 
-print("252 production repair patch applied")
+print("252 six-site production repair patch applied; 简单拖鞋 intentionally skipped")
