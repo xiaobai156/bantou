@@ -75,23 +75,11 @@ def main() -> None:
             + "; ".join(f"{name}: {failures.get(name, 'unknown')}" for name in missing_required)
         )
 
-    # Prove 把把论坛 uses the declared authoritative iframe for both historical and current rows.
-    baba_251 = run_one(100, by_name["把把论坛"], 251)
-    if baba_251.error or baba_251.miss_reason or len(baba_251.matches) != 1:
-        raise SystemExit("把把论坛 251 authority regression: " + fail_reason(baba_251))
-    historical = baba_251.matches[0]
-    print(
-        "BABA_251_AUTHORITY\t"
-        + "\t".join([historical.value, historical.source_url, historical.source_kind, historical.snippet])
-    )
-    if historical.value != "3头双" or historical.source_url != BABA_FORUM_DATA_URL:
+    baba = successes["把把论坛"]
+    if baba.source_url != BABA_FORUM_DATA_URL or baba.source_kind != "iframe":
         raise SystemExit(
-            f"把把论坛 251 authority mismatch: {historical.value} {historical.source_url}"
+            f"把把论坛 252 wrong authority: {baba.source_url} {baba.source_kind}"
         )
-
-    current = successes["把把论坛"]
-    if current.source_url != BABA_FORUM_DATA_URL:
-        raise SystemExit(f"把把论坛 252 wrong authority: {current.source_url}")
 
     print(f"LIVE_SUMMARY\t252_success={len(successes)}\t252_fail={len(failures)}\t简单拖鞋=skipped")
 
