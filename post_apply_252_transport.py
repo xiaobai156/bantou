@@ -7,7 +7,7 @@ old = 'MAX_BODY_BYTES = 16 * 1024 * 1024\n\n\ndef _click_interactive_card'
 new = '''MAX_BODY_BYTES = 16 * 1024 * 1024
 SIMPLE_DRAG_SHOE_FORUMS_ORIGIN = "wcvwpj.mb4i3-vwk1b-cadppa.work"
 SIMPLE_DRAG_SHOE_FORUMS_PATH = "/api/v1/users/1293/forums"
-SIMPLE_DRAG_SHOE_MAX_BODY_BYTES = 24 * 1024 * 1024
+SIMPLE_DRAG_SHOE_MAX_BODY_BYTES = 32 * 1024 * 1024
 
 
 def _body_limit_for_url(url: str) -> int:
@@ -61,15 +61,16 @@ def test_simple_drag_shoe_body_limit_is_targeted():
     )
 
     assert _body_limit_for_url(
-        "https://wcvwpj.mb4i3-vwk1b-cadppa.work/api/v1/users/1293/forums?per_page=253"
+        "https://wcvwpj.mb4i3-vwk1b-cadppa.work/api/v1/users/1293/forums?per_page=500"
     ) == SIMPLE_DRAG_SHOE_MAX_BODY_BYTES
+    assert SIMPLE_DRAG_SHOE_MAX_BODY_BYTES == 32 * 1024 * 1024
     assert SIMPLE_DRAG_SHOE_MAX_BODY_BYTES > MAX_BODY_BYTES
     assert _body_limit_for_url(
-        "https://wcvwpj.mb4i3-vwk1b-cadppa.work/api/v1/users/999/forums?per_page=253"
+        "https://wcvwpj.mb4i3-vwk1b-cadppa.work/api/v1/users/999/forums?per_page=500"
     ) == MAX_BODY_BYTES
     assert _body_limit_for_url("https://example.test/api/v1/users/1293/forums") == MAX_BODY_BYTES
 '''
 if 'def test_simple_drag_shoe_body_limit_is_targeted():' in tests:
     raise RuntimeError("targeted body limit test already exists")
 test_path.write_text(tests + extra, encoding="utf-8")
-print("targeted 24 MiB body limit added for simple-drag-shoe aggregate only")
+print("targeted 32 MiB body limit added for simple-drag-shoe aggregate only")
