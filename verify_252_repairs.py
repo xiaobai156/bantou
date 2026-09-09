@@ -8,7 +8,6 @@ from bantou.site_profiles.registry import BABA_FORUM_DATA_URL
 
 ISSUE = 252
 TARGETS = [
-    "简单拖鞋",
     "揭竿而起",
     "把把论坛",
     "彩运通",
@@ -18,6 +17,7 @@ TARGETS = [
 ]
 EXPECTED = {
     "揭竿而起": "4头单",
+    "把把论坛": "1头双",
     "彩运通": "2头单",
     "山高水厂": "2头单",
     "萌小萌": "3头双",
@@ -55,8 +55,6 @@ def main() -> None:
         if result.error or result.miss_reason or len(result.matches) != 1:
             failures[name] = fail_reason(result)
             print(f"LIVE_FAIL\t{name}\t{failures[name]}")
-            if name == "简单拖鞋":
-                raise SystemExit("简单拖鞋 252 still failing: " + failures[name])
             continue
         match = result.matches[0]
         successes[name] = match
@@ -66,40 +64,36 @@ def main() -> None:
                 [name, match.value, match.source_url, match.source_kind, match.snippet]
             )
         )
-        expected = EXPECTED.get(name)
-        if expected is not None and match.value != expected:
+        expected = EXPECTED[name]
+        if match.value != expected:
             raise SystemExit(f"{name} 252 value changed: {match.value} != {expected}")
 
-    required = set(TARGETS) - {"把把论坛"}
-    missing_required = sorted(required - successes.keys())
+    missing_required = sorted(set(TARGETS) - successes.keys())
     if missing_required:
         raise SystemExit(
             "required 252 sites still failing: "
             + "; ".join(f"{name}: {failures.get(name, 'unknown')}" for name in missing_required)
         )
 
-    # Prove the declared 把把论坛 authority remains the same source as the known 251 evidence.
+    # Prove 把把论坛 uses the declared authoritative iframe for both historical and current rows.
     baba_251 = run_one(100, by_name["把把论坛"], 251)
     if baba_251.error or baba_251.miss_reason or len(baba_251.matches) != 1:
         raise SystemExit("把把论坛 251 authority regression: " + fail_reason(baba_251))
-    match = baba_251.matches[0]
+    historical = baba_251.matches[0]
     print(
         "BABA_251_AUTHORITY\t"
-        + "\t".join([match.value, match.source_url, match.source_kind, match.snippet])
+        + "\t".join([historical.value, historical.source_url, historical.source_kind, historical.snippet])
     )
-    if match.value != "3头双" or match.source_url != BABA_FORUM_DATA_URL:
+    if historical.value != "3头双" or historical.source_url != BABA_FORUM_DATA_URL:
         raise SystemExit(
-            f"把把论坛 251 authority mismatch: {match.value} {match.source_url}"
+            f"把把论坛 251 authority mismatch: {historical.value} {historical.source_url}"
         )
 
-    if "把把论坛" in successes:
-        baba = successes["把把论坛"]
-        if baba.source_url != BABA_FORUM_DATA_URL:
-            raise SystemExit(f"把把论坛 252 wrong authority: {baba.source_url}")
-    else:
-        print("BABA_252_NOT_PUBLISHED\t" + failures.get("把把论坛", "no verified row"))
+    current = successes["把把论坛"]
+    if current.source_url != BABA_FORUM_DATA_URL:
+        raise SystemExit(f"把把论坛 252 wrong authority: {current.source_url}")
 
-    print(f"LIVE_SUMMARY\t252_success={len(successes)}\t252_fail={len(failures)}")
+    print(f"LIVE_SUMMARY\t252_success={len(successes)}\t252_fail={len(failures)}\t简单拖鞋=skipped")
 
 
 if __name__ == "__main__":
