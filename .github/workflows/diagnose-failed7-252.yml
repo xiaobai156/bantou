@@ -10,7 +10,7 @@ permissions:
 jobs:
   repair:
     runs-on: windows-latest
-    timeout-minutes: 20
+    timeout-minutes: 22
     steps:
       - name: Check out staging branch
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -21,6 +21,7 @@ jobs:
         shell: pwsh
         run: |
           Copy-Item apply_252_repairs.py "$env:RUNNER_TEMP\apply_252_repairs.py"
+          Copy-Item post_apply_252.py "$env:RUNNER_TEMP\post_apply_252.py"
           Copy-Item verify_252_repairs.py "$env:RUNNER_TEMP\verify_252_repairs.py"
 
       - name: Switch to clean main base
@@ -29,12 +30,12 @@ jobs:
           git fetch origin main
           git checkout -B repair/252-result-20260909 origin/main
 
-      - name: Set up Python
+      - name: Set up Python 3.11
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.11'
 
-      - name: Install pinned dependencies
+      - name: Install pinned dependencies on Python 3.11
         run: python -m pip install -c constraints.txt -e ".[test]"
 
       - name: Install Chromium
@@ -46,25 +47,42 @@ jobs:
           $sitesBefore = (Get-FileHash sites.json -Algorithm SHA256).Hash
           $cacheBefore = (Get-FileHash recent_10_cache.json -Algorithm SHA256).Hash
           python -B "$env:RUNNER_TEMP\apply_252_repairs.py"
+          python -B "$env:RUNNER_TEMP\post_apply_252.py"
           if ((Get-FileHash sites.json -Algorithm SHA256).Hash -ne $sitesBefore) { throw 'sites.json changed' }
           if ((Get-FileHash recent_10_cache.json -Algorithm SHA256).Hash -ne $cacheBefore) { throw 'recent_10_cache.json changed' }
 
-      - name: Compile
+      - name: Compile on Python 3.11
         run: python -B -m compileall -q bantou run_daily.py run_multi.py
 
-      - name: Run regressions with Chromium smoke
+      - name: Run Python 3.11 regressions with Chromium smoke
         env:
           RUN_BROWSER_SMOKE: '1'
           PYTHONUTF8: '1'
         run: python -B -m pytest -q tests
 
-      - name: Check retry launcher
+      - name: Check retry launcher on Python 3.11
         run: python -B check_retry_input.py
 
       - name: Verify targeted live sites
         env:
           PYTHONUTF8: '1'
         run: python -B "$env:RUNNER_TEMP\verify_252_repairs.py"
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.10'
+
+      - name: Install pinned dependencies on Python 3.10
+        run: python -m pip install -c constraints.txt -e ".[test]"
+
+      - name: Run Python 3.10 regressions
+        env:
+          PYTHONUTF8: '1'
+        run: python -B -m pytest -q tests
+
+      - name: Check retry launcher on Python 3.10
+        run: python -B check_retry_input.py
 
       - name: Verify diff scope
         shell: pwsh
