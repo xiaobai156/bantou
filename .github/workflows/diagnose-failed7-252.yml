@@ -1,19 +1,34 @@
-name: Diagnose exact remaining issue 252 sources
+name: Apply and verify issue 252 repairs
 
 on:
   push:
     branches: [repair/252-failures-20260909]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  diagnose:
+  repair:
+    if: github.event.head_commit.message == 'test: run clean 252 production repair'
     runs-on: windows-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
-      - name: Check out repository
+      - name: Check out staging branch
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+
+      - name: Save staging repair tools
+        shell: pwsh
+        run: |
+          Copy-Item apply_252_repairs.py "$env:RUNNER_TEMP\apply_252_repairs.py"
+          Copy-Item verify_252_repairs.py "$env:RUNNER_TEMP\verify_252_repairs.py"
+
+      - name: Switch to clean main base
+        shell: pwsh
+        run: |
+          git fetch origin main
+          git checkout -B repair/252-result-20260909 origin/main
 
       - name: Set up Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
@@ -26,7 +41,57 @@ jobs:
       - name: Install Chromium
         run: python -m playwright install chromium
 
-      - name: Inspect exact live sources
+      - name: Apply production patch
+        shell: pwsh
+        run: |
+          $sitesBefore = (Get-FileHash sites.json -Algorithm SHA256).Hash
+          $cacheBefore = (Get-FileHash recent_10_cache.json -Algorithm SHA256).Hash
+          python -B "$env:RUNNER_TEMP\apply_252_repairs.py"
+          if ((Get-FileHash sites.json -Algorithm SHA256).Hash -ne $sitesBefore) { throw 'sites.json changed' }
+          if ((Get-FileHash recent_10_cache.json -Algorithm SHA256).Hash -ne $cacheBefore) { throw 'recent_10_cache.json changed' }
+
+      - name: Compile
+        run: python -B -m compileall -q bantou run_daily.py run_multi.py
+
+      - name: Run regressions with Chromium smoke
+        env:
+          RUN_BROWSER_SMOKE: '1'
+          PYTHONUTF8: '1'
+        run: python -B -m pytest -q tests
+
+      - name: Check retry launcher
+        run: python -B check_retry_input.py
+
+      - name: Verify targeted live sites
         env:
           PYTHONUTF8: '1'
-        run: python -B diagnose_remaining_queries.py
+        run: python -B "$env:RUNNER_TEMP\verify_252_repairs.py"
+
+      - name: Verify diff scope
+        shell: pwsh
+        run: |
+          git diff --check
+          $allowed = @(
+            'bantou/documents/collection.py',
+            'bantou/documents/dynamic/aggregate.py',
+            'bantou/documents/dynamic/routes.py',
+            'bantou/fetching/policy.py',
+            'bantou/site_profiles/registry.py',
+            'tests/test_audit_repairs.py'
+          )
+          $changed = @(git diff --name-only)
+          foreach ($path in $changed) {
+            if ($allowed -notcontains $path) { throw "unexpected changed file: $path" }
+          }
+          foreach ($path in $allowed) {
+            if ($changed -notcontains $path) { throw "expected file was not changed: $path" }
+          }
+
+      - name: Commit clean result branch
+        shell: pwsh
+        run: |
+          git config user.name 'xiaobai156'
+          git config user.email '20069100+xiaobai156@users.noreply.github.com'
+          git add bantou/documents/collection.py bantou/documents/dynamic/aggregate.py bantou/documents/dynamic/routes.py bantou/fetching/policy.py bantou/site_profiles/registry.py tests/test_audit_repairs.py
+          git commit -m 'fix: repair verified issue 252 site failures'
+          git push --force origin HEAD:refs/heads/repair/252-result-20260909
