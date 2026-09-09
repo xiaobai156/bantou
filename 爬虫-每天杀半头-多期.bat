@@ -17,16 +17,7 @@ cd /d "%~dp0"
 set "PYTHONUTF8=1"
 set "PYTHONIOENCODING=utf-8"
 
-echo Input periods, for example 187 188 189 190
-set /p PERIODS=
-
-if "%PERIODS%"=="" (
-  echo Periods are required.
-  pause
-  exit /b 1
-)
-
-%PY_CMD% "%~dp0bantou_multi_period.py" %PERIODS%
+%PY_CMD% "%~dp0run_multi.py"
 if errorlevel 1 (
   echo.
   echo Multi-period crawl failed.

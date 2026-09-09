@@ -7,7 +7,8 @@ import concurrent.futures
 import re
 import threading
 from dataclasses import dataclass
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import urlsplit, urlunsplit, urljoin
+import time
 
 import requests
 
@@ -33,7 +34,7 @@ def _click_interactive_card(page, issue: int, site_name: str, timeout: int) -> N
     count = card.count()
     if count != 1:
         raise ValueError(f"目标卡片未唯一命中：{card_text}，找到{count}个")
-    card.click()
+    card.click(timeout=timeout * 1000)
     page.wait_for_function(
         """
         ([issue]) => {
@@ -56,6 +57,13 @@ def canonical_url(url: str) -> str:
         host = f"{host}:{port}"
     path = parsed.path or "/"
     return urlunsplit((scheme, host, path, parsed.query, ""))
+
+
+
+def canonical_browser_url(url: str) -> str:
+    parsed = urlsplit(url.strip())
+    base = canonical_url(url)
+    return base + ("#" + parsed.fragment if parsed.fragment else "")
 
 
 def decode_response_content(raw: bytes, declared_encoding: str | None) -> str:
@@ -93,72 +101,24 @@ class _Flight:
     error: Exception | None = None
 
 
-class _BrowserWorker:
-    def __init__(self) -> None:
-        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
-        self._playwright = None
-        self._browser = None
-        self._browser_contexts: dict[bool, object] = {}
+from .browser_process import ProcessBrowserWorker as _BrowserWorker
 
-    def _render_owner(
-        self,
-        url: str,
-        timeout: int,
-        verify_ssl: bool,
-        html: bool,
-        wait_until: str,
-        interaction: tuple[int, str] | None = None,
-    ) -> str:
-        from playwright.sync_api import sync_playwright
 
-        if self._playwright is None:
-            self._playwright = sync_playwright().start()
-            self._browser = self._playwright.chromium.launch(headless=True)
-        context = self._browser_contexts.get(verify_ssl)
-        if context is None:
-            context = self._browser.new_context(ignore_https_errors=not verify_ssl)
-            self._browser_contexts[verify_ssl] = context
-        page = context.new_page()
-        try:
-            page.goto(url, wait_until=wait_until, timeout=timeout * 1000)
-            if interaction is not None:
-                _click_interactive_card(page, *interaction, timeout=timeout)
-            return page.content() if html else page.inner_text("body", timeout=timeout * 1000)
-        finally:
-            page.close()
 
-    def render(
-        self,
-        url: str,
-        timeout: int,
-        verify_ssl: bool,
-        html: bool,
-        wait_until: str,
-        interaction: tuple[int, str] | None = None,
-    ) -> str:
-        future = self.executor.submit(
-            self._render_owner, url, timeout, verify_ssl, html, wait_until, interaction
-        )
-        return future.result(timeout=timeout + 10)
+class FetchedText(str):
+    def __new__(cls, text, requested_url="", final_url="", redirect_chain=()):
+        obj = super().__new__(cls, text)
+        obj.requested_url = requested_url
+        obj.final_url = final_url or requested_url
+        obj.redirect_chain = tuple(redirect_chain)
+        return obj
 
-    def _close_owner(self) -> None:
-        for context in self._browser_contexts.values():
-            context.close()
-        self._browser_contexts.clear()
-        if self._browser is not None:
-            self._browser.close()
-            self._browser = None
-        if self._playwright is not None:
-            self._playwright.stop()
-            self._playwright = None
 
-    def close(self) -> None:
-        try:
-            self.executor.submit(self._close_owner).result(timeout=10)
-        except concurrent.futures.TimeoutError:
-            self.executor.shutdown(wait=False, cancel_futures=True)
-        else:
-            self.executor.shutdown(wait=True, cancel_futures=True)
+def same_origin(left: str, right: str) -> bool:
+    def origin(value):
+        parsed = urlsplit(value)
+        return (parsed.scheme.lower(), parsed.hostname, parsed.port or (443 if parsed.scheme == "https" else 80))
+    return origin(left) == origin(right)
 
 
 class RunTransport:
@@ -206,21 +166,33 @@ class RunTransport:
 
     def _request_once(self, url: str, timeout: int, verify_ssl: bool) -> str:
         session = self.session_for(verify_ssl)
-        with self._domain_semaphore(url):
-            response = session.get(
-                url,
-                timeout=(min(10, timeout), timeout),
-                verify=verify_ssl,
-                allow_redirects=True,
-            )
-        for historic_response in [*response.history, response]:
-            from_scheme = urlsplit(historic_response.url).scheme.lower()
-            location = historic_response.headers.get("Location", "")
-            to_scheme = urlsplit(location).scheme.lower()
-            if from_scheme == "https" and to_scheme == "http":
-                raise requests.RequestException("禁止 HTTPS 重定向到 HTTP，避免误抓")
-        response.raise_for_status()
-        return decode_response_content(response.content, response.encoding)
+        deadline = time.monotonic() + timeout
+        semaphore = self._domain_semaphore(url)
+        if not semaphore.acquire(timeout=timeout):
+            raise TimeoutError("单站总超时：等待域名请求槽超时")
+        chain = []
+        current = url
+        try:
+            for _hop in range(6):
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise TimeoutError("单站总超时：重定向超时")
+                with session.get(current, timeout=(min(10, remaining), remaining),
+                                 verify=verify_ssl, allow_redirects=False) as response:
+                    location = response.headers.get("Location")
+                    if response.status_code in {301, 302, 303, 307, 308} and location:
+                        destination = urljoin(current, location)
+                        if not same_origin(url, destination):
+                            raise requests.RequestException("禁止未登记的跨来源重定向")
+                        chain.append(current)
+                        current = destination
+                        continue
+                    response.raise_for_status()
+                    return FetchedText(decode_response_content(response.content, response.encoding),
+                                       url, response.url or current, chain)
+            raise requests.TooManyRedirects("重定向次数超过5次")
+        finally:
+            semaphore.release()
 
     def fetch_text(self, url: str, timeout: int, verify_ssl: bool) -> str:
         normalized = canonical_url(url)
@@ -253,7 +225,8 @@ class RunTransport:
                     self._flights.pop(key, None)
                     flight.event.set()
 
-        flight.event.wait()
+        if not flight.event.wait(timeout=timeout):
+            raise TimeoutError("单站总超时：等待共享请求超时")
         if flight.error is not None:
             raise flight.error
         if flight.text is None:
@@ -271,7 +244,7 @@ class RunTransport:
     ) -> str:
         with self._lock:
             if not self._browser_workers:
-                self._browser_workers = [_BrowserWorker() for _ in range(4)]
+                self._browser_workers = [_BrowserWorker() for _ in range(2)]
             worker = self._browser_workers[
                 self._browser_worker_index % len(self._browser_workers)
             ]
@@ -297,7 +270,7 @@ class RunTransport:
     ) -> str:
         if wait_until not in {"domcontentloaded", "load", "networkidle"}:
             raise ValueError(f"浏览器等待方式无效：{wait_until}")
-        normalized = canonical_url(url)
+        normalized = canonical_browser_url(url)
         key = (
             "html" if html else "text",
             wait_until,
@@ -338,7 +311,8 @@ class RunTransport:
                 with self._lock:
                     self._render_flights.pop(key, None)
                     flight.event.set()
-        flight.event.wait()
+        if not flight.event.wait(timeout=timeout):
+            raise TimeoutError("单站总超时：等待共享请求超时")
         if flight.error is not None:
             raise flight.error
         if flight.text is None:

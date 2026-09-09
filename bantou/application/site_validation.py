@@ -16,8 +16,9 @@ from bantou.application.site_crawl import crawl_site
 from bantou.config.issues import parse_issue_range
 from bantou.config.sites import DEFAULT_SITES_FILE, read_sites
 from bantou.domain.models import Site, SiteResult
+from bantou.domain.validation import validate_exact_matches
 from bantou.fetching.policy import run_transport_scope
-from bantou.fetching.transport import canonical_url
+from bantou.config.sites import normalized_site_url as canonical_url
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -60,7 +61,7 @@ def _matches_all_requested(result: SiteResult, wanted_issues: set[int]) -> bool:
     return (
         not result.error
         and not result.miss_reason
-        and {match.issue for match in result.matches} == wanted_issues
+        and validate_exact_matches(result.matches, wanted_issues) is None
     )
 
 
@@ -98,6 +99,14 @@ def main(argv: list[str] | None = None) -> int:
         issues, _width, _label = parse_issue_range(args.issue)
         wanted_issues = set(issues)
         sites = select_sites(read_sites(Path(args.sites)), args.site, args.url)
+        if len(issues) > 1:
+            codes = []
+            for issue in issues:
+                for site in sites:
+                    codes.append(main(["--issue", str(issue), "--site", site.name, "--sites", args.sites,
+                                       "--timeout", str(args.timeout), "--site-timeout", str(args.site_timeout),
+                                       "--retries", str(args.retries)]))
+            return 0 if all(code == 0 for code in codes) else 2
     except Exception as exc:
         print(f"独立验证输入错误：{exc}", file=sys.stderr)
         return 2

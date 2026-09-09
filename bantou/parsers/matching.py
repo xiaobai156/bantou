@@ -32,6 +32,7 @@ from .segments import (
     segment_quantity_valid,
     strict_segment_has_keyword,
     strict_values_in_segment,
+    values_in_segment,
 )
 
 
@@ -79,7 +80,12 @@ def special_matches_in_text(
                 continue
             seen.add(key)
             snippet = compact_line(matched_text)
-            found.append((issue, value, snippet, match.start()))
+            record = next((segment for number, _token, segment, position
+                           in iter_issue_segments(normalized, {issue})
+                           if number == issue and position == match.start()), matched_text)
+            record_values = values_in_segment(record)
+            for record_value in record_values or [value]:
+                found.append((issue, record_value, compact_line(record), match.start()))
     return found
 
 
@@ -90,6 +96,8 @@ def _source_block_bounds(
     searched_position: int,
     value: str,
 ) -> tuple[int, int] | None:
+    if hasattr(searched_text, "source_position"):
+        return searched_text.source_position, searched_text.source_row_end
     start = original_issue_position(
         document, searched_text, issue_text, searched_position, value
     )
@@ -158,7 +166,7 @@ def find_matches(
 
     for document_order, document in enumerate(documents):
         for text in iter_search_texts(document):
-            normalized_search_text = normalize_text(text)
+            normalized_search_text = text if hasattr(text, "source_position") else normalize_text(text)
             for issue, value, snippet, parsed_position in special_matches_in_text(
                 text,
                 wanted_issues,
@@ -181,6 +189,10 @@ def find_matches(
                 anchor_text, anchor_position = _anchor_evidence(
                     document, local_start, local_end, tuple(site.anchors)
                 )
+                if hasattr(text, "source_header_start"):
+                    anchor_text, anchor_position = _anchor_evidence(
+                        document, text.source_header_start, text.source_header_end, tuple(site.anchors)
+                    )
                 if anchor_position >= 0:
                     anchor_position += offset
                 key = (document_order, issue, value, position)
@@ -224,17 +236,16 @@ def find_matches(
                     continue
                 if not segment_has_body_locator(segment):
                     continue
-                if not segment_quantity_valid(segment, issue):
+                if {int(token.group(1)) for token in ISSUE_RE.finditer(segment)} != {issue}:
                     continue
-                values = strict_values_in_segment(segment)
+                # Preserve all same-record values for the boundary conflict gate.
+                values = values_in_segment(segment)
                 if not values:
                     continue
                 if target is not None:
                     if target not in values:
                         continue
                     values = [target]
-                else:
-                    values = values[:1]
                 snippet = compact_line(segment)
                 for value in values:
                     bounds = _source_block_bounds(
@@ -250,6 +261,10 @@ def find_matches(
                     anchor_text, anchor_position = _anchor_evidence(
                         document, local_start, local_end, tuple(site.anchors)
                     )
+                    if hasattr(text, "source_header_start"):
+                        anchor_text, anchor_position = _anchor_evidence(
+                            document, text.source_header_start, text.source_header_end, tuple(site.anchors)
+                        )
                     if anchor_position >= 0:
                         anchor_position += offset
                     key = (document_order, issue, value, position)
@@ -361,7 +376,7 @@ def apply_secondary_site_scope(
                     replace(
                         match,
                         anchor_text=anchor,
-                        anchor_position=match.position + normalized.find(anchor),
+                        anchor_position=match.anchor_position,
                     )
                 )
             scoped = annotated
@@ -402,11 +417,7 @@ def apply_secondary_site_scope(
             replace(
                 match,
                 anchor_text=anchor,
-                anchor_position=(
-                    match.position + compact_snippet.find(anchor)
-                    if anchor and anchor in compact_snippet
-                    else match.position
-                ),
+                anchor_position=match.anchor_position,
                 block_id=match.block_id
                 or f"{match.container_id or 'document'}:{match.block_start}:{match.block_end}",
             )
@@ -465,8 +476,8 @@ def apply_direction_source_scope(
             if site.url in SITE_RENDERED_PAGE_AUTHORITY_URLS
             else "declared-browser"
         )
-    elif any(match.source_kind == "dynamic-record" for match in matches):
-        preferred_kinds = {"dynamic-record"}
+    elif any(match.source_kind in {"dynamic-record", "dynamic-record-browser"} for match in matches):
+        preferred_kinds = {"dynamic-record", "dynamic-record-browser"}
         authority = "exact-dynamic-record"
 
     if preferred_kinds is not None:

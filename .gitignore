@@ -9,12 +9,10 @@ htmlcov/
 coverage.xml
 .reasonix/
 
-tests/
-test_*.py
-test-*.test.js
-sites_*_test.json
-*_test.html
-*_test.txt
-*.snap
 *.log
 *.tmp
+
+.venv/
+build/
+dist/
+*.egg-info/

@@ -12,26 +12,12 @@ if not defined PY_CMD (
   pause
   exit /b 1
 )
-setlocal EnableDelayedExpansion
+setlocal DisableDelayedExpansion
 cd /d "%~dp0"
 set "PYTHONUTF8=1"
 set "PYTHONIOENCODING=utf-8"
 
-echo Input period, for example 125 or 094-125
-set /p ISSUES=
-
-if "%ISSUES%"=="" (
-  echo Period is required.
-  pause
-  exit /b 1
-) else (
-  echo %ISSUES% | findstr /c:"-" >nul
-  if errorlevel 1 (
-    %PY_CMD% "%~dp0bantou_crawler.py" %ISSUES% --write-backup
-  ) else (
-    %PY_CMD% "%~dp0bantou_crawler.py" %ISSUES%
-  )
-)
+%PY_CMD% "%~dp0run_daily.py"
 if errorlevel 1 (
   echo.
   echo Crawl or cache update failed. Check the result and cache messages above.

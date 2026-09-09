@@ -43,8 +43,16 @@ def parse_issue_range(value: str) -> tuple[list[int], int, str]:
         raise ValueError("期数不能为空")
 
     ordered = sorted(issues)
-    if len(ordered) == 1:
-        label = f"{ordered[0]:0{width}d}"
-    else:
-        label = f"{ordered[0]:0{width}d}-{ordered[-1]:0{width}d}"
+    label = format_issue_label(ordered, width)
     return ordered, width, label
+
+
+def format_issue_label(issues: list[int], width: int = 3) -> str:
+    ordered = sorted(set(issues))
+    if not ordered or any(type(issue) is not int or issue <= 0 for issue in ordered):
+        raise ValueError("期数必须为正整数")
+    if len(ordered) == 1:
+        return f"{ordered[0]:0{width}d}"
+    if ordered == list(range(ordered[0], ordered[-1] + 1)):
+        return f"{ordered[0]:0{width}d}-{ordered[-1]:0{width}d}"
+    return "_".join(f"{issue:0{width}d}" for issue in ordered)

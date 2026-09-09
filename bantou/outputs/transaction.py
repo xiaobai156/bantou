@@ -49,12 +49,15 @@ def _lock_handle(handle) -> None:
     if handle.tell() == 0:
         handle.write(b"\0")
         handle.flush()
+    deadline = time.monotonic() + 30
     while True:
         try:
             handle.seek(0)
             msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
             return
         except OSError:
+            if time.monotonic() >= deadline:
+                raise TimeoutError("等待正式输出锁超过30秒")
             time.sleep(0.05)
 
 

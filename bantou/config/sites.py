@@ -1,3 +1,4 @@
+import csv
 import json
 import re
 from pathlib import Path
@@ -64,6 +65,8 @@ def parse_json_sites(text: str, source: str) -> list[Site]:
         name = str(item.get("name") or item.get("网站名称") or "").strip()
         url = str(item.get("url") or item.get("网址") or "").strip()
         raw_pick = str(item.get("region") or item.get("pick") or item.get("位置") or "").strip()
+        if any(char in name + url for char in "\t\r\n"):
+            raise ValueError(f"{source}:{index} 站点名称/URL不能含制表符或换行")
         if not name or not url:
             raise ValueError(f"{source}:{index} 缺少 name/url")
         if not raw_pick:
@@ -158,25 +161,35 @@ def read_sites(path: Path, *, script_dir: Path = SCRIPT_DIR) -> list[Site]:
     raise FileNotFoundError(f"找不到网站列表：{path}")
 
 
-def read_failed_sites(path: Path, all_sites: list[Site]) -> list[Site]:
+def read_failed_sites(path: Path, all_sites: list[Site], *, issue: int | None = None) -> list[Site]:
+    if issue is None:
+        raise ValueError("读取失败文件必须明确指定目标期数")
     if not path.exists():
         raise FileNotFoundError(f"找不到失败结果文件：{path}")
-
-    rows = path.read_text(encoding="utf-8-sig").splitlines()
-    wanted_names: set[str] = set()
-    wanted_urls: set[str] = set()
-    for line in rows[1:]:
-        if not line.strip() or line.startswith("无失败"):
-            continue
-        parts = line.split("\t")
-        if parts:
-            wanted_names.add(parts[0].strip())
-        for match in URL_RE.finditer(line):
-            wanted_urls.add(match.group(0).rstrip("，,;；"))
-
-    selected = [
-        site for site in all_sites if site.name in wanted_names or site.url in wanted_urls
-    ]
-    if not selected:
-        raise ValueError(f"失败结果里没有匹配到可重跑的网站：{path}")
-    return selected
+    filename_issue = re.fullmatch(r"([0-9]{1,4})期-半头-失败\.txt", path.name)
+    by_identity = {(site.name, normalized_site_url(site.url)): site for site in all_sites}
+    if len(by_identity) != len(all_sites):
+        raise ValueError("正式配置站点身份不唯一")
+    wanted = set()
+    with path.open(encoding="utf-8-sig", newline="") as handle:
+        reader = csv.DictReader(handle, delimiter="\t")
+        required = {"网站名称", "分类", "原因", "网址"}
+        if reader.fieldnames is None or not required <= set(reader.fieldnames):
+            raise ValueError("失败文件表头无效")
+        explicit_issue = "期数" in reader.fieldnames
+        if not explicit_issue and (filename_issue is None or int(filename_issue.group(1)) != issue):
+            raise ValueError("旧格式失败文件名与指定期数不一致")
+        for row in reader:
+            if not any(str(value or "").strip() for value in row.values()):
+                continue
+            if str(row.get("网站名称") or "").startswith("无失败"):
+                continue
+            if None in row or any(row.get(field) is None for field in required):
+                raise ValueError(f"失败文件第{reader.line_num}行字段数量无效")
+            if explicit_issue and str(row.get("期数") or "").strip() not in {str(issue), f"{issue:03d}"}:
+                raise ValueError(f"失败文件第{reader.line_num}行期数不匹配")
+            identity = (str(row["网站名称"]).strip(), normalized_site_url(str(row["网址"])))
+            if identity not in by_identity:
+                raise ValueError(f"失败文件第{reader.line_num}行站名和URL未成对匹配正式配置")
+            wanted.add(identity)
+    return [site for site in all_sites if (site.name, normalized_site_url(site.url)) in wanted]

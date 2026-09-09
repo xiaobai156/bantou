@@ -27,6 +27,7 @@ from ..site_profiles.registry import (
     WUZHUANXINGYI_URL,
 )
 from ..text import normalize_text
+from ..fetching.transport import same_origin
 from .content import (
     add_document_with_decoded,
     extract_dedicated_rendered_documents,
@@ -113,6 +114,8 @@ def add_fetched_resources(
         urls, timeout, verify_ssl, deadline=deadline
     ):
         if resource_error is not None:
+            if resource_kind in {"iframe", "script"}:
+                raise FetchError(f"权威附属资源获取失败：{resource_url}：{resource_error}") from resource_error
             script_errors.append(f"{resource_url} ({resource_error})")
             continue
         if resource_text:
@@ -197,29 +200,38 @@ def collect_documents(
     frame_index = 0
     document_scan_index = 0
     while True:
+        if len(documents) > 128 or len(seen_scripts) + len(seen_frames) + len(seen_half_head_urls) > 64:
+            raise ValueError("来源资源数量超过上限，未完成来源核验")
         documents_to_scan = documents[document_scan_index:]
         document_scan_index = len(documents)
         for document in documents_to_scan:
+            document_url = str(getattr(document, "source_url", "") or url)
             scan_documents = (document, document.replace("\\'", "'").replace('\\"', '"'))
             for scan_document in scan_documents:
                 for _, src in SCRIPT_SRC_RE.findall(scan_document):
                     if not src or src.strip("\\/") == "":
                         continue
-                    full_url = urljoin(url, html.unescape(src))
+                    full_url = urljoin(document_url, html.unescape(src))
+                    if not same_origin(url, full_url):
+                        raise ValueError("附属资源指向未登记的跨来源URL")
                     if full_url not in seen_scripts and should_fetch_script(full_url):
                         seen_scripts.add(full_url)
                         script_urls.append(full_url)
                 for _, src in IFRAME_SRC_RE.findall(scan_document):
                     if not src or src.strip("\\/") == "":
                         continue
-                    full_url = urljoin(url, html.unescape(src))
+                    full_url = urljoin(document_url, html.unescape(src))
+                    if not same_origin(url, full_url):
+                        raise ValueError("附属资源指向未登记的跨来源URL")
                     if full_url not in seen_frames and should_fetch_iframe(full_url):
                         seen_frames.add(full_url)
                         frame_urls.append(full_url)
                 for _, href in HALF_HEAD_LINK_RE.findall(scan_document):
                     if not href or href.strip("\\/") == "":
                         continue
-                    full_url = urljoin(url, html.unescape(href))
+                    full_url = urljoin(document_url, html.unescape(href))
+                    if not same_origin(url, full_url):
+                        raise ValueError("半头链接指向未登记的跨来源URL")
                     if full_url not in seen_half_head_urls and should_fetch_half_head_link(full_url):
                         seen_half_head_urls.add(full_url)
                         half_head_urls.append(full_url)

@@ -68,11 +68,11 @@ def cache_record_signature(record: dict[str, object]) -> tuple[str, int, int]:
         raise CacheValidationError(f"重复检测缓存记录缺少值、原始顺序或原始位置：{exc}") from exc
 
 
-def _site_identity(site: Site) -> tuple[str, str, str, str, tuple[str, ...]]:
-    return site.name, site.url, site.pick, site.parser_id, tuple(site.anchors)
+def _site_identity(site: Site) -> tuple[str, str, str, str, tuple[str, ...], str, str]:
+    return site.name, site.url, site.pick, site.parser_id, tuple(site.anchors), site.fetch_url, site.entry_mode
 
 
-def _cache_identity(item: dict[str, object]) -> tuple[str, str, str, str, tuple[str, ...]]:
+def _cache_identity(item: dict[str, object]) -> tuple[str, str, str, str, tuple[str, ...], str, str]:
     anchors = item.get("anchors")
     if not isinstance(anchors, list):
         raise CacheValidationError("重复检测缓存站点 anchors 无效")
@@ -82,6 +82,8 @@ def _cache_identity(item: dict[str, object]) -> tuple[str, str, str, str, tuple[
         str(item.get("pick") or ""),
         str(item.get("parser") or ""),
         tuple(str(anchor) for anchor in anchors),
+        str(item.get("fetch_url") or ""),
+        str(item.get("entry_mode") or "direct"),
     )
 
 
@@ -152,8 +154,8 @@ def evaluate_cache(
     """Compare configured sites solely from a validated recent-ten cache."""
     cache_schema = int(payload.get("schema") or 0)
     validated = validate_cache_payload(payload)
-    if not 1 <= window <= 10:
-        raise ValueError("检测窗口只能是 1 到 10 期")
+    if window != 10:
+        raise ValueError("正式重复检测固定使用完整近10期")
 
     all_issues = tuple(int(issue) for issue in validated["issues"])
     issues = all_issues[-window:]
@@ -198,7 +200,7 @@ def evaluate_cache(
                 run = DuplicateRun(left_name, right_name, start, end, values)
                 if left_name in SEPARATE_DUPLICATE_STAT_NAMES or right_name in SEPARATE_DUPLICATE_STAT_NAMES:
                     separate_pairs.append(run)
-                elif run.length >= 6:
+                if run.length >= 6:
                     duplicate_pairs.append(run)
                 else:
                     suspect_pairs.append(run)
@@ -227,6 +229,7 @@ def format_report(report: DuplicateReport) -> str:
     basis = "recent_10_cache.json schema=2（含原始顺序/位置和来源证据，不联网、不写缓存）"
     rule = "判定依据：同一期半头值相同且期号连续；原始顺序/位置只作来源证据"
     lines = [
+        f"正式结论：{report_decision(report)[0]}",
         f"检测依据：{basis}",
         f"检测窗口：{report.issues[0]}期~{report.issues[-1]}期，共 {len(report.issues)} 期",
         rule,
@@ -270,6 +273,17 @@ def format_report(report: DuplicateReport) -> str:
     return "\n".join(lines) + "\n"
 
 
+
+def report_decision(report: DuplicateReport) -> tuple[str, int]:
+    if report.missing_sites or report.identity_errors or len(report.issues) != 10:
+        return "未完成", 2
+    if report.duplicate_pairs:
+        return "重复拒收", 4
+    if report.suspect_pairs:
+        return "待人工审核", 3
+    return "通过", 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="半头正式重复检测（只读取 recent_10_cache.json）")
     parser.add_argument("--period", type=int, help="当前期，必须手动指定期数，例如 202")
@@ -292,6 +306,7 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         payload = read_cache(Path(args.backup_file))
+        validate_cache_payload(payload)
         if args.period is not None and args.period != int(payload["period"]):
             raise CacheValidationError(
                 f"指定 {args.period}期 与缓存最新期 {payload['period']}期不一致，拒绝混用"
@@ -302,7 +317,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"重复检测拒绝：{exc}")
         return 2
 
-    output_path = Path(args.output) if args.output else RESULT_DIR / f"{report.period}期连续8期重复检测.txt"
+    output_path = Path(args.output) if args.output else RESULT_DIR / f"{report.period}期近10期重复检测.txt"
+    if output_path.resolve() in {Path(args.backup_file).resolve(), Path(args.sites).resolve()}:
+        print("重复检测拒绝：报告不能覆盖缓存或站点配置")
+        return 2
     write_transaction({output_path: format_report(report).encode("utf-8-sig")})
     print(
         f"重复检测完成：疑似 {len(report.suspect_pairs)} 段，"
@@ -310,7 +328,9 @@ def main(argv: list[str] | None = None) -> int:
         f"缓存/身份异常 {len(report.missing_sites) + len(report.identity_errors)} 项"
     )
     print(f"检测报告：{output_path.resolve()}")
-    return 0
+    conclusion, code = report_decision(report)
+    print(f"正式结论：{conclusion}")
+    return code
 
 
 if __name__ == "__main__":

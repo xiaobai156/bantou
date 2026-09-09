@@ -21,6 +21,8 @@ def _site_cache_item_for_issues(
     period_failures: dict[int, str] | None = None,
 ) -> dict[str, object]:
     issue_set = set(issues)
+    if any(type(issue) is not int or match.issue != issue for issue, match in matches.items()):
+        raise CacheValidationError("缓存键与实际抓取期数不一致")
     if not matches or not set(matches) <= issue_set:
         raise CacheValidationError(f"{site.name} 缓存数据不在当前连续期数内，拒绝写入")
     failures = dict(period_failures or {})
@@ -35,6 +37,8 @@ def _site_cache_item_for_issues(
         "pick": site.pick,
         "parser": site.parser_id,
         "anchors": list(site.anchors),
+        "fetch_url": site.fetch_url,
+        "entry_mode": site.entry_mode,
         "records": {
             str(issue): cache_entry_from_match(matches[issue])
             for issue in issues
@@ -97,12 +101,14 @@ def build_bootstrap_cache_payload(
     )
 
 
-def _site_identity_from_item(item: dict[str, object]) -> tuple[str, str, str, str, tuple[str, ...]]:
+def _site_identity_from_item(item: dict[str, object]) -> tuple[str, str, str, str, tuple[str, ...], str, str]:
     return (
         *(str(item[field]) for field in ("name", "url", "pick", "parser")),
         tuple(str(anchor) for anchor in item["anchors"]),
+        str(item.get("fetch_url") or ""),
+        str(item.get("entry_mode") or "direct"),
     )
 
 
-def _site_identity_from_site(site: Site) -> tuple[str, str, str, str, tuple[str, ...]]:
-    return site.name, site.url, site.pick, site.parser_id, tuple(site.anchors)
+def _site_identity_from_site(site: Site) -> tuple[str, str, str, str, tuple[str, ...], str, str]:
+    return site.name, site.url, site.pick, site.parser_id, tuple(site.anchors), site.fetch_url, site.entry_mode

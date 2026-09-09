@@ -21,6 +21,7 @@ from ..documents.dynamic.routes import (
     is_user_aggregate_page_without_record_id,
 )
 from ..domain.models import Site, SiteResult
+from ..domain.validation import validate_exact_matches
 from ..fetching.policy import FetchError, should_retry_fetch_error
 from ..outputs.formatting import failure_category
 from ..parsers.matching import (
@@ -115,14 +116,14 @@ def _documents_for_requested_issues(
                 verify_ssl,
                 deadline=deadline,
             )
-            scoped = target_record_document(loaded, fetch_url, site)
+            scoped = target_record_document(loaded, fetch_url, site, wanted_issues={issue} if issue_specific else wanted_issues)
         except ValueError as exc:
             if dynamic_record_scope(fetch_url) is None or not dynamic_browser_fallback_allowed(exc):
                 raise
             browser_documents = collect_dynamic_browser_documents(
                 fetch_url, timeout, verify_ssl, deadline=deadline
             )
-            scoped = target_record_document(browser_documents, fetch_url, site)
+            scoped = target_record_document(browser_documents, fetch_url, site, wanted_issues={issue} if issue_specific else wanted_issues)
             errors = []
         documents.extend(scoped)
         script_errors.extend(errors)
@@ -238,6 +239,9 @@ def crawl_site(
                 matches = [match for match in matches if match.value == target]
             missing = sorted(wanted_issues - {match.issue for match in matches})
             if not missing:
+                final_error = validate_exact_matches(matches, wanted_issues)
+                if final_error:
+                    return SiteResult(index, site, [], miss_reason=final_error)
                 return SiteResult(
                     index,
                     site,

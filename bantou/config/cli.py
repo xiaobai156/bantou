@@ -18,6 +18,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("-s", "--sites", help="网站列表 JSON")
     parser.add_argument("--success-out", default="", help="成功结果 txt；不填则自动生成 N期-半头.txt")
     parser.add_argument("--fail-out", default="", help="失败结果 txt；不填则自动生成 N期-半头-失败.txt")
+    parser.add_argument("--replace-existing", action="store_true", help="明确授权替换已存在的整期成功/失败结果")
     parser.add_argument("--retry-fail", action="store_true", help="只重跑上次失败结果里的网站")
     parser.add_argument("--retry-fail-file", default="", help="指定要重跑的失败结果 txt；默认使用本期半头失败文件")
     parser.add_argument("--timeout", type=int, default=20, help="单个请求超时秒数")
@@ -44,6 +45,8 @@ def resolve_inputs(args: argparse.Namespace) -> tuple[str | None, str, str]:
     issues_input = args.issues
     sites_input = args.sites
     positional = list(args.pos_args)
+    if positional and any(value is not None for value in (args.target, args.issues, args.sites)):
+        raise ValueError("位置参数不能与 --target/--issues/--sites 混用")
 
     if len(positional) > 3:
         raise ValueError("参数太多。常用格式：python bantou_crawler.py 120 sites.json")

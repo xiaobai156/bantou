@@ -2,11 +2,11 @@
 import sys
 from pathlib import Path
 
-from ..config.issues import parse_issue_range
+from ..config.issues import parse_issue_range, format_issue_label
 from ..config.sites import read_sites
 from ..domain.models import Site
 from ..fetching.policy import run_transport_scope
-from ..outputs.formatting import spaced_failure_lines
+from ..outputs.formatting import spaced_failure_lines, read_success_data, default_output_names
 from ..outputs.transaction import write_transaction
 from ..paths import FAILURE_RESULT_DIR, PROJECT_DIR, RESULT_DIR
 from .single_period import main as run_single_period
@@ -20,24 +20,11 @@ def parse_periods(value: str) -> list[int]:
 
 
 def output_label(periods: list[int]) -> str:
-    ordered = sorted(periods)
-    if len(ordered) > 1 and ordered == list(range(ordered[0], ordered[-1] + 1)):
-        return f"{ordered[0]}-{ordered[-1]}"
-    return "_".join(str(period) for period in periods)
+    return format_issue_label(periods)
 
 
 def read_success_names(path: Path) -> set[str]:
-    if not path.exists():
-        return set()
-    names: set[str] = set()
-    for raw_line in path.read_text(encoding="utf-8-sig").splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("="):
-            break
-        parts = line.split("\t")
-        if len(parts) >= 2:
-            names.add(parts[1].strip())
-    return names
+    return {name for name, _issue, _value, _url in read_success_data(path, "")}
 
 
 def read_failure_reasons(path: Path) -> dict[str, str]:
@@ -70,8 +57,9 @@ def write_summary(periods: list[int]) -> Path:
     success_by_period: dict[int, set[str]] = {}
     failure_by_period: dict[int, dict[str, str]] = {}
     for period in periods:
-        success_path = RESULT_DIR / f"{period}期-半头.txt"
-        fail_path = FAILURE_RESULT_DIR / f"{period}期-半头-失败.txt"
+        success_name, fail_name = default_output_names(format_issue_label([period]))
+        success_path = RESULT_DIR / success_name
+        fail_path = FAILURE_RESULT_DIR / fail_name
         success_by_period[period] = read_success_names(success_path)
         failure_by_period[period] = read_failure_reasons(fail_path)
 

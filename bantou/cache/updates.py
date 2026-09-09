@@ -28,6 +28,8 @@ def merge_cache_updates(
     payload: dict[str, object],
     incoming: dict[str, tuple[Site, dict[int, Match]]],
     failures: list[tuple[str, str, str]],
+    *,
+    target_issue: int | None = None,
 ) -> tuple[dict[str, object], dict[str, str]]:
     """Merge verified in-window cache updates without overwriting conflicts.
 
@@ -35,6 +37,12 @@ def merge_cache_updates(
     diagnostics; callers must not use them to reclassify the live crawl result.
     """
     original = validate_cache_for_update(payload)
+    if target_issue is None:
+        raise CacheValidationError("缓存合并必须指定目标期数")
+    if target_issue != original["period"]:
+        raise CacheValidationError("历史重抓不得更新正式缓存；目标期必须等于缓存当前期")
+    if any(set(records) != {target_issue} for _site, records in incoming.values()):
+        raise CacheValidationError("缓存合并只能包含目标单期")
     updated = json.loads(json.dumps(original, ensure_ascii=False))
     issues = {int(issue) for issue in updated["issues"]}
     items = {str(item["name"]): item for item in updated["sites"]}
@@ -115,6 +123,8 @@ def roll_cache_payload(
     all_sites: list[Site],
     incoming: dict[str, tuple[Site, dict[int, Match]]],
     failures: list[tuple[str, str, str]],
+    *,
+    target_issue: int | None = None,
 ) -> tuple[dict[str, object], dict[str, str]]:
     """Advance a schema-2 cache by one period after live results are finalized.
 
@@ -124,7 +134,7 @@ def roll_cache_payload(
     original = validate_cache_for_update(payload)
     old_period = int(original["period"])
     if period == old_period:
-        return merge_cache_updates(original, incoming, failures)
+        return merge_cache_updates(original, incoming, failures, target_issue=period)
     if period != old_period + 1:
         raise CacheValidationError(
             f"缓存最后一期是 {old_period}，当前期是 {period}，不能跨期滚动；只能按下一期顺序滚动"

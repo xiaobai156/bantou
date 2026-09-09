@@ -70,7 +70,7 @@ def iter_json_payloads(document: SourceDocument):
 
 
 def dynamic_browser_fallback_allowed(error: Exception) -> bool:
-    return isinstance(error, DynamicBrowserFallbackRequired) or "缺少正文内容" in str(error)
+    return isinstance(error, DynamicBrowserFallbackRequired)
 
 
 def decode_article_field(value: object, field_name: str) -> str:
@@ -129,7 +129,7 @@ def profile_author_from_documents(
 
 
 def target_record_document(
-    documents: list[SourceDocument], url: str, site: Site
+    documents: list[SourceDocument], url: str, site: Site, *, wanted_issues: set[int] | None = None
 ) -> list[SourceDocument]:
     scope = dynamic_record_scope(url)
     if scope is None:
@@ -157,6 +157,13 @@ def target_record_document(
     if str(record.get("id") or "") != target_id:
         raise ValueError(f"动态记录 {target_id} ID校验失败：JSON路径 {path}")
 
+    if wanted_issues is not None and "draw" in record:
+        try:
+            draw = int(record["draw"])
+        except (TypeError, ValueError) as exc:
+            raise ValueError("动态记录目标期字段无效") from exc
+        if draw not in wanted_issues:
+            raise ValueError("动态记录draw与指定期数冲突")
     parsed = urlparse(url)
     user_match = re.search(r"/(?:users/)(\d+)", parsed.fragment, re.I)
     expected_user_id = user_match.group(1) if user_match else None
@@ -236,7 +243,7 @@ def target_record_document(
 
     content = target_record_content(record, record_kind)
     if not content:
-        raise ValueError(f"动态记录 {target_id} 缺少正文内容")
+        raise DynamicBrowserFallbackRequired(f"动态记录 {target_id} 缺少正文内容")
 
     if record_kind in {"reference", "forum"}:
         topic = normalize_text(str(record.get("topic") or ""))
@@ -292,7 +299,7 @@ def target_record_document(
         SourceDocument(
             f"{metadata}\n{content}",
             source_url=source_document.source_url,
-            source_kind="dynamic-record",
+            source_kind=("dynamic-record" if source_document.source_kind == "api" else "dynamic-record-browser"),
             record_id=target_id,
             record_path=path,
             route_type=record_kind,

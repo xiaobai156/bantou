@@ -22,6 +22,7 @@ from ..config.cli import build_parser, resolve_inputs
 from ..config.issues import parse_issue_range
 from ..config.sites import read_failed_sites, read_sites
 from ..domain.models import Match, Site, SiteResult
+from ..domain.validation import validate_exact_matches
 from ..fetching.policy import INSECURE_TLS_COMPATIBILITY_URLS, run_transport_scope
 from ..fetching.transport import canonical_url
 from ..outputs.formatting import (
@@ -43,14 +44,7 @@ from .site_crawl import crawl_site, format_progress_line, print_failure_summary
 
 
 def _failure_rows(lines: list[str]) -> list[tuple[str, str, str]]:
-    rows: list[tuple[str, str, str]] = []
-    for line in lines[1:]:
-        if not line.strip():
-            continue
-        parts = line.split("\t")
-        if len(parts) >= 4:
-            rows.append((parts[0], parts[2], parts[3]))
-    return rows
+    return [(name, reason, url) for name, _category, reason, url in read_fail_entries_from_lines(lines)]
 
 
 def _success_bytes(rows: list[tuple[str, str, str, str]]) -> bytes:
@@ -74,14 +68,17 @@ def _merge_retry_rows(
     issues_label: str,
     retry_rows: list[tuple[str, str, str, str]],
     retry_fail_lines: list[str],
+    *,
+    success_path: Path,
+    fail_path: Path,
 ) -> tuple[list[tuple[str, str, str, str]], list[str]]:
-    success_name, fail_name = default_output_names(issues_label)
-    success_path = Path(default_success_name_path(success_name))
-    fail_path = Path(default_failure_name_path(fail_name))
     issue_text = f"{issues_label}期"
     existing_success = read_success_data(success_path, issue_text)
     existing_success_names = {row[0] for row in existing_success}
     for row in retry_rows:
+        existing = next((old for old in existing_success if old[0] == row[0]), None)
+        if existing is not None and existing[2] != row[2]:
+            raise ValueError(f"原成功结果与重抓结果冲突：{row[0]}，拒绝改写或清除失败")
         if row[0] not in existing_success_names:
             existing_success.append(row)
             existing_success_names.add(row[0])
@@ -94,7 +91,7 @@ def _merge_retry_rows(
     existing_failures = {
         name: (name, category, reason, url)
         for name, category, reason, url in read_fail_entries(fail_path)
-        if name not in retry_success_names and _failure_url_identity(url) not in retry_success_urls
+        if (name, _failure_url_identity(url)) not in {(row[0], _failure_url_identity(row[3])) for row in retry_rows}
     }
     existing_failures.update(retry_failures)
     lines = ["网站名称\t分类\t原因\t网址"]
@@ -133,9 +130,11 @@ def _prepare_cache_payload(
 
     payload = read_cache_for_update(
         DUPLICATE_BACKUP_FILE,
-        allow_legacy_bootstrap=True,
+        allow_legacy_bootstrap=False,
     )
     if payload.get("state") == CACHE_STATE_RESET:
+        if args.retry_fail:
+            raise CacheValidationError("失败重抓不得初始化正式缓存，请先完成正常单期流程")
         return build_bootstrap_cache_payload(
             issues[0], issues, success_rows, failures
         ), {}
@@ -144,7 +143,7 @@ def _prepare_cache_payload(
             payload, issues[0], sites, success_rows, failures
         )
     if args.retry_fail:
-        updated, conflicts = merge_cache_updates(payload, success_rows, failures)
+        updated, conflicts = merge_cache_updates(payload, success_rows, failures, target_issue=issues[0])
         period_text = str(issues[0])
         missing = [
             name for name, (_site, records) in success_rows.items()
@@ -276,6 +275,7 @@ def _finalize_run(
                 args, issues, sites, rank_rows, cache_rows, fail_lines
             )
             if cache_conflicts:
+                cache_payload = None
                 cache_update_error = CacheValidationError(
                     "缓存更新未完成："
                     + "；".join(
@@ -296,13 +296,24 @@ def _finalize_run(
             )
 
         default_success_name, default_fail_name = default_output_names(issues_label)
-        success_path = default_success_name_path(args.success_out or default_success_name)
-        fail_path = default_failure_name_path(args.fail_out or default_fail_name)
-        if args.retry_fail:
-            rank_rows, fail_lines = _merge_retry_rows(
-                issues_label, rank_rows, fail_lines
-            )
+        success_path = args.resolved_success_path
+        fail_path = args.resolved_fail_path
+        try:
+            if args.retry_fail:
+                rank_rows, fail_lines = _merge_retry_rows(
+                    issues_label, rank_rows, fail_lines,
+                    success_path=success_path, fail_path=fail_path,
+                )
+            elif success_path.exists() and not args.replace_existing:
+                raise ValueError("成功文件已存在；失败重抓使用 --retry-fail，整期替换需 --replace-existing")
+        except ValueError as exc:
+            print(f"结果合并拒绝：{exc}", file=sys.stderr)
+            return 2
 
+        if fail_path.name != default_fail_name:
+            fail_lines = ["期数\t" + fail_lines[0]] + [
+                f"{issues[0]}\t{line}" for line in fail_lines[1:] if line.strip()
+            ]
         try:
             write_transaction(
                 {
@@ -364,6 +375,20 @@ def main(argv: list[str] | None = None) -> int:
         target_input, issues_input, sites_input = resolve_inputs(args)
         target = normalize_target(target_input) if target_input else None
         issues, issue_width, issues_label = parse_issue_range(issues_input)
+        if len(issues) != 1:
+            raise ValueError("单期入口一次只能指定一期；多期请使用 bantou_multi_period.py")
+        default_success, default_failure = default_output_names(issues_label)
+        args.resolved_success_path = default_success_name_path(args.success_out or default_success).resolve()
+        args.resolved_fail_path = default_failure_name_path(args.fail_out or args.retry_fail_file or default_failure).resolve()
+        paths = [args.resolved_success_path, args.resolved_fail_path, DUPLICATE_BACKUP_FILE.resolve()]
+        if len(set(paths)) != len(paths):
+            raise ValueError("成功、失败和缓存路径不能相同")
+        if args.retry_fail_file and not args.retry_fail:
+            raise ValueError("--retry-fail-file 必须与 --retry-fail 一起使用")
+        if args.retry_fail and args.fail_out and args.retry_fail_file and args.resolved_fail_path != default_fail_path_for_issues(issues_label, args.retry_fail_file).resolve():
+            raise ValueError("重抓的失败输入与输出路径必须相同")
+        if args.resolved_success_path.exists() and not (args.diagnose or args.retry_fail or args.replace_existing):
+            raise ValueError("成功文件已存在，拒绝覆盖；使用 --retry-fail 或 --replace-existing")
         if args.retry_fail and len(issues) != 1:
             raise ValueError("失败站点重跑一次只能指定一期")
         if args.rebuild_cache:
@@ -373,10 +398,20 @@ def main(argv: list[str] | None = None) -> int:
         if args.write_backup and len(issues) != 1:
             raise ValueError("正式缓存只允许单期抓取后更新")
         wanted_issues = set(issues)
+        from ..paths import DEFAULT_SITES_FILE
+        protected = {DEFAULT_SITES_FILE.resolve(), Path(sites_input).resolve()}
+        if args.resolved_success_path in protected or args.resolved_fail_path in protected:
+            raise ValueError("结果输出不能覆盖站点配置")
+        if Path(sites_input).resolve() != DEFAULT_SITES_FILE.resolve() or target is not None:
+            if not args.diagnose:
+                raise ValueError("自定义站点配置或目标值筛选只能使用 --diagnose，不得覆盖正式输出和缓存")
         sites = read_sites(Path(sites_input))
         if args.retry_fail:
-            retry_fail_path = default_fail_path_for_issues(issues_label, args.retry_fail_file)
-            sites = read_failed_sites(retry_fail_path, sites)
+            retry_fail_path = args.resolved_fail_path
+            sites = read_failed_sites(retry_fail_path, sites, issue=issues[0])
+            if not sites:
+                print("本期无失败站点；未抓取、未写入任何文件")
+                return 0
             print(f"只重跑失败网站：{len(sites)} 个，来源：{retry_fail_path.resolve()}")
         sites = sorted(
             sites,
@@ -406,8 +441,9 @@ def main(argv: list[str] | None = None) -> int:
     for result in sorted(results, key=lambda item: item.index):
         site = result.site
         matches = [match for match in result.matches if match.issue in wanted_issues]
-        if result.error or not matches or {match.issue for match in matches} != wanted_issues:
-            reason = result.error or result.miss_reason or f"{issues_label}期未抓到头"
+        validation_error = validate_exact_matches(result.matches, wanted_issues)
+        if result.error or result.miss_reason or validation_error:
+            reason = result.error or result.miss_reason or validation_error or f"{issues_label}期未抓到头"
             fail_lines.append(fail_line(site, append_script_error(reason, result.script_error_count)))
             continue
         by_issue = {match.issue: match for match in matches}

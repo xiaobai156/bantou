@@ -245,7 +245,7 @@ def normalize_half_head_value(head_no: str | int, parity: str) -> str | None:
 
 def normalize_target(text: str) -> str:
     normalized = normalize_text(text)
-    match = ANY_VALUE_RE.search(normalized)
+    match = ANY_VALUE_RE.fullmatch(normalized)
     if not match:
         raise ValueError("目标格式不对，例子：2头双、0头单")
     if not valid_half_head_no(match.group(1)):
@@ -263,82 +263,77 @@ def html_to_text(document: str) -> str:
     return normalize_text(parser.text())
 
 
+
+class TableSearchText(str):
+    def __new__(cls, text, position, row_end, header_start, header_end):
+        obj = super().__new__(cls, text)
+        obj.source_position = position
+        obj.source_row_end = row_end
+        obj.source_header_start = header_start
+        obj.source_header_end = header_end
+        return obj
+
+
 def extract_half_head_table_texts(document: str) -> list[str]:
-    extracted: list[str] = []
-    seen: set[tuple[str, str]] = set()
-    table_blocks = TABLE_RE.findall(document or "")
-    row_groups = [TABLE_ROW_RE.findall(table_html) for table_html in table_blocks]
-    if not row_groups:
-        row_groups = [TABLE_ROW_RE.findall(document or "")]
-
-    for rows in row_groups:
-        half_head_indexes: list[int] = []
-        for row_html in rows:
-            cells_html = TABLE_CELL_RE.findall(row_html)
-            if not cells_html:
+    extracted = []
+    seen = set()
+    tables = list(TABLE_RE.finditer(document or ""))
+    groups = [(m.group(1), m.start(1)) for m in tables] or [(document or "", 0)]
+    for table_html, table_offset in groups:
+        if re.search(r"<table\b", table_html, re.I):
+            continue  # Nested/merged layout needs its declared dedicated parser.
+        header_indexes = []
+        headers = {}
+        for row in TABLE_ROW_RE.finditer(table_html):
+            row_html = row.group(1)
+            row_start = table_offset + row.start(1)
+            row_end = table_offset + row.end(1)
+            cells = list(TABLE_CELL_RE.finditer(row_html))
+            texts = [normalize_text(html_to_text(cell.group(1))) for cell in cells]
+            if not texts:
                 continue
-
-            cells = [
-                normalize_text(re.sub(r"<[^>]+>", " ", html.unescape(cell_html)))
-                for cell_html in cells_html
-            ]
-            cells = [cell for cell in cells if cell]
-            if not cells:
+            if re.search(r"\b(?:colspan|rowspan)\s*=\s*[\"']?(?:[2-9]|[1-9][0-9])", row_html, re.I):
+                continue  # Do not guess positions after a non-unit span.
+            issue_cells = [i for i, text in enumerate(texts) if ISSUE_RE.search(text)]
+            current_headers = [i for i, text in enumerate(texts) if "半头" in re.sub(r"\s+", "", text)]
+            if not issue_cells:
+                if current_headers:
+                    header_indexes = current_headers
+                    headers = {i: (row_start + cells[i].start(1), row_start + cells[i].end(1)) for i in current_headers}
                 continue
-
-            current_half_head_indexes = [
-                index for index, cell in enumerate(cells) if "半头" in re.sub(r"\s+", "", cell)
-            ]
-            issue_cell = next((cell for cell in cells if ISSUE_RE.search(cell)), "")
-            if current_half_head_indexes and not issue_cell:
-                half_head_indexes = current_half_head_indexes
+            if len(issue_cells) != 1:
                 continue
-            if current_half_head_indexes:
-                half_head_indexes = current_half_head_indexes
-
-            if not half_head_indexes or not issue_cell:
+            issue_index = issue_cells[0]
+            tokens = list(ISSUE_RE.finditer(texts[issue_index]))
+            if len(tokens) != 1:
                 continue
-
-            issue_match = ISSUE_RE.search(issue_cell)
-            if issue_match is None:
+            token = tokens[0]
+            raw_cell_start = row_start + cells[issue_index].start(1)
+            raw_cell_end = row_start + cells[issue_index].end(1)
+            positions = [p for p in issue_token_positions(document, token.group(1)) if raw_cell_start <= p < raw_cell_end]
+            if len(positions) != 1:
                 continue
-
-            for index in half_head_indexes:
+            indexes = current_headers or header_indexes
+            for index in indexes:
                 if index >= len(cells):
                     continue
-                value_match = VALUE_RE.search(cells[index])
-                if not value_match:
+                if index in current_headers:
+                    header_start, header_end = row_start + cells[index].start(1), row_start + cells[index].end(1)
+                else:
+                    header_start, header_end = headers[index]
+                open_cell = next((text for text in texts if "期" not in text and re.search(r"开\s*[:：]?\s*[鼠牛虎兔龙蛇马羊猴鸡狗猪]?\s*[0-9]{2,4}", text)), "")
+                if not open_cell:
                     continue
-                value = f"{int(value_match.group(1))}头{value_match.group(2)}"
-                open_cell = next(
-                    (
-                        re.sub(r"\s+", "", cell)
-                        for cell in cells
-                        if "期" not in cell
-                        and re.search(r"[鼠牛虎兔龙蛇马羊猴鸡狗猪？?]?\s*\d{2,4}\s*[准对错中√×xX]?", cell)
-                        and (
-                            "开" in cell
-                            or any(marker in cell for marker in ("准", "对", "错", "中", "√", "×", "x", "X"))
-                            or any(animal in cell for animal in "鼠牛虎兔龙蛇马羊猴鸡狗猪")
-                        )
-                    ),
-                    "",
-                )
-                key = (issue_match.group(1), value)
-                if key not in seen:
+                for value_match in VALUE_RE.finditer(texts[index]):
+                    value = f"{int(value_match.group(1))}头{value_match.group(2)}"
+                    key = (positions[0], token.group(1), value, index)
+                    if key in seen:
+                        continue
                     seen.add(key)
-                    suffix = f" 开{open_cell}" if open_cell else ""
-                    extracted.append(f"{issue_match.group(1)}期 杀半头 {value}{suffix}")
-
-            if half_head_indexes:
-                continue
-
-    if extracted:
-        return extracted
-
-    for table_html in table_blocks or [document or ""]:
-        extracted.extend(extract_table_window_texts(table_html, seen))
-
+                    extracted.append(TableSearchText(
+                        f"{token.group(1)}期 杀半头 {value} {open_cell}",
+                        positions[0], row_end, header_start, header_end,
+                    ))
     return extracted
 
 
@@ -348,7 +343,6 @@ def extract_table_window_texts(table_html: str, seen: set[tuple[str, str]]) -> l
         normalize_text(re.sub(r"<[^>]+>", " ", html.unescape(cell_html)))
         for cell_html in cells_html
     ]
-    cells = [cell for cell in cells if cell]
     extracted: list[str] = []
     for index in range(0, max(0, len(cells) - 4)):
         window = cells[index : index + 5]

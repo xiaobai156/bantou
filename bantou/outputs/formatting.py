@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import csv
+import io
 import sys
 from pathlib import Path
 
@@ -61,7 +63,7 @@ def detailed_failure_reason(reason: str) -> str:
 
 
 def fail_line(site: Site, reason: str) -> str:
-    detailed = detailed_failure_reason(reason)
+    detailed = " ".join(detailed_failure_reason(reason).split())
     return f"{site.name}\t{failure_category(detailed)}\t{detailed}\t{site.url}"
 
 
@@ -101,13 +103,20 @@ def read_fail_entries(path: Path) -> list[tuple[str, str, str, str]]:
 
 
 def read_fail_entries_from_lines(lines: list[str]) -> list[tuple[str, str, str, str]]:
-    entries: list[tuple[str, str, str, str]] = []
-    for line in lines[1:]:
-        if not line.strip() or line.startswith("无失败"):
+    if not lines:
+        return []
+    reader = csv.DictReader(io.StringIO("\n".join(lines)), delimiter="\t")
+    fields = ("网站名称", "分类", "原因", "网址")
+    if reader.fieldnames is None or not set(fields) <= set(reader.fieldnames):
+        raise ValueError("失败文件表头无效")
+    entries = []
+    for row in reader:
+        name = str(row.get("网站名称") or "").strip()
+        if not name or name.startswith("无失败"):
             continue
-        parts = line.split("\t")
-        if len(parts) >= 4:
-            entries.append((parts[0], parts[1], parts[2], parts[3]))
+        if None in row or any(row.get(field) is None for field in fields):
+            raise ValueError(f"失败文件第{reader.line_num}行字段数量无效")
+        entries.append(tuple(str(row[field]).strip() for field in fields))
     return entries
 
 

@@ -58,7 +58,7 @@ def _validate_match_evidence(match: Match) -> None:
         raise CacheValidationError("证据不完整：区块起点无效")
     if not isinstance(match.block_end, int) or match.block_end <= match.block_start:
         raise CacheValidationError("证据不完整：区块终点无效")
-    if match.source_kind == "dynamic-record":
+    if match.source_kind in {"dynamic-record", "dynamic-record-browser"}:
         dynamic_required = {
             "记录ID": match.record_id,
             "记录路径": match.record_path,
@@ -68,6 +68,8 @@ def _validate_match_evidence(match: Match) -> None:
             "标题": match.title,
             "作者": match.author,
         }
+        if match.source_kind == "dynamic-record-browser":
+            dynamic_required.pop("接口URL")
         missing_dynamic = [
             label for label, value in dynamic_required.items() if not str(value or "").strip()
         ]
@@ -212,7 +214,19 @@ def _validate_entry(
             raise CacheValidationError(f"{issue}期缓存 {field} 无效")
     if not legacy_confirmed and int(entry["block_end"]) <= int(entry["block_start"]):
         raise CacheValidationError(f"{issue}期缓存区块边界无效")
-    _entry_source(entry)
+    source = _entry_source(entry)
+    required_source = ("url", "kind", "snippet", "container_id", "document_authority", "rule_id")
+    for field in required_source:
+        if not isinstance(source[field], str) or not source[field].strip():
+            raise CacheValidationError(f"{issue}期缓存来源证据 {field} 为空")
+    if source["kind"] in {"dynamic-record", "dynamic-record-browser"}:
+        fields = ("record_id", "record_path", "route_type", "url_record_id", "title", "author")
+        if source["kind"] == "dynamic-record":
+            fields += ("api_url",)
+        if any(not isinstance(source[field], str) or not source[field].strip() for field in fields):
+            raise CacheValidationError(f"{issue}期动态来源证据不完整")
+        if source["record_id"] != source["url_record_id"]:
+            raise CacheValidationError(f"{issue}期动态来源记录ID冲突")
 
 
 def _validate_cache_payload(

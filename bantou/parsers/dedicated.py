@@ -265,84 +265,40 @@ def caiyuntong_macau_matches(
     return matches
 
 
-def caiyuntong_macau_matches_from_joined(
-    joined: str,
-    wanted_issues: set[int],
-) -> list[Match]:
-    starts = [
-        match.start()
-        for match in re.finditer(r"id=[\"']con_jihuadanshuang50000aloa_1[\"']", joined)
-    ]
-    blocks: list[tuple[int, int, int, str]] = []
+def caiyuntong_macau_matches_from_joined(joined: str, wanted_issues: set[int]) -> list[Match]:
+    matches = []
+    starts = [m.start() for m in re.finditer(r"id=[\"']con_jihuadanshuang50000aloa_1[\"']", joined)]
     for start in starts:
         prefix_start = max(0, start - 2500)
         prefix = joined[prefix_start:start]
         if "彩运通" not in prefix or "澳门综合杀" not in prefix:
             continue
-        anchor_position = joined.rfind("澳门综合杀", prefix_start, start)
-        if anchor_position < 0:
-            continue
+        anchor = joined.rfind("澳门综合杀", prefix_start, start)
         end_match = re.search(r"id=[\"']con_jihuadanshuang50000aloa_2[\"']", joined[start:])
-        if end_match is None:
+        if anchor < 0 or end_match is None:
             continue
         end = start + end_match.start()
-        candidate = joined[start:end]
-        if any(f"{issue}期" in candidate for issue in wanted_issues):
-            blocks.append((anchor_position, start, end, candidate))
-    if not blocks:
-        return []
-
-    matches: list[Match] = []
-    order = 0
-    for anchor_position, table_start, block_end, macau_block in blocks:
-        for row_match in TABLE_ROW_RE.finditer(macau_block):
-            cells = [
-                normalize_text(html_to_text(cell))
-                for cell in TABLE_CELL_RE.findall(row_match.group(1))
-            ]
+        for row in TABLE_ROW_RE.finditer(joined[start:end]):
+            cells = [normalize_text(html_to_text(cell)) for cell in TABLE_CELL_RE.findall(row.group(1))]
             if len(cells) < 4:
                 continue
-            issue_match = ISSUE_RE.search(cells[0])
-            if not issue_match:
+            tokens = list(ISSUE_RE.finditer(cells[0]))
+            if len(tokens) != 1:
                 continue
-            issue = int(issue_match.group(1))
+            token = tokens[0]
+            issue = int(token.group(1))
             if issue not in wanted_issues:
                 continue
-            value_match = VALUE_RE.search(cells[3])
-            if not value_match:
-                continue
-            value = normalize_half_head_value(value_match.group(1), value_match.group(2))
-            if value is None:
-                continue
-            row_start = table_start + row_match.start()
-            row_end = table_start + row_match.end()
-            positions = [
-                position
-                for position in issue_token_positions(joined, issue_match.group(1))
-                if row_start <= position < row_end
-            ]
+            row_start, row_end = start + row.start(), start + row.end()
+            positions = [p for p in issue_token_positions(joined, token.group(1)) if row_start <= p < row_end]
             if len(positions) != 1:
                 continue
-            position = positions[0]
-            order += 1
-            snippet = compact_line(" ".join(cells))
-            matches.append(
-                Match(
-                    issue,
-                    issue_match.group(1),
-                    value,
-                    snippet,
-                    order,
-                    position=position,
-                    anchor_text="澳门综合杀",
-                    anchor_position=anchor_position,
-                    block_id=f"macau:{anchor_position}:{block_end}:{row_start}:{row_end}",
-                    block_start=anchor_position,
-                    block_end=block_end,
-                    table_column="macau-half-head",
-                    rule_id="caiyuntong_macau",
-                )
-            )
+            values = list(dict.fromkeys(f"{int(v.group(1))}头{v.group(2)}" for v in VALUE_RE.finditer(cells[3])))
+            for value in values:
+                matches.append(Match(issue, token.group(1), value, compact_line(" ".join(cells)), len(matches)+1,
+                    position=positions[0], anchor_text="澳门综合杀", anchor_position=anchor,
+                    block_id=f"macau:{anchor}:{end}:{row_start}:{row_end}", block_start=anchor,
+                    block_end=end, table_column="macau-half-head", rule_id="caiyuntong_macau"))
     return matches
 
 
@@ -581,5 +537,3 @@ def special_matches_in_documents(
     ):
         return shenzhen_futan_matches(documents, wanted_issues)
     return []
-
-

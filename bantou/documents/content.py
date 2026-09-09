@@ -50,6 +50,7 @@ def add_document_with_decoded(
     source_url: str,
     source_kind: str,
 ) -> None:
+    source_url = str(getattr(text, "final_url", "") or source_url)
     queue = [(text, 0, 0)]
     index = 0
     while index < len(queue):
