@@ -11,6 +11,8 @@ jobs:
   repair:
     runs-on: windows-latest
     timeout-minutes: 22
+    env:
+      PYTHONUTF8: '1'
     steps:
       - name: Check out staging branch
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -55,15 +57,12 @@ jobs:
       - name: Run Python 3.11 regressions with Chromium smoke
         env:
           RUN_BROWSER_SMOKE: '1'
-          PYTHONUTF8: '1'
         run: python -B -m pytest -q tests
 
       - name: Check retry launcher on Python 3.11
         run: python -B check_retry_input.py
 
       - name: Verify six targeted live sites
-        env:
-          PYTHONUTF8: '1'
         run: python -B "$env:RUNNER_TEMP\verify_252_repairs.py"
 
       - name: Set up Python 3.10
@@ -75,8 +74,6 @@ jobs:
         run: python -m pip install -c constraints.txt -e ".[test]"
 
       - name: Run Python 3.10 regressions
-        env:
-          PYTHONUTF8: '1'
         run: python -B -m pytest -q tests
 
       - name: Check retry launcher on Python 3.10
