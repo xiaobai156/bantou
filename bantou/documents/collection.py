@@ -235,7 +235,7 @@ def collect_documents(
                     if not should_fetch_script(full_url):
                         continue
                     if not same_origin(url, full_url):
-                        raise ValueError("附属资源指向未登记的跨来源URL")
+                        continue
                     if full_url not in seen_scripts:
                         seen_scripts.add(full_url)
                         script_urls.append(full_url)
@@ -246,7 +246,7 @@ def collect_documents(
                     if not should_fetch_iframe(full_url):
                         continue
                     if not same_origin(url, full_url):
-                        raise ValueError("附属资源指向未登记的跨来源URL")
+                        continue
                     if full_url not in seen_frames:
                         seen_frames.add(full_url)
                         frame_urls.append(full_url)
@@ -257,7 +257,7 @@ def collect_documents(
                     if not should_fetch_half_head_link(full_url):
                         continue
                     if not same_origin(url, full_url):
-                        raise ValueError("半头链接指向未登记的跨来源URL")
+                        continue
                     if full_url not in seen_half_head_urls:
                         seen_half_head_urls.add(full_url)
                         half_head_urls.append(full_url)
@@ -451,7 +451,7 @@ def collect_site_documents(
             issue,
             site.name,
             deadline=deadline,
-            wait_until="load",
+            wait_until="domcontentloaded",
         )
         return [
             SourceDocument(

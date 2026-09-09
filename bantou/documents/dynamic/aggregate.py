@@ -1,6 +1,7 @@
 """Resolve one exact issue record; never convert every record into a forum."""
 import json
 import re
+from datetime import date
 from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse
 
 from ...domain.models import Site
@@ -26,6 +27,13 @@ def iter_user_aggregate_records(value, path="root"):
 def aggregate_record_matches_request(record, user_id, requested_issue, site=None):
     if str(record.get("user_id") or "") != user_id:
         return False
+    if "year" in record:
+        try:
+            year = int(record["year"])
+        except (TypeError, ValueError) as exc:
+            raise ValueError("聚合记录年度无效") from exc
+        if year != date.today().year:
+            return False
     try:
         if int(record.get("draw")) != requested_issue:
             return False
@@ -49,7 +57,7 @@ def aggregate_record_matches_request(record, user_id, requested_issue, site=None
 
 
 def _pages(api_url, timeout, verify_ssl, deadline):
-    """Follow explicit page metadata, or request successive 20-item pages.
+    """Follow explicit metadata or successive pages of the declared size.
 
     A repeated full page, malformed metadata or exhausted limit is incomplete,
     never evidence that a candidate is unique. Unverified endpoints fail closed.
@@ -58,7 +66,13 @@ def _pages(api_url, timeout, verify_ssl, deadline):
     seen_pages = set()
     for page in range(1, 51):
         query = dict(parse_qsl(parsed.query, keep_blank_values=True))
-        query.update(page=str(page), per_page="20")
+        try:
+            page_size = int(query.get("per_page", "20"))
+        except ValueError as exc:
+            raise ValueError("聚合接口分页大小无效") from exc
+        if page_size < 1:
+            raise ValueError("聚合接口分页大小无效")
+        query.update(page=str(page), per_page=str(page_size))
         page_url = urlunparse(parsed._replace(query=urlencode(query)))
         payload = json.loads(fetch_text(page_url, timeout, verify_ssl, deadline=deadline))
         if isinstance(payload, list):
@@ -79,7 +93,7 @@ def _pages(api_url, timeout, verify_ssl, deadline):
             raise ValueError("聚合接口重复返回同一页，无法证明记录完整")
         seen_pages.add(fingerprint)
         yield rows
-        if (last is not None and page == last) or (last is None and len(rows) < 20):
+        if (last is not None and page == last) or (last is None and len(rows) < page_size):
             return
     raise ValueError("聚合接口分页超过50页，记录唯一性核验未完成")
 

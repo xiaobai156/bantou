@@ -70,9 +70,9 @@ def extra_api_urls(url: str) -> list[str]:
     if user_id is not None:
         urls.extend(
             [
-                f"{base}/api/v1/users/{user_id}/forums?per_page=20",
-                f"{base}/api/v1/users/{user_id}/discoveries?per_page=20",
-                f"{base}/api/v1/users/{user_id}/references?per_page=20",
+                f"{base}/api/v1/users/{user_id}/forums?per_page=5000",
+                f"{base}/api/v1/users/{user_id}/discoveries?per_page=1000",
+                f"{base}/api/v1/users/{user_id}/references?per_page=1000",
                 f"{base}/api/v1/users/{user_id}/references/history",
             ]
         )

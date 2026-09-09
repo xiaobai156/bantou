@@ -32,12 +32,14 @@ MAX_BODY_BYTES = 16 * 1024 * 1024
 def _click_interactive_card(page, issue: int, site_name: str, timeout: int) -> None:
     card_text = f"{issue}期: 白蛇传【绝杀半头】→{site_name}"
     card = page.get_by_text(card_text, exact=True)
+    card.wait_for(state="attached", timeout=timeout * 1000)
     count = card.count()
     if count != 1:
         raise ValueError(f"目标卡片未唯一命中：{card_text}，找到{count}个")
-    card.click(timeout=timeout * 1000)
+    # The verified data card is covered by a separate advertising overlay.
+    card.dispatch_event("click", timeout=timeout * 1000)
     page.wait_for_function(
-        """
+        r"""
         ([issue]) => {
             const text = document.body.innerText || "";
             return new RegExp(`${issue}期\\s*[:：]\\s*【绝杀半头】`).test(text);

@@ -22,6 +22,7 @@ from bantou.cache.validation import CACHE_KIND, cache_entry_from_match, validate
 from bantou.outputs.formatting import build_success_output_lines, read_success_data, read_fail_entries_from_lines
 from bantou.fetching.transport import RunTransport, canonical_url, canonical_browser_url, FetchedText
 from bantou.documents.dynamic import records, aggregate
+from bantou.documents import collection
 from bantou.text import extract_half_head_table_texts, normalize_target
 
 
@@ -372,6 +373,34 @@ def test_repeated_full_api_page_is_incomplete(monkeypatch):
     monkeypatch.setattr(aggregate,'fetch_text',lambda *a,**k:json.dumps([record(i) for i in range(1,21)]))
     with pytest.raises(ValueError,match='同一页'):
         aggregate.resolve_user_aggregate_detail_url(s,251,2,True)
+
+
+def test_aggregate_preserves_declared_large_page_size(monkeypatch):
+    s=site(url='https://example.test/#/users/123')
+    monkeypatch.setattr(aggregate,'extra_api_urls',lambda url:['https://example.test/api/v1/users/123/forums?per_page=1000'])
+    calls=[]
+    monkeypatch.setattr(aggregate,'fetch_text',lambda url,*a,**k:(calls.append(url) or json.dumps([record(5)])))
+    assert aggregate.resolve_user_aggregate_detail_url(s,251,2,True).endswith('/forums/5')
+    assert calls == ['https://example.test/api/v1/users/123/forums?per_page=1000&page=1']
+
+
+def test_aggregate_rejects_previous_year_same_issue():
+    current = aggregate.date.today().year
+    assert aggregate.aggregate_record_matches_request(dict(record(), year=current), '123', 251)
+    assert not aggregate.aggregate_record_matches_request(dict(record(), year=current-1), '123', 251)
+
+
+def test_unregistered_cross_origin_assets_are_ignored(monkeypatch):
+    html = (
+        '<script src="https://cdn.example/upload/script/app.js"></script>'
+        '<iframe src="https://frame.example/main/bbs/page.html"></iframe>'
+        '<a href="https://other.example/gsb/page.html">半头</a>'
+    )
+    monkeypatch.setattr(collection,'fetch_text',lambda *a,**k: html)
+    monkeypatch.setattr(collection,'extra_api_urls',lambda url: [])
+    documents, errors = collection.collect_documents('https://example.test/page.html',2,True)
+    assert len(documents) == 1
+    assert errors == []
 
 
 def test_unknown_discovery_route_is_rejected(monkeypatch):
