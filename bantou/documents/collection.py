@@ -14,6 +14,7 @@ from ..fetching.policy import (
     fetch_text,
 )
 from ..site_profiles.registry import (
+    BABA_FORUM_DATA_URL,
     BABA_FORUM_URL,
     DEDICATED_RENDERED_SITE_RULES,
     DYNAMIC_RECORD_SUBTOPIC_ALIASES,
@@ -151,6 +152,7 @@ def collect_documents(
     verify_ssl: bool,
     *,
     deadline: float | None = None,
+    follow_resources: bool = True,
 ) -> tuple[list[SourceDocument], list[str]]:
     documents: list[SourceDocument] = []
     seen_docs: set[tuple[str, str, str, int]] = set()
@@ -159,6 +161,9 @@ def collect_documents(
     seen_scripts: set[str] = set()
     frame_urls: list[str] = []
     seen_frames: set[str] = set()
+    if url == BABA_FORUM_URL:
+        seen_frames.add(BABA_FORUM_DATA_URL)
+        frame_urls.append(BABA_FORUM_DATA_URL)
     half_head_urls: list[str] = []
     seen_half_head_urls: set[str] = set()
     forum_detail_urls: list[str] = []
@@ -184,6 +189,9 @@ def collect_documents(
             add_document_with_decoded(
                 rendered_html, documents, seen_docs, source_url=url, source_kind="browser"
             )
+
+    if not follow_resources:
+        return documents, script_errors
 
     add_fetched_resources(
         extra_api_urls(url),
@@ -319,7 +327,11 @@ def resolve_mengxiaomeng_detail_url(
 ) -> str:
     entry_url = site.fetch_url or site.url
     documents, _script_errors = collect_documents(
-        entry_url, timeout, verify_ssl, deadline=deadline
+        entry_url,
+        timeout,
+        verify_ssl,
+        deadline=deadline,
+        follow_resources=False,
     )
     link_re = re.compile(r'''<a[^>]*href\s*=\s*["']?([^"'\s>]+)["']?[^>]*>(.*?)</a>''', re.I | re.S)
     issue_re = re.compile(rf"(?<!\d){requested_issue}\s*期(?!\d)")
@@ -469,7 +481,11 @@ def collect_site_documents(
         and site.parser_id != "wuzhuanxingyi_embedded"
     ):
         rendered_text = fetch_rendered_text(
-            fetch_url, timeout, verify_ssl, deadline=deadline
+            fetch_url,
+            timeout,
+            verify_ssl,
+            deadline=deadline,
+            wait_until=SITE_BROWSER_HTML_WAIT_UNTIL.get(site.url, "networkidle"),
         )
         return [
             SourceDocument(

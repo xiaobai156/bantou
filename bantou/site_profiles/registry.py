@@ -80,8 +80,10 @@ SEWAI_TAOYUAN_URL = "https://667755.xn--q9ja6j.xn--q9jyb4c/gsb/030.html"
 MENGXIAOMENG_URL = "https://xmdrbud.eqpr2-6tpvi-pjqztv.xyz:16677/"
 SITE_BROWSER_HTML_URLS = {CAIYUNTONG_URL, GUANGDONG_BAER_URL, MENGXIAOMENG_URL}
 SITE_BROWSER_HTML_WAIT_UNTIL = {
+    CAIYUNTONG_URL: "domcontentloaded",
     GUANGDONG_BAER_URL: "load",
     MENGXIAOMENG_URL: "domcontentloaded",
+    "https://opfeal.zbwno-faau4-zilwkd.xyz:16677/topic/930772.html": "domcontentloaded",
     "https://sadoleu.rznla-fgwyr-nzqalp.xyz:16677/topic/287642.html": "domcontentloaded",
     "https://vqyjnlug.qt1u6-vqjjl-vkdnzw.work:16655/topic/650194.html": "domcontentloaded",
     "https://sqddimfu.evs71-kia2b-gshsdc.xyz:16677/topic/205530.html": "domcontentloaded",
@@ -179,6 +181,7 @@ DYNAMIC_RECORD_SUBTOPIC_ALIASES = {
 WUZHUANXINGYI_URL = "https://ocnrhq.du156-vb27w-tmhsed.xyz:16677/"
 WUZHUANXINGYI_CARD_LABELS = ("星移物换", "物转星移")
 BABA_FORUM_URL = "https://43666.886677a.app:2563/htm/bbs/top080.html"
+BABA_FORUM_DATA_URL = "https://43666.886677a.app:2563/main/bbs/080.html"
 SHENZHEN_FUTAN_URL = "https://128.241.252.220:9201/tz/bbsjs/080.html"
 SITE_IFRAME_PAGE_AUTHORITY_URLS = {BABA_FORUM_URL}
 

@@ -272,10 +272,19 @@ def fetch_resource_group(
 
 
 def fetch_rendered_text(
-    url: str, timeout: int, verify_ssl: bool, *, deadline: float | None = None
+    url: str,
+    timeout: int,
+    verify_ssl: bool,
+    *,
+    deadline: float | None = None,
+    wait_until: str = "networkidle",
 ) -> str:
     return DEFAULT_TRANSPORT.fetch_rendered(
-        url, _request_timeout(timeout, deadline), verify_ssl, html=False
+        url,
+        _request_timeout(timeout, deadline),
+        verify_ssl,
+        html=False,
+        wait_until=wait_until,
     )
 
 
