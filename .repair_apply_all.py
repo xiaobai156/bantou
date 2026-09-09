@@ -35,7 +35,11 @@ exec(
     {"__name__": "__main__", "__file__": ".repair_round3.py"},
 )
 
-for script_name in (".repair_followup.py", ".repair_testfix.py"):
+for script_name in (
+    ".repair_followup.py",
+    ".repair_testfix.py",
+    ".repair_fixturefix.py",
+):
     path = Path(script_name)
     script = path.read_text(encoding="utf-8")
     exec(
