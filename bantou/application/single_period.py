@@ -86,7 +86,7 @@ def _merge_retry_rows(
     )
     success_existed = success_path.exists()
     existing_success = read_success_data_strict(
-        success_path, issue_text, configured_sites
+        success_path, issue_text, configured_sites, preserve_unconfigured=True
     )
     existing_fail_entries = read_fail_entries(fail_path)
     if not success_existed:

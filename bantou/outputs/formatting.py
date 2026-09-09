@@ -100,6 +100,8 @@ def read_success_data_strict(
     path: Path,
     issue_text: str,
     configured_sites: list[Site],
+    *,
+    preserve_unconfigured: bool = False,
 ) -> list[tuple[str, str, str, str]]:
     """Read a formal success file without silently dropping damaged rows."""
     if not path.exists():
@@ -145,12 +147,12 @@ def read_success_data_strict(
             value = f"{int(value_match.group(1))}头{value_match.group(2)}"
             if normalize_text(value_text) != value:
                 raise ValueError(f"成功文件第{line_number}行半头值不是规范格式")
-            if site_name not in by_name:
+            if site_name not in by_name and not preserve_unconfigured:
                 raise ValueError(f"成功文件第{line_number}行站点不在正式配置：{site_name}")
             if site_name in seen_names:
                 raise ValueError(f"成功文件站点重复：{site_name}")
             seen_names.add(site_name)
-            rows.append((site_name, issue_text, value, by_name[site_name].url))
+            rows.append((site_name, issue_text, value, by_name[site_name].url if site_name in by_name else ""))
             continue
         parts = stripped.split("\t")
         if len(parts) != 3:
