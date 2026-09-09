@@ -30,6 +30,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Copy-Item diagnose_failed7_252.py "$env:RUNNER_TEMP\diagnose_failed7_252.py"
           Copy-Item apply_guangdong_wait_fix.py "$env:RUNNER_TEMP\apply_guangdong_wait_fix.py"
+          Copy-Item apply_guangdong_fresh_retry.py "$env:RUNNER_TEMP\apply_guangdong_fresh_retry.py"
 
       - name: Check out untouched main baseline
         shell: pwsh
@@ -57,6 +58,8 @@ jobs:
           python -B "$env:RUNNER_TEMP\apply_252_failed_repairs.py"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -B "$env:RUNNER_TEMP\apply_guangdong_wait_fix.py"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B "$env:RUNNER_TEMP\apply_guangdong_fresh_retry.py"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           git diff --check
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
