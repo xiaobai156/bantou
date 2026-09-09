@@ -12,7 +12,7 @@ def replace_once(path: str, old: str, new: str) -> None:
     p.write_text(text.replace(old, new, 1), encoding="utf-8")
 
 
-# Site-specific browser waits and the declared authoritative iframe for 把把论坛.
+# Site-specific browser waits and the declared authoritative data document for 把把论坛.
 replace_once(
     "bantou/site_profiles/registry.py",
     'SITE_BROWSER_HTML_WAIT_UNTIL = {\n    GUANGDONG_BAER_URL: "load",\n    MENGXIAOMENG_URL: "domcontentloaded",',
@@ -123,40 +123,61 @@ replace_once(
 )
 replace_once(
     "bantou/documents/collection.py",
+    '''def collect_documents(
+    url: str,
+    timeout: int,
+    verify_ssl: bool,
+    *,
+    deadline: float | None = None,
+) -> tuple[list[SourceDocument], list[str]]:
+''',
+    '''def collect_documents(
+    url: str,
+    timeout: int,
+    verify_ssl: bool,
+    *,
+    deadline: float | None = None,
+    follow_resources: bool = True,
+) -> tuple[list[SourceDocument], list[str]]:
+''',
+)
+replace_once(
+    "bantou/documents/collection.py",
     '    frame_urls: list[str] = []\n    seen_frames: set[str] = set()\n    half_head_urls: list[str] = []',
     '    frame_urls: list[str] = []\n    seen_frames: set[str] = set()\n    if url == BABA_FORUM_URL:\n        seen_frames.add(BABA_FORUM_DATA_URL)\n        frame_urls.append(BABA_FORUM_DATA_URL)\n    half_head_urls: list[str] = []',
 )
 replace_once(
     "bantou/documents/collection.py",
-    '''    entry_url = site.fetch_url or site.url
-    documents, _script_errors = collect_documents(
+    '''            add_document_with_decoded(
+                rendered_html, documents, seen_docs, source_url=url, source_kind="browser"
+            )
+
+    add_fetched_resources(
+''',
+    '''            add_document_with_decoded(
+                rendered_html, documents, seen_docs, source_url=url, source_kind="browser"
+            )
+
+    if not follow_resources:
+        return documents, script_errors
+
+    add_fetched_resources(
+''',
+)
+replace_once(
+    "bantou/documents/collection.py",
+    '''    documents, _script_errors = collect_documents(
         entry_url, timeout, verify_ssl, deadline=deadline
     )
-    link_re = re.compile''',
-    '''    entry_url = site.fetch_url or site.url
-    page_html = fetch_text(entry_url, timeout, verify_ssl, deadline=deadline)
-    rendered_html = fetch_rendered_html(
+''',
+    '''    documents, _script_errors = collect_documents(
         entry_url,
         timeout,
         verify_ssl,
         deadline=deadline,
-        wait_until=SITE_BROWSER_HTML_WAIT_UNTIL.get(site.url, "domcontentloaded"),
+        follow_resources=False,
     )
-    documents = [
-        SourceDocument(
-            str(page_html),
-            source_url=str(getattr(page_html, "final_url", "") or entry_url),
-            source_kind="page",
-            document_authority="primary",
-        ),
-        SourceDocument(
-            str(rendered_html),
-            source_url=entry_url,
-            source_kind="browser",
-            document_authority="declared-browser",
-        ),
-    ]
-    link_re = re.compile''',
+''',
 )
 replace_once(
     "bantou/documents/collection.py",
@@ -174,7 +195,7 @@ replace_once(
 ''',
 )
 
-# Focused independent regressions. Do not rewrite the existing regression file.
+# Focused independent regressions. Do not rewrite existing regression files.
 Path("tests/test_issue252_repairs.py").write_text(
     '''from __future__ import annotations
 
@@ -222,6 +243,24 @@ def test_meng_resolver_uses_exact_same_origin_anchor(monkeypatch):
     assert collection.resolve_mengxiaomeng_detail_url(site, 252, 2, True).endswith(
         "/topic/1090013.html"
     )
+
+
+def test_entry_only_collection_does_not_follow_resources(monkeypatch):
+    from bantou.documents import collection
+    from bantou.site_profiles.registry import MENGXIAOMENG_URL
+
+    monkeypatch.setattr(collection, "fetch_text", lambda *a, **k: "<html></html>")
+    monkeypatch.setattr(collection, "fetch_rendered_html", lambda *a, **k: "<html></html>")
+    monkeypatch.setattr(
+        collection,
+        "add_fetched_resources",
+        lambda *a, **k: (_ for _ in ()).throw(AssertionError("followed resources")),
+    )
+    documents, errors = collection.collect_documents(
+        MENGXIAOMENG_URL, 2, True, follow_resources=False
+    )
+    assert len(documents) == 2
+    assert errors == []
 
 
 def test_baba_declared_data_source_is_fetched(monkeypatch):
