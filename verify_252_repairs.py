@@ -8,9 +8,9 @@ from bantou.site_profiles.registry import BABA_FORUM_DATA_URL
 
 ISSUE = 252
 TARGETS = [
+    "简单拖鞋",
     "揭竿而起",
     "把把论坛",
-    "简单拖鞋",
     "彩运通",
     "山高水厂",
     "萌小萌",
@@ -55,6 +55,8 @@ def main() -> None:
         if result.error or result.miss_reason or len(result.matches) != 1:
             failures[name] = fail_reason(result)
             print(f"LIVE_FAIL\t{name}\t{failures[name]}")
+            if name == "简单拖鞋":
+                raise SystemExit("简单拖鞋 252 still failing: " + failures[name])
             continue
         match = result.matches[0]
         successes[name] = match
@@ -76,8 +78,7 @@ def main() -> None:
             + "; ".join(f"{name}: {failures.get(name, 'unknown')}" for name in missing_required)
         )
 
-    # 把把论坛 currently has no verified 252 row. Prove its declared authority still
-    # resolves and parses the most recent known 251 row instead of manufacturing 252.
+    # Prove the declared 把把论坛 authority remains the same source as the known 251 evidence.
     baba_251 = run_one(100, by_name["把把论坛"], 251)
     if baba_251.error or baba_251.miss_reason or len(baba_251.matches) != 1:
         raise SystemExit("把把论坛 251 authority regression: " + fail_reason(baba_251))
@@ -91,12 +92,12 @@ def main() -> None:
             f"把把论坛 251 authority mismatch: {match.value} {match.source_url}"
         )
 
-    if "把把论坛" not in successes:
-        print("BABA_252_NOT_PUBLISHED\t" + failures.get("把把论坛", "no verified row"))
-    else:
+    if "把把论坛" in successes:
         baba = successes["把把论坛"]
         if baba.source_url != BABA_FORUM_DATA_URL:
             raise SystemExit(f"把把论坛 252 wrong authority: {baba.source_url}")
+    else:
+        print("BABA_252_NOT_PUBLISHED\t" + failures.get("把把论坛", "no verified row"))
 
     print(f"LIVE_SUMMARY\t252_success={len(successes)}\t252_fail={len(failures)}")
 
