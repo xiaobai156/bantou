@@ -6,7 +6,12 @@ from ..config.issues import parse_issue_range, format_issue_label
 from ..config.sites import read_sites
 from ..domain.models import Site
 from ..fetching.policy import run_transport_scope
-from ..outputs.formatting import spaced_failure_lines, read_success_data, default_output_names
+from ..outputs.formatting import (
+    default_output_names,
+    read_fail_entries,
+    read_success_data_strict,
+    spaced_failure_lines,
+)
 from ..outputs.transaction import write_transaction
 from ..paths import FAILURE_RESULT_DIR, PROJECT_DIR, RESULT_DIR
 from .single_period import main as run_single_period
@@ -23,27 +28,25 @@ def output_label(periods: list[int]) -> str:
     return format_issue_label(periods)
 
 
-def read_success_names(path: Path) -> set[str]:
-    return {name for name, _issue, _value, _url in read_success_data(path, "")}
+def read_success_names(path: Path, issue_text: str, sites: list[Site]) -> set[str]:
+    return {
+        name
+        for name, _issue, _value, _url in read_success_data_strict(
+            path, issue_text, sites
+        )
+    }
 
 
 def read_failure_reasons(path: Path) -> dict[str, str]:
-    if not path.exists():
-        return {}
-    reasons: dict[str, str] = {}
-    for raw_line in path.read_text(encoding="utf-8-sig").splitlines()[1:]:
-        if not raw_line.strip():
-            continue
-        parts = raw_line.split("\t")
-        if len(parts) >= 4:
-            name, category, reason, _url = parts[:4]
-            reasons[name] = f"{category}：{reason}"
-    return reasons
+    return {
+        name: f"{category}：{reason}"
+        for name, category, reason, _url in read_fail_entries(path)
+    }
 
 
 def run_period(period: int) -> None:
     print(f"\n===== 开始抓取 {period}期 =====", flush=True)
-    exit_code = run_single_period([str(period), "--multi-mode"])
+    exit_code = run_single_period([str(period)], multi_mode=True)
     if exit_code:
         raise RuntimeError(f"{period}期正式抓取退出码：{exit_code}")
 
@@ -60,7 +63,9 @@ def write_summary(periods: list[int]) -> Path:
         success_name, fail_name = default_output_names(format_issue_label([period]))
         success_path = RESULT_DIR / success_name
         fail_path = FAILURE_RESULT_DIR / fail_name
-        success_by_period[period] = read_success_names(success_path)
+        success_by_period[period] = read_success_names(
+            success_path, f"{format_issue_label([period])}期", sites
+        )
         failure_by_period[period] = read_failure_reasons(fail_path)
 
     lines = [

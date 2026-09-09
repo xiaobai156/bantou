@@ -75,18 +75,24 @@ def _values_text(result: SiteResult) -> str:
 def print_result(index: int, total: int, site: Site, result: SiteResult, wanted_issues: set[int]) -> bool:
     passed = _matches_all_requested(result, wanted_issues)
     reason = result.error or result.miss_reason or "未返回指定期的完整结果"
-    conflict = "存在" if "冲突" in reason or "重复" in reason else "无"
+    evidence = list(result.matches) or list(result.direction_evidence)
 
     print(f"\n===== 验证 {index}/{total}：{site.name} =====")
     print(f"网址：{site.url}")
     print("指定期数：" + "、".join(f"{issue}期" for issue in sorted(wanted_issues)))
-    print(f"是否抓到指定期数：{'通过' if passed else '未通过'}")
+    print(f"最终结果：{'通过' if passed else '未通过'}")
     print(f"实际半头：{_values_text(result) if passed else '未确认'}")
-    print(f"top/bottom：{site.pick}（{'通过' if passed else '未通过'}）")
-    print(f"锚点：{'通过' if passed else '未通过'}")
-    print(f"关键词：{'通过' if passed else '未通过'}")
-    print(f"半头字段：{'通过' if passed else '未通过'}")
-    print(f"同期冲突或重复半头：{conflict}")
+    if evidence:
+        for item_index, match in enumerate(evidence, start=1):
+            print(
+                f"证据{item_index}：{match.issue}期 {match.value}；"
+                f"来源={match.source_url or '缺失'}；类型={match.source_kind or '缺失'}；"
+                f"容器={match.container_id or match.block_id or '缺失'}；"
+                f"位置={match.position}；锚点={match.anchor_text or '缺失'}@{match.anchor_position}"
+            )
+    else:
+        print("来源证据：无")
+    print(f"同期冲突或重复半头：{'存在' if '冲突' in reason or '重复' in reason else '无'}")
     print(f"失败原因：{'无' if passed else reason}")
     return passed
 

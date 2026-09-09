@@ -35,6 +35,7 @@ from ..outputs.formatting import (
     read_fail_entries,
     read_fail_entries_from_lines,
     read_success_data,
+    read_success_data_strict,
     spaced_failure_lines,
 )
 from ..outputs.transaction import formal_write_lock, write_transaction
@@ -71,9 +72,35 @@ def _merge_retry_rows(
     *,
     success_path: Path,
     fail_path: Path,
+    configured_sites: list[Site],
 ) -> tuple[list[tuple[str, str, str, str]], list[str]]:
     issue_text = f"{issues_label}期"
-    existing_success = read_success_data(success_path, issue_text)
+    try:
+        target_issue = int(issues_label)
+    except ValueError as exc:
+        raise ValueError("失败重抓期数标签无效") from exc
+    # Revalidate the on-disk failure file under the formal write lock. It may
+    # have changed while network requests were running.
+    validated_failed_sites = read_failed_sites(
+        fail_path, configured_sites, issue=target_issue
+    )
+    success_existed = success_path.exists()
+    existing_success = read_success_data_strict(
+        success_path, issue_text, configured_sites
+    )
+    existing_fail_entries = read_fail_entries(fail_path)
+    if not success_existed:
+        configured_identities = {
+            (site.name, _failure_url_identity(site.url)) for site in configured_sites
+        }
+        failed_identities = {
+            (site.name, _failure_url_identity(site.url))
+            for site in validated_failed_sites
+        }
+        if failed_identities != configured_identities:
+            raise ValueError(
+                "成功文件不存在，且失败文件未覆盖全部正式站点；拒绝猜测原成功结果"
+            )
     existing_success_names = {row[0] for row in existing_success}
     for row in retry_rows:
         existing = next((old for old in existing_success if old[0] == row[0]), None)
@@ -90,7 +117,7 @@ def _merge_retry_rows(
     }
     existing_failures = {
         name: (name, category, reason, url)
-        for name, category, reason, url in read_fail_entries(fail_path)
+        for name, category, reason, url in existing_fail_entries
         if (name, _failure_url_identity(url)) not in {(row[0], _failure_url_identity(row[3])) for row in retry_rows}
     }
     existing_failures.update(retry_failures)
@@ -118,12 +145,14 @@ def _prepare_cache_payload(
     sites: list[Site],
     success_rows: dict[str, tuple[Site, dict[int, Match]]],
     failures: list[tuple[str, str, str]],
+    *,
+    multi_mode: bool = False,
 ) -> tuple[dict[str, object] | None, dict[str, str]]:
     if args.rebuild_cache:
         raise CacheValidationError("缓存重建已停用；缓存只允许每天单期顺序滚动")
     if args.write_backup and len(issues) != 1:
         raise CacheValidationError("正式缓存只允许单期抓取后更新")
-    if args.diagnose or args.multi_mode:
+    if args.diagnose or multi_mode:
         return None, {}
     if not args.write_backup:
         return None, {}
@@ -171,9 +200,12 @@ def _prepare_cache_update(
     rank_rows: list[tuple[str, str, str, str]],
     cache_rows: dict[str, tuple[Site, dict[int, Match]]],
     fail_lines: list[str],
+    *,
+    multi_mode: bool = False,
 ) -> tuple[list[tuple[str, str, str, str]], dict[str, tuple[Site, dict[int, Match]]], list[str], dict[str, object] | None, dict[str, str]]:
     payload, conflicts = _prepare_cache_payload(
-        args, issues, sites, cache_rows, _failure_rows(fail_lines)
+        args, issues, sites, cache_rows, _failure_rows(fail_lines),
+        multi_mode=multi_mode,
     )
     if conflicts:
         print(
@@ -261,6 +293,9 @@ def _finalize_run(
     rank_rows: list[tuple[str, str, str, str]],
     cache_rows: dict[str, tuple[Site, dict[int, Match]]],
     fail_lines: list[str],
+    *,
+    multi_mode: bool = False,
+    configured_sites: list[Site] | None = None,
 ) -> int:
     if args.diagnose:
         print(f"完成：成功 {len(rank_rows)} 条，失败 {len(fail_lines) - 1} 条")
@@ -272,7 +307,8 @@ def _finalize_run(
         cache_update_error: CacheValidationError | None = None
         try:
             rank_rows, cache_rows, fail_lines, cache_payload, cache_conflicts = _prepare_cache_update(
-                args, issues, sites, rank_rows, cache_rows, fail_lines
+                args, issues, sites, rank_rows, cache_rows, fail_lines,
+                multi_mode=multi_mode,
             )
             if cache_conflicts:
                 cache_payload = None
@@ -303,6 +339,7 @@ def _finalize_run(
                 rank_rows, fail_lines = _merge_retry_rows(
                     issues_label, rank_rows, fail_lines,
                     success_path=success_path, fail_path=fail_path,
+                    configured_sites=configured_sites or sites,
                 )
             elif success_path.exists() and not args.replace_existing:
                 raise ValueError("成功文件已存在；失败重抓使用 --retry-fail，整期替换需 --replace-existing")
@@ -354,7 +391,7 @@ def _finalize_run(
         return 2 if cache_update_error is not None or cache_write_error is not None else 0
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: list[str] | None = None, *, multi_mode: bool = False) -> int:
     configure_console_encoding()
     args = build_parser().parse_args(argv)
     if args.diagnose and (args.write_backup or args.rebuild_cache):
@@ -377,6 +414,10 @@ def main(argv: list[str] | None = None) -> int:
         issues, issue_width, issues_label = parse_issue_range(issues_input)
         if len(issues) != 1:
             raise ValueError("单期入口一次只能指定一期；多期请使用 bantou_multi_period.py")
+        if not args.diagnose and (args.success_out or args.fail_out):
+            raise ValueError(
+                "正式运行使用固定的目标期输出路径；自定义 success/fail 路径只允许 --diagnose"
+            )
         default_success, default_failure = default_output_names(issues_label)
         args.resolved_success_path = default_success_name_path(args.success_out or default_success).resolve()
         args.resolved_fail_path = default_failure_name_path(args.fail_out or args.retry_fail_file or default_failure).resolve()
@@ -393,7 +434,7 @@ def main(argv: list[str] | None = None) -> int:
             raise ValueError("失败站点重跑一次只能指定一期")
         if args.rebuild_cache:
             raise ValueError("缓存重建已停用；缓存只允许每天单期顺序滚动")
-        if not args.diagnose and not args.multi_mode and len(issues) == 1:
+        if not args.diagnose and not multi_mode and len(issues) == 1:
             args.write_backup = True
         if args.write_backup and len(issues) != 1:
             raise ValueError("正式缓存只允许单期抓取后更新")
@@ -406,6 +447,7 @@ def main(argv: list[str] | None = None) -> int:
             if not args.diagnose:
                 raise ValueError("自定义站点配置或目标值筛选只能使用 --diagnose，不得覆盖正式输出和缓存")
         sites = read_sites(Path(sites_input))
+        configured_sites = list(sites)
         if args.retry_fail:
             retry_fail_path = args.resolved_fail_path
             sites = read_failed_sites(retry_fail_path, sites, issue=issues[0])
@@ -452,5 +494,7 @@ def main(argv: list[str] | None = None) -> int:
             rank_rows.append((site.name, f"{match.issue:0{issue_width}d}期", match.value, site.url))
 
     return _finalize_run(
-        args, issues, sites, issues_label, rank_rows, cache_rows, fail_lines
+        args, issues, sites, issues_label, rank_rows, cache_rows, fail_lines,
+        multi_mode=multi_mode,
+        configured_sites=configured_sites,
     )

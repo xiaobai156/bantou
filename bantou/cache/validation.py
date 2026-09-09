@@ -178,6 +178,7 @@ def compare_cached_match(cached: dict[str, object], current: Match) -> str | Non
         ("接口URL", "api_url"),
         ("标题", "title"),
         ("作者", "author"),
+        ("原始片段", "snippet"),
         ("容器ID", "container_id"),
         ("表格列", "table_column"),
         ("方向权威", "document_authority"),

@@ -26,6 +26,7 @@ _META_CHARSET_RE = re.compile(
     rb"\bcharset\s*=\s*['\"]?\s*([a-z0-9_.-]+)", re.I
 )
 _WEAK_DEFAULT_ENCODINGS = {"ascii", "iso-8859-1", "latin-1", "latin1"}
+MAX_BODY_BYTES = 16 * 1024 * 1024
 
 
 def _click_interactive_card(page, issue: int, site_name: str, timeout: int) -> None:
@@ -135,6 +136,7 @@ class RunTransport:
         self.max_per_domain = max_per_domain
         self._local = threading.local()
         self._lock = threading.RLock()
+        self._sessions: set[requests.Session] = set()
         self._cache: dict[tuple[str, bool], str] = {}
         self._flights: dict[tuple[str, bool], _Flight] = {}
         self._domains: dict[str, threading.BoundedSemaphore] = {}
@@ -149,10 +151,12 @@ class RunTransport:
             sessions = {}
             self._local.sessions = sessions
         session = sessions.get(verify_ssl)
-        if session is None:
-            session = requests.Session()
-            session.headers.update(DEFAULT_HEADERS)
-            sessions[verify_ssl] = session
+        with self._lock:
+            if session is None or session not in self._sessions:
+                session = requests.Session()
+                session.headers.update(DEFAULT_HEADERS)
+                sessions[verify_ssl] = session
+                self._sessions.add(session)
         return session
 
     def _domain_semaphore(self, url: str) -> threading.BoundedSemaphore:
@@ -170,26 +174,60 @@ class RunTransport:
         semaphore = self._domain_semaphore(url)
         if not semaphore.acquire(timeout=timeout):
             raise TimeoutError("单站总超时：等待域名请求槽超时")
-        chain = []
+        chain: list[str] = []
         current = url
         try:
             for _hop in range(6):
                 remaining = deadline - time.monotonic()
                 if remaining <= 0:
                     raise TimeoutError("单站总超时：重定向超时")
-                with session.get(current, timeout=(min(10, remaining), remaining),
-                                 verify=verify_ssl, allow_redirects=False) as response:
+                with session.get(
+                    current,
+                    timeout=(min(10, remaining), min(10, remaining)),
+                    verify=verify_ssl,
+                    allow_redirects=False,
+                    stream=True,
+                ) as response:
                     location = response.headers.get("Location")
                     if response.status_code in {301, 302, 303, 307, 308} and location:
                         destination = urljoin(current, location)
                         if not same_origin(url, destination):
-                            raise requests.RequestException("禁止未登记的跨来源重定向")
+                            raise requests.RequestException(
+                                "禁止未登记的跨来源重定向"
+                            )
                         chain.append(current)
                         current = destination
                         continue
                     response.raise_for_status()
-                    return FetchedText(decode_response_content(response.content, response.encoding),
-                                       url, response.url or current, chain)
+                    declared_size = response.headers.get("Content-Length")
+                    if (
+                        declared_size
+                        and declared_size.isdigit()
+                        and int(declared_size) > MAX_BODY_BYTES
+                    ):
+                        raise requests.RequestException(
+                            f"响应正文超过 {MAX_BODY_BYTES} 字节上限"
+                        )
+                    chunks: list[bytes] = []
+                    total = 0
+                    for chunk in response.iter_content(chunk_size=64 * 1024):
+                        if time.monotonic() >= deadline:
+                            raise TimeoutError("单站总超时：响应正文读取超时")
+                        if not chunk:
+                            continue
+                        total += len(chunk)
+                        if total > MAX_BODY_BYTES:
+                            raise requests.RequestException(
+                                f"响应正文超过 {MAX_BODY_BYTES} 字节上限"
+                            )
+                        chunks.append(chunk)
+                    raw = b"".join(chunks)
+                    return FetchedText(
+                        decode_response_content(raw, response.encoding),
+                        url,
+                        response.url or current,
+                        chain,
+                    )
             raise requests.TooManyRedirects("重定向次数超过5次")
         finally:
             semaphore.release()
@@ -348,13 +386,22 @@ class RunTransport:
             for flight in self._render_flights.values():
                 flight.event.set()
             self._render_flights.clear()
+            self._domains.clear()
 
     def close(self) -> None:
         with self._lock:
             browser_workers = self._browser_workers
             self._browser_workers = []
+            sessions = list(self._sessions)
+            self._sessions.clear()
+            try:
+                self._local.sessions = {}
+            except AttributeError:
+                pass
         for worker in browser_workers:
             worker.close()
+        for session in sessions:
+            session.close()
 
 
 DEFAULT_TRANSPORT = RunTransport()

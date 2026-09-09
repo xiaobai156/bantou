@@ -23,12 +23,14 @@ from ..text import (
     normalize_text,
     original_issue_position,
     source_issue_token_positions,
+    source_text_without_hidden_html,
 )
 from .dedicated import special_matches_in_documents
 from .segments import (
     focused_half_head_block,
     iter_issue_segments,
     segment_has_body_locator,
+    half_head_values_in_segment,
     segment_quantity_valid,
     strict_segment_has_keyword,
     strict_values_in_segment,
@@ -83,8 +85,10 @@ def special_matches_in_text(
             record = next((segment for number, _token, segment, position
                            in iter_issue_segments(normalized, {issue})
                            if number == issue and position == match.start()), matched_text)
-            record_values = values_in_segment(record)
-            for record_value in record_values or [value]:
+            record_values = half_head_values_in_segment(record)
+            if value not in record_values:
+                record_values.insert(0, value)
+            for record_value in record_values:
                 found.append((issue, record_value, compact_line(record), match.start()))
     return found
 
@@ -119,7 +123,9 @@ def _anchor_evidence(
     block_end: int,
     anchors: tuple[str, ...],
 ) -> tuple[str, int]:
-    raw_block = str(document)[block_start:block_end]
+    raw_block = source_text_without_hidden_html(
+        str(document)[block_start:block_end]
+    )
     reverse_brackets = str.maketrans({"[": "【", "]": "】", "(": "（", ")": "）", ":": "："})
     for anchor in anchors:
         variants = (anchor, anchor.translate(reverse_brackets))
@@ -239,13 +245,11 @@ def find_matches(
                 if {int(token.group(1)) for token in ISSUE_RE.finditer(segment)} != {issue}:
                     continue
                 # Preserve all same-record values for the boundary conflict gate.
-                values = values_in_segment(segment)
+                values = half_head_values_in_segment(segment)
                 if not values:
                     continue
-                if target is not None:
-                    if target not in values:
-                        continue
-                    values = [target]
+                if target is not None and target not in values:
+                    continue
                 snippet = compact_line(segment)
                 for value in values:
                     bounds = _source_block_bounds(
@@ -443,13 +447,14 @@ def apply_direction_source_scope(
 
     available_orders = sorted({match.document_order for match in matches})
     if is_rendered_container_page:
+        if len(available_orders) != 1:
+            details = "、".join(str(order) for order in available_orders)
+            return [], f"专属权威容器未唯一确定：文档{details}"
+        selected_order = available_orders[0]
         return [
-            replace(
-                match,
-                document_order=0,
-                document_authority="declared-rendered-container",
-            )
+            replace(match, document_authority="declared-rendered-container")
             for match in matches
+            if match.document_order == selected_order
         ], None
 
     preferred_kinds: set[str] | None = None

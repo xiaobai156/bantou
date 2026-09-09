@@ -17,12 +17,48 @@ from ..text import (
 )
 
 
+RAW_HALF_HEAD_LABEL_RE = re.compile(
+    r"(?:(?:秒杀|必杀|绝杀|稳杀|杀)[\s㊣正★☆✿ღ:：\-—|【】\[\]（）()]{0,12})?半\s*头",
+    re.I,
+)
+_METADATA_BOUNDARY_RE = re.compile(r"(?:作者|网站|站点|栏目)\s*[:：]", re.I)
+
+
 def values_in_segment(segment: str) -> list[str]:
+    """Return every head/parity token, without assigning a business field."""
     values: list[str] = []
     for match in VALUE_RE.finditer(normalize_text(segment)):
         value = f"{int(match.group(1))}头{match.group(2)}"
         if value not in values:
             values.append(value)
+    return values
+
+
+def half_head_values_in_segment(segment: str) -> list[str]:
+    """Return only values inside an explicitly labelled half-head field.
+
+    A period record may contain several columns whose values all look like
+    ``X头单/双``.  The crawler must never borrow a value from another column.
+    The field ends at the next issue, next half-head label, declared non-half
+    column, or metadata boundary.  Multiple values inside the same field are
+    deliberately preserved for the existing conflict gate.
+    """
+    normalized = normalize_text(segment)
+    labels = list(RAW_HALF_HEAD_LABEL_RE.finditer(normalized))
+    values: list[str] = []
+    for index, label in enumerate(labels):
+        end_candidates = [len(normalized)]
+        if index + 1 < len(labels):
+            end_candidates.append(labels[index + 1].start())
+        for pattern in (ISSUE_RE, NON_HALF_HEAD_COLUMN_RE, _METADATA_BOUNDARY_RE):
+            boundary = pattern.search(normalized, label.end())
+            if boundary is not None:
+                end_candidates.append(boundary.start())
+        field = normalized[label.end() : min(end_candidates)]
+        for match in VALUE_RE.finditer(field):
+            value = f"{int(match.group(1))}头{match.group(2)}"
+            if value not in values:
+                values.append(value)
     return values
 
 
@@ -77,10 +113,9 @@ def segment_quantity_valid(segment: str, issue: int | None = None, expected_valu
     elif len(issues) != 1:
         return False
 
-    values = {
-        f"{int(match.group(1))}头{match.group(2)}"
-        for match in VALUE_RE.finditer(normalized)
-    }
+    values = half_head_values_in_segment(normalized)
+    if expected_value is not None and values != [expected_value]:
+        return False
     return len(values) == 1
 
 
@@ -90,28 +125,7 @@ def strict_values_in_segment(segment: str) -> list[str]:
         return []
     if not segment_has_body_locator(normalized):
         return []
-    values: list[str] = []
-
-    for match in STRICT_HALF_HEAD_RE.finditer(normalized):
-        value = f"{int(match.group(1))}头{match.group(2)}"
-        if value not in values:
-            values.append(value)
-    if values:
-        return values
-
-    compact = re.sub(r"\s+", "", normalized)
-    generic_values: list[str] = []
-    for match in VALUE_RE.finditer(normalized):
-        value = f"{int(match.group(1))}头{match.group(2)}"
-        if value not in generic_values:
-            generic_values.append(value)
-
-    if HALF_HEAD_KEYWORD_RE.search(compact) or any(keyword in compact for keyword in DEFAULT_KEYWORDS):
-        if len(generic_values) == 1:
-            return generic_values
-        return []
-
-    return generic_values
+    return half_head_values_in_segment(normalized)
 
 def iter_issue_segments(text: str, wanted_issues: set[int]):
     normalized = normalize_text(text)

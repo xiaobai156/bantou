@@ -172,8 +172,18 @@ def crawl_site(
                 site,
                 region_issues=wanted_issues,
             )
-            direction_candidates, source_reason = apply_direction_source_scope(
-                raw_matches, site, documents
+            identity_candidates, secondary_reason, rejection_evidence = apply_secondary_site_scope(
+                raw_matches, site, wanted_issues
+            )
+            if secondary_reason is not None:
+                return SiteResult(
+                    index, site, [], None, last_script_errors, secondary_reason,
+                    debug_sample_from_documents(documents, wanted_issues),
+                    rejection_evidence,
+                    tuple(raw_matches),
+                )
+            matches, source_reason = apply_direction_source_scope(
+                identity_candidates, site, documents
             )
             if source_reason is not None:
                 return SiteResult(
@@ -184,16 +194,8 @@ def crawl_site(
                     last_script_errors,
                     source_reason,
                     debug_sample_from_documents(documents, wanted_issues),
-                )
-            matches, secondary_reason, rejection_evidence = apply_secondary_site_scope(
-                direction_candidates, site, wanted_issues
-            )
-            if secondary_reason is not None:
-                return SiteResult(
-                    index, site, [], None, last_script_errors, secondary_reason,
-                    debug_sample_from_documents(documents, wanted_issues),
                     rejection_evidence,
-                    direction_candidates,
+                    tuple(identity_candidates),
                 )
             decision = select_direction_window_matches(
                 matches, wanted_issues, site.pick

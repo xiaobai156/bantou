@@ -269,6 +269,7 @@ def extract_dedicated_rendered_documents(
     root_text = normalize_text(raw_page_text)
     page_identity = DEDICATED_RENDERED_PAGE_IDENTITIES.get(site.url, "")
     alternate_data_anchors = DEDICATED_RENDERED_ALTERNATE_DATA_ANCHORS.get(site.url, ())
+    page_matches = bool(page_identity and page_identity in root_text)
     blocks: list[tuple[str, int, int, str, str]] = []
     if preferred == "page":
         if not direction_first and (not page_identity or page_identity not in root_text):
@@ -317,7 +318,7 @@ def extract_dedicated_rendered_documents(
             None if direction_first else wanted_issues,
             alternate_data_anchors,
         ):
-            identity = site.name if site.name in body_text else page_identity if page_matches else ""
+            identity = site.name if site.name in body_text else page_identity if page_identity and page_identity in body_text else ""
             blocks.append(
                 (
                     normalized_block,
@@ -327,6 +328,18 @@ def extract_dedicated_rendered_documents(
                     identity,
                 )
             )
+    if direction_first and preferred != "page" and site.url not in DEDICATED_RENDERED_AUTHOR_CONTEXT_URLS:
+        locally_identified = [block for block in blocks if block[4]]
+        if locally_identified:
+            blocks = locally_identified
+        elif page_matches and len(blocks) == 1:
+            block = blocks[0]
+            blocks = [(block[0], block[1], block[2], block[3], page_identity)]
+        elif page_matches and len(blocks) > 1:
+            raise ValueError(
+                f"专属页面只有全局身份且候选容器不唯一：class={preferred}，候选数={len(blocks)}"
+            )
+
     if not direction_first and len(blocks) != 1:
         raise ValueError(
             f"专属解析容器未唯一匹配：class={preferred}，候选数={len(blocks)}"

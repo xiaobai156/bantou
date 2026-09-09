@@ -39,23 +39,62 @@ VOID_HTML_TAGS = {
     "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta",
     "param", "source", "track", "wbr",
 }
+IGNORED_HTML_TAGS = {"script", "style", "template", "noscript"}
+_IGNORED_HTML_BLOCK_RE = re.compile(
+    r"<(?P<tag>script|style|template|noscript)\b[^>]*>[\s\S]*?(?:</(?P=tag)\s*>|\Z)",
+    re.I,
+)
+
+
+def _ignored_html_ranges(text: str) -> tuple[tuple[int, int], ...]:
+    return tuple((match.start(), match.end()) for match in _IGNORED_HTML_BLOCK_RE.finditer(text or ""))
+
+
+def _position_in_ranges(position: int, ranges: tuple[tuple[int, int], ...]) -> bool:
+    return any(start <= position < end for start, end in ranges)
+
+
+def _mask_ignored_html_blocks(text: str) -> str:
+    def mask(match: re.Match[str]) -> str:
+        return "".join("\n" if char == "\n" else " " for char in match.group(0))
+
+    return _IGNORED_HTML_BLOCK_RE.sub(mask, text or "")
+
+
+def source_text_without_hidden_html(text: str) -> str:
+    """Mask hidden HTML blocks while preserving every source offset."""
+    return _mask_ignored_html_blocks(text)
 
 
 class PlainTextParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
         self.parts: list[str] = []
+        self.ignored_depth = 0
 
     def handle_starttag(self, tag: str, attrs) -> None:
-        if tag.lower() in BLOCK_TAGS:
+        tag = tag.lower()
+        if self.ignored_depth:
+            if tag not in VOID_HTML_TAGS:
+                self.ignored_depth += 1
+            return
+        if tag in IGNORED_HTML_TAGS:
+            self.ignored_depth = 1
+            return
+        if tag in BLOCK_TAGS:
             self.parts.append("\n")
 
     def handle_endtag(self, tag: str) -> None:
-        if tag.lower() in BLOCK_TAGS:
+        tag = tag.lower()
+        if self.ignored_depth:
+            if tag not in VOID_HTML_TAGS:
+                self.ignored_depth -= 1
+            return
+        if tag in BLOCK_TAGS:
             self.parts.append("\n")
 
     def handle_data(self, data: str) -> None:
-        if data:
+        if not self.ignored_depth and data:
             self.parts.append(data)
 
     def text(self) -> str:
@@ -82,12 +121,23 @@ class RenderedContainerParser(HTMLParser):
         self.block_spans: dict[str, list[tuple[int, int]]] = {}
         self.page_parts: list[str] = []
         self.last_author = ""
+        self.ignored_depth = 0
 
     def page_text(self) -> str:
         return "".join(self.page_parts)
 
     def handle_starttag(self, tag: str, attrs) -> None:
-        if tag.lower() in BLOCK_TAGS:
+        tag = tag.lower()
+        if self.ignored_depth:
+            if tag not in VOID_HTML_TAGS:
+                self.depth += 1
+                self.ignored_depth += 1
+            return
+        if tag in IGNORED_HTML_TAGS:
+            self.depth += 1
+            self.ignored_depth = 1
+            return
+        if tag in BLOCK_TAGS:
             for _start_depth, _class_name, parts, _author, _page_start in self.active:
                 parts.append("\n")
             self.page_parts.append("\n")
@@ -98,14 +148,18 @@ class RenderedContainerParser(HTMLParser):
             self.active.append(
                 (self.depth, class_name, [], self.last_author, len(self.page_text()))
             )
-        if tag.lower() not in VOID_HTML_TAGS:
+        if tag not in VOID_HTML_TAGS:
             self.depth += 1
 
     def handle_endtag(self, tag: str) -> None:
-        if tag.lower() in VOID_HTML_TAGS:
+        tag = tag.lower()
+        if tag in VOID_HTML_TAGS:
             return
         self.depth -= 1
-        if tag.lower() in BLOCK_TAGS:
+        if self.ignored_depth:
+            self.ignored_depth -= 1
+            return
+        if tag in BLOCK_TAGS:
             for _start_depth, _class_name, parts, _author, _page_start in self.active:
                 parts.append("\n")
             self.page_parts.append("\n")
@@ -124,6 +178,8 @@ class RenderedContainerParser(HTMLParser):
                 self.last_author = "".join(parts)
 
     def handle_data(self, data: str) -> None:
+        if self.ignored_depth:
+            return
         if data:
             self.page_parts.append(data)
             for _start_depth, _class_name, parts, _author, _page_start in self.active:
@@ -158,8 +214,12 @@ def _inside_html_tag(text: str, position: int) -> bool:
 
 def source_issue_token_positions(text: str, *, browser_text: bool = False) -> list[int]:
     positions: list[int] = []
+    ignored_ranges = () if browser_text else _ignored_html_ranges(text)
     for match in SOURCE_ISSUE_TOKEN_RE.finditer(text or ""):
-        if browser_text or not _inside_html_tag(text, match.start()):
+        if browser_text or (
+            not _inside_html_tag(text, match.start())
+            and not _position_in_ranges(match.start(), ignored_ranges)
+        ):
             positions.append(match.start())
     return positions
 
@@ -181,10 +241,15 @@ def original_issue_position(
     """
     is_browser_text = getattr(source_text, "source_kind", "") == "browser-text"
     searched_positions = issue_token_positions(searched_text, issue_text)
+    ignored_ranges = () if is_browser_text else _ignored_html_ranges(source_text)
     source_positions = [
         position
         for position in issue_token_positions(source_text, issue_text)
-        if is_browser_text or not _inside_html_tag(source_text, position)
+        if is_browser_text
+        or (
+            not _inside_html_tag(source_text, position)
+            and not _position_in_ranges(position, ignored_ranges)
+        )
     ]
     if required_value:
         compact_value = re.sub(r"\s+", "", normalize_text(required_value))
@@ -259,7 +324,8 @@ def html_to_text(document: str) -> str:
         parser.feed(document)
         parser.close()
     except Exception:
-        return normalize_text(re.sub(r"<[^>]+>", " ", document))
+        visible = _mask_ignored_html_blocks(document)
+        return normalize_text(re.sub(r"<[^>]+>", " ", visible))
     return normalize_text(parser.text())
 
 
@@ -277,8 +343,9 @@ class TableSearchText(str):
 def extract_half_head_table_texts(document: str) -> list[str]:
     extracted = []
     seen = set()
-    tables = list(TABLE_RE.finditer(document or ""))
-    groups = [(m.group(1), m.start(1)) for m in tables] or [(document or "", 0)]
+    working_document = _mask_ignored_html_blocks(document or "")
+    tables = list(TABLE_RE.finditer(working_document))
+    groups = [(m.group(1), m.start(1)) for m in tables] or [(working_document, 0)]
     for table_html, table_offset in groups:
         if re.search(r"<table\b", table_html, re.I):
             continue  # Nested/merged layout needs its declared dedicated parser.
@@ -293,13 +360,18 @@ def extract_half_head_table_texts(document: str) -> list[str]:
             if not texts:
                 continue
             if re.search(r"\b(?:colspan|rowspan)\s*=\s*[\"']?(?:[2-9]|[1-9][0-9])", row_html, re.I):
-                continue  # Do not guess positions after a non-unit span.
+                header_indexes = []
+                headers = {}
+                continue  # Do not carry a prior column map across merged cells.
             issue_cells = [i for i, text in enumerate(texts) if ISSUE_RE.search(text)]
             current_headers = [i for i, text in enumerate(texts) if "半头" in re.sub(r"\s+", "", text)]
             if not issue_cells:
                 if current_headers:
                     header_indexes = current_headers
                     headers = {i: (row_start + cells[i].start(1), row_start + cells[i].end(1)) for i in current_headers}
+                elif re.search(r"<th\b", row_html, re.I) or not any(VALUE_RE.search(text) for text in texts):
+                    header_indexes = []
+                    headers = {}
                 continue
             if len(issue_cells) != 1:
                 continue
@@ -310,7 +382,7 @@ def extract_half_head_table_texts(document: str) -> list[str]:
             token = tokens[0]
             raw_cell_start = row_start + cells[issue_index].start(1)
             raw_cell_end = row_start + cells[issue_index].end(1)
-            positions = [p for p in issue_token_positions(document, token.group(1)) if raw_cell_start <= p < raw_cell_end]
+            positions = [p for p in issue_token_positions(working_document, token.group(1)) if raw_cell_start <= p < raw_cell_end]
             if len(positions) != 1:
                 continue
             indexes = current_headers or header_indexes

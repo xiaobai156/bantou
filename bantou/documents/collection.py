@@ -77,7 +77,7 @@ def collect_dynamic_api_documents(
         raise ValueError(f"动态记录专属接口不是可信JSON：{exact_api_url}") from exc
 
     documents: list[SourceDocument] = []
-    seen_docs: set[tuple[str, str, str]] = set()
+    seen_docs: set[tuple[str, str, str, int]] = set()
     script_errors: list[str] = []
     add_document_with_decoded(
         exact_text,
@@ -103,10 +103,11 @@ def add_fetched_resources(
     timeout: int,
     verify_ssl: bool,
     documents: list[SourceDocument],
-    seen_docs: set[tuple[str, str, str]],
+    seen_docs: set[tuple[str, str, str, int]],
     script_errors: list[str],
     resource_kind: str,
     split_user_aggregates: bool = False,
+    required: bool = False,
     *,
     deadline: float | None = None,
 ) -> None:
@@ -114,7 +115,7 @@ def add_fetched_resources(
         urls, timeout, verify_ssl, deadline=deadline
     ):
         if resource_error is not None:
-            if resource_kind in {"iframe", "script"}:
+            if required:
                 raise FetchError(f"权威附属资源获取失败：{resource_url}：{resource_error}") from resource_error
             script_errors.append(f"{resource_url} ({resource_error})")
             continue
@@ -152,7 +153,7 @@ def collect_documents(
     deadline: float | None = None,
 ) -> tuple[list[SourceDocument], list[str]]:
     documents: list[SourceDocument] = []
-    seen_docs: set[tuple[str, str, str]] = set()
+    seen_docs: set[tuple[str, str, str, int]] = set()
     script_errors: list[str] = []
     script_urls: list[str] = []
     seen_scripts: set[str] = set()
@@ -200,46 +201,72 @@ def collect_documents(
     frame_index = 0
     document_scan_index = 0
     while True:
-        if len(documents) > 128 or len(seen_scripts) + len(seen_frames) + len(seen_half_head_urls) > 64:
+        if (
+            len(documents) > 128
+            or len(seen_scripts) + len(seen_frames) + len(seen_half_head_urls)
+            + len(seen_forum_detail_urls) > 64
+        ):
             raise ValueError("来源资源数量超过上限，未完成来源核验")
         documents_to_scan = documents[document_scan_index:]
         document_scan_index = len(documents)
         for document in documents_to_scan:
             document_url = str(getattr(document, "source_url", "") or url)
+            source_kind = str(getattr(document, "source_kind", "page"))
+            if source_kind in {"api", "api-decoded"}:
+                for full_url in reference_forum_urls_from_document(url, str(document)):
+                    if not same_origin(url, full_url):
+                        raise ValueError("动态详情资源指向未登记的跨来源URL")
+                    if full_url not in seen_forum_detail_urls:
+                        seen_forum_detail_urls.add(full_url)
+                        forum_detail_urls.append(full_url)
+                continue
+            if source_kind not in {
+                "page", "page-decoded", "browser", "browser-decoded",
+                "iframe", "iframe-decoded", "linked-page",
+                "linked-page-decoded",
+            }:
+                continue
             scan_documents = (document, document.replace("\\'", "'").replace('\\"', '"'))
             for scan_document in scan_documents:
                 for _, src in SCRIPT_SRC_RE.findall(scan_document):
                     if not src or src.strip("\\/") == "":
                         continue
                     full_url = urljoin(document_url, html.unescape(src))
+                    if not should_fetch_script(full_url):
+                        continue
                     if not same_origin(url, full_url):
                         raise ValueError("附属资源指向未登记的跨来源URL")
-                    if full_url not in seen_scripts and should_fetch_script(full_url):
+                    if full_url not in seen_scripts:
                         seen_scripts.add(full_url)
                         script_urls.append(full_url)
                 for _, src in IFRAME_SRC_RE.findall(scan_document):
                     if not src or src.strip("\\/") == "":
                         continue
                     full_url = urljoin(document_url, html.unescape(src))
+                    if not should_fetch_iframe(full_url):
+                        continue
                     if not same_origin(url, full_url):
                         raise ValueError("附属资源指向未登记的跨来源URL")
-                    if full_url not in seen_frames and should_fetch_iframe(full_url):
+                    if full_url not in seen_frames:
                         seen_frames.add(full_url)
                         frame_urls.append(full_url)
                 for _, href in HALF_HEAD_LINK_RE.findall(scan_document):
                     if not href or href.strip("\\/") == "":
                         continue
                     full_url = urljoin(document_url, html.unescape(href))
+                    if not should_fetch_half_head_link(full_url):
+                        continue
                     if not same_origin(url, full_url):
                         raise ValueError("半头链接指向未登记的跨来源URL")
-                    if full_url not in seen_half_head_urls and should_fetch_half_head_link(full_url):
+                    if full_url not in seen_half_head_urls:
                         seen_half_head_urls.add(full_url)
                         half_head_urls.append(full_url)
-                for full_url in reference_forum_urls_from_document(url, scan_document):
-                    if full_url not in seen_forum_detail_urls:
-                        seen_forum_detail_urls.add(full_url)
-                        forum_detail_urls.append(full_url)
 
+        if (
+            len(seen_scripts) + len(seen_frames) + len(seen_half_head_urls)
+            + len(seen_forum_detail_urls) > 64
+        ):
+            raise ValueError("来源资源数量超过上限，未完成来源核验")
         if (
             script_index >= len(script_urls)
             and frame_index >= len(frame_urls)
@@ -252,6 +279,7 @@ def collect_documents(
             script_index = len(script_urls)
             add_fetched_resources(
                 pending_scripts, timeout, verify_ssl, documents, seen_docs, script_errors, "script",
+                required=(url == WUZHUANXINGYI_URL),
                 deadline=deadline,
             )
             continue
@@ -260,6 +288,7 @@ def collect_documents(
             frame_index = len(frame_urls)
             add_fetched_resources(
                 pending_frames, timeout, verify_ssl, documents, seen_docs, script_errors, "iframe",
+                required=(url == BABA_FORUM_URL or url == WUZHUANXINGYI_URL),
                 deadline=deadline,
             )
             continue
@@ -294,19 +323,21 @@ def resolve_mengxiaomeng_detail_url(
     )
     link_re = re.compile(r'''<a[^>]*href\s*=\s*["']?([^"'\s>]+)["']?[^>]*>(.*?)</a>''', re.I | re.S)
     issue_re = re.compile(rf"(?<!\d){requested_issue}\s*期(?!\d)")
-    entry_host = urlparse(entry_url).hostname or ""
     candidates: set[str] = set()
     for document in documents:
         source_url = str(getattr(document, "source_url", ""))
         source_kind = str(getattr(document, "source_kind", ""))
-        if source_kind in {"linked-page", "api"}:
-            continue
-        if source_url and source_url != entry_url and source_kind not in {
-            "script",
-            "script-decoded",
-            "iframe",
-            "iframe-decoded",
+        if source_kind in {
+            "linked-page", "linked-page-decoded", "api", "api-decoded"
         }:
+            continue
+        allowed_link_sources = {
+            "page", "page-decoded", "browser", "browser-decoded",
+            "script", "script-decoded", "iframe", "iframe-decoded",
+        }
+        if source_kind not in allowed_link_sources:
+            continue
+        if source_url and not same_origin(entry_url, source_url):
             continue
         for match in link_re.finditer(document):
             href = html.unescape(match.group(1))
@@ -318,8 +349,8 @@ def resolve_mengxiaomeng_detail_url(
                 continue
             if site.name not in compact:
                 continue
-            detail_url = urljoin(entry_url, href)
-            if (urlparse(detail_url).hostname or "") != entry_host:
+            detail_url = urljoin(source_url or entry_url, href)
+            if not same_origin(entry_url, detail_url):
                 continue
             candidates.add(detail_url)
     if len(candidates) == 1:

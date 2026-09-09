@@ -96,6 +96,80 @@ def read_success_data(path: Path, issue_text: str) -> list[tuple[str, str, str, 
     return rows
 
 
+def read_success_data_strict(
+    path: Path,
+    issue_text: str,
+    configured_sites: list[Site],
+) -> list[tuple[str, str, str, str]]:
+    """Read a formal success file without silently dropping damaged rows."""
+    if not path.exists():
+        # A formal run may have produced only a failure file because every site
+        # failed. Retry then starts from an empty success set.
+        return []
+    expected_name = f"{issue_text}-半头.txt"
+    if path.name != expected_name:
+        raise ValueError(f"成功文件名与目标期不一致：期望 {expected_name}，实际 {path.name}")
+    by_name = {site.name: site for site in configured_sites}
+    if len(by_name) != len(configured_sites):
+        raise ValueError("正式配置站点名称不唯一")
+
+    rows: list[tuple[str, str, str, str]] = []
+    ranking_lines: list[str] = []
+    seen_names: set[str] = set()
+    in_ranking = False
+    saw_ranking_header = False
+    for line_number, raw in enumerate(
+        path.read_text(encoding="utf-8-sig").splitlines(), start=1
+    ):
+        stripped = raw.strip()
+        if not stripped:
+            continue
+        if stripped in LEGACY_SUCCESS_FOOTER_LINES and not in_ranking:
+            continue
+        if stripped in {"内容\t次数\t排名", "排名\t内容\t数量"}:
+            if saw_ranking_header:
+                raise ValueError(f"成功文件第{line_number}行重复排行榜表头")
+            saw_ranking_header = True
+            in_ranking = True
+            continue
+        if stripped.startswith("======"):
+            raise ValueError(f"成功文件第{line_number}行包含未知分隔内容")
+        if not in_ranking:
+            parts = stripped.split(maxsplit=1)
+            if len(parts) != 2:
+                raise ValueError(f"成功文件第{line_number}行格式无效")
+            value_text, site_name = parts[0], parts[1].strip()
+            value_match = VALUE_RE.fullmatch(normalize_text(value_text))
+            if value_match is None:
+                raise ValueError(f"成功文件第{line_number}行半头值无效")
+            value = f"{int(value_match.group(1))}头{value_match.group(2)}"
+            if normalize_text(value_text) != value:
+                raise ValueError(f"成功文件第{line_number}行半头值不是规范格式")
+            if site_name not in by_name:
+                raise ValueError(f"成功文件第{line_number}行站点不在正式配置：{site_name}")
+            if site_name in seen_names:
+                raise ValueError(f"成功文件站点重复：{site_name}")
+            seen_names.add(site_name)
+            rows.append((site_name, issue_text, value, by_name[site_name].url))
+            continue
+        parts = stripped.split("\t")
+        if len(parts) != 3:
+            raise ValueError(f"成功文件第{line_number}行排行榜格式无效")
+        value_text, count_text, rank_text = parts
+        value_match = VALUE_RE.fullmatch(normalize_text(value_text))
+        if value_match is None or not count_text.isdigit() or not rank_text.isdigit():
+            raise ValueError(f"成功文件第{line_number}行排行榜内容无效")
+        value = f"{int(value_match.group(1))}头{value_match.group(2)}"
+        ranking_lines.append(f"{value}\t{int(count_text)}\t{int(rank_text)}")
+
+    if rows and not saw_ranking_header:
+        raise ValueError("成功文件缺少排行榜，拒绝在不完整文件上重抓合并")
+    expected_rankings = build_rank_lines(rows)
+    if ranking_lines != expected_rankings[1:]:
+        raise ValueError("成功文件排行榜与网站数据不一致")
+    return rows
+
+
 def read_fail_entries(path: Path) -> list[tuple[str, str, str, str]]:
     if not path.exists():
         return []

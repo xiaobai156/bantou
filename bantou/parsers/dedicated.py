@@ -21,6 +21,7 @@ from ..text import (
     issue_token_positions,
     normalize_half_head_value,
     normalize_text,
+    source_text_without_hidden_html,
 )
 
 SEWAI_TAOYUAN_ROW_RE = re.compile(
@@ -82,7 +83,7 @@ def wuzhuanxingyi_matches(
     for document_order, document in enumerate(documents):
         if getattr(document, "source_kind", "page") not in allowed_source_kinds:
             continue
-        text = str(document)
+        text = source_text_without_hidden_html(str(document))
         for card_match in WUZHUANXINGYI_CARD_RE.finditer(text):
             header_text = normalize_text(html_to_text(card_match.group("header")))
             header_compact = re.sub(r"\s+", "", header_text)
@@ -161,7 +162,7 @@ def sewai_taoyuan_matches(
 ) -> list[Match]:
     matches: list[Match] = []
     for document_order, document in enumerate(documents):
-        text = str(document)
+        text = source_text_without_hidden_html(str(document))
         if "世外桃源" not in text or "绝杀半头" not in text:
             continue
         row_matches = list(SEWAI_TAOYUAN_ROW_RE.finditer(text))
@@ -233,7 +234,9 @@ def caiyuntong_macau_matches(
 ) -> list[Match]:
     matches: list[Match] = []
     for document_order, document in enumerate(documents):
-        local_matches = caiyuntong_macau_matches_from_joined(document, wanted_issues)
+        local_matches = caiyuntong_macau_matches_from_joined(
+            source_text_without_hidden_html(str(document)), wanted_issues
+        )
         for local_match in local_matches:
             offset = int(getattr(document, "position_offset", 0) or 0)
             matches.append(
@@ -309,7 +312,7 @@ def guangdong_baer_left_half_head_matches(
     matches: list[Match] = []
     for document_order, document in enumerate(documents):
         local_matches = guangdong_baer_left_half_head_matches_from_joined(
-            document, wanted_issues
+            source_text_without_hidden_html(str(document)), wanted_issues
         )
         for local_match in local_matches:
             offset = int(getattr(document, "position_offset", 0) or 0)
@@ -426,7 +429,7 @@ def shenzhen_futan_matches(
 ) -> list[Match]:
     matches: list[Match] = []
     for document_order, document in enumerate(documents):
-        text = str(document)
+        text = source_text_without_hidden_html(str(document))
         target_titles = [
             title_match
             for title_match in SHENZHEN_FUTAN_TITLE_RE.finditer(text)

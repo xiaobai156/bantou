@@ -146,7 +146,7 @@ def test_cache_conflict_never_written_but_live_result_preserved(tmp_path, monkey
     cache.write_bytes(b'original bytes')
     args=finalize_args(tmp_path)
     monkeypatch.setattr(single_period, 'DUPLICATE_BACKUP_FILE', cache)
-    monkeypatch.setattr(single_period, '_prepare_cache_update', lambda *args: (args[3], args[4], args[5], {'bad':'partial'}, {'A':'identity conflict'}))
+    monkeypatch.setattr(single_period, '_prepare_cache_update', lambda *args, **kwargs: (args[3], args[4], args[5], {'bad':'partial'}, {'A':'identity conflict'}))
     rows=[('A','251期','2头双',site().url)]
     code=single_period._finalize_run(args,[251],[site()],'251',rows,{},['网站名称\t分类\t原因\t网址'])
     assert code == 2
@@ -155,21 +155,22 @@ def test_cache_conflict_never_written_but_live_result_preserved(tmp_path, monkey
 
 
 def test_retry_merge_uses_given_paths_and_preserves_old_order(tmp_path):
-    good=tmp_path/'custom-success.txt'
+    good=tmp_path/'251期-半头.txt'
     bad=failure_file(tmp_path)
     good.write_text('1头单 OLD\n\n内容\t次数\t排名\n1头单\t1\t1\n',encoding='utf-8-sig')
-    rows, failures=single_period._merge_retry_rows('251',[('A','251期','2头双',site().url)],['网站名称\t分类\t原因\t网址'],success_path=good,fail_path=bad)
+    rows, failures=single_period._merge_retry_rows('251',[('A','251期','2头双',site().url)],['网站名称\t分类\t原因\t网址'],success_path=good,fail_path=bad,configured_sites=[site('OLD','https://example.test/old'),site()])
     assert [row[0] for row in rows] == ['OLD','A']
     assert len(failures)==1
 
 
 def test_retry_conflicting_existing_success_is_not_cleared(tmp_path):
-    good=tmp_path/'custom.txt'
-    good.write_text('1头单 A\n',encoding='utf-8')
+    good=tmp_path/'251期-半头.txt'
+    original='1头单 A\n\n内容\t次数\t排名\n1头单\t1\t1\n'
+    good.write_text(original,encoding='utf-8')
     bad=failure_file(tmp_path)
     with pytest.raises(ValueError,match='冲突'):
-        single_period._merge_retry_rows('251',[('A','251期','2头双',site().url)],['网站名称\t分类\t原因\t网址'],success_path=good,fail_path=bad)
-    assert good.read_text(encoding='utf-8')=='1头单 A\n'
+        single_period._merge_retry_rows('251',[('A','251期','2头双',site().url)],['网站名称\t分类\t原因\t网址'],success_path=good,fail_path=bad,configured_sites=[site()])
+    assert good.read_text(encoding='utf-8')==original
     assert bad.exists()
 
 
@@ -309,6 +310,7 @@ def response(url, status=200, location=None, data=b'ok'):
     item=Mock(url=url,status_code=status,headers={'Location':location} if location else {},content=data,encoding='utf-8')
     item.__enter__=Mock(return_value=item)
     item.__exit__=Mock(return_value=False)
+    item.iter_content=Mock(return_value=[data])
     return item
 
 
@@ -450,7 +452,7 @@ def test_same_table_cell_multiple_values_not_silently_truncated(monkeypatch):
 def test_custom_retry_failure_keeps_explicit_issue(tmp_path, monkeypatch):
     bad = failure_file(tmp_path, 'custom.txt', '期数\t网站名称\t分类\t原因\t网址\n251\tA\t超时\t超时\thttps://example.test/a\n')
     args = finalize_args(tmp_path, retry_fail=True, resolved_fail_path=bad)
-    monkeypatch.setattr(single_period, '_prepare_cache_update', lambda *a: (a[3], a[4], a[5], None, {}))
+    monkeypatch.setattr(single_period, '_prepare_cache_update', lambda *a, **kwargs: (a[3], a[4], a[5], None, {}))
     code = single_period._finalize_run(args, [251], [site()], '251', [], {}, ['网站名称\t分类\t原因\t网址','A\t超时\t仍然超时\thttps://example.test/a'])
     assert code == 0
     assert bad.read_text(encoding='utf-8-sig').startswith('期数\t')

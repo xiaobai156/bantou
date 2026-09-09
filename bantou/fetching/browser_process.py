@@ -13,7 +13,6 @@ def _browser_main(connection):
     if os.name != "nt":
         os.setsid()
     playwright = browser = None
-    contexts = {}
     try:
         connection.send(("ready", None))
         while True:
@@ -21,6 +20,7 @@ def _browser_main(connection):
             if task is None:
                 return
             url, timeout, verify_ssl, html, wait_until, interaction = task
+            context = None
             page = None
             try:
                 from playwright.sync_api import sync_playwright
@@ -28,10 +28,10 @@ def _browser_main(connection):
                 if playwright is None:
                     playwright = sync_playwright().start()
                     browser = playwright.chromium.launch(headless=True)
-                context = contexts.get(verify_ssl)
-                if context is None:
-                    context = browser.new_context(ignore_https_errors=not verify_ssl)
-                    contexts[verify_ssl] = context
+                context = browser.new_context(
+                    ignore_https_errors=not verify_ssl,
+                    service_workers="block",
+                )
                 page = context.new_page()
                 page.set_default_timeout(timeout * 1000)
                 # A top-level cross-origin redirect must not be followed. Normal
@@ -58,6 +58,8 @@ def _browser_main(connection):
             finally:
                 if page is not None:
                     page.close()
+                if context is not None:
+                    context.close()
     except (EOFError, BrokenPipeError, OSError):
         pass
     finally:

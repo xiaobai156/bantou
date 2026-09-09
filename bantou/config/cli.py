@@ -33,7 +33,6 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--rebuild-cache", action="store_true", help="已停用：缓存只允许按当天单期顺序滚动")
     parser.add_argument("--diagnose", action="store_true", help="全站真实抓取但不写成功TXT、失败TXT或缓存")
-    parser.add_argument("--multi-mode", action="store_true", help=argparse.SUPPRESS)
     parser.set_defaults(verify_ssl=True)
     parser.add_argument("--verify-ssl", dest="verify_ssl", action="store_true", help="校验证书（默认开启）")
     parser.add_argument("--no-verify-ssl", dest="verify_ssl", action="store_false", help="不校验证书；仅人工确认需要时使用")
