@@ -8,7 +8,7 @@ permissions:
   contents: write
 
 env:
-  BASE_SHA: ca57138b0b676d5a0391ec70b7763ca545eba87b
+  BASE_SHA: 3bf54468b236717631f6d8dc837f820b70a016e4
   RESULT_BRANCH: repair/252-failures-result-20260909
   PYTHONUTF8: '1'
 
