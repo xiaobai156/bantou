@@ -30,11 +30,17 @@ if source.count(old_tabs) != 4:
         f"expected four escaped-tab fixtures, found {source.count(old_tabs)}"
     )
 source = source.replace(old_tabs, new_tabs)
-exec(compile(source, ".repair_round3.py", "exec"), {"__name__": "__main__"})
+exec(
+    compile(source, ".repair_round3.py", "exec"),
+    {"__name__": "__main__", "__file__": ".repair_round3.py"},
+)
 
 for script_name in (".repair_followup.py", ".repair_testfix.py"):
     path = Path(script_name)
     script = path.read_text(encoding="utf-8")
-    exec(compile(script, str(path), "exec"), {"__name__": "__main__"})
+    exec(
+        compile(script, str(path), "exec"),
+        {"__name__": "__main__", "__file__": str(path)},
+    )
 
 print("All reviewed round-three repairs were applied.")
