@@ -26,11 +26,7 @@ jobs:
           $bytes = [Convert]::FromBase64String($encoded)
           [IO.File]::WriteAllBytes('.repair_round3.py.gz', $bytes)
           python -c "import gzip,pathlib; pathlib.Path('.repair_round3.py').write_bytes(gzip.decompress(pathlib.Path('.repair_round3.py.gz').read_bytes()))"
-          $script = Get-Content '.repair_round3.py' -Raw
-          $old = 'replace_once("bantou/fetching/browser_process.py", "        contexts = {}\n", "")'
-          $new = 'replace_once("bantou/fetching/browser_process.py", "    contexts = {}\n", "")'
-          if (-not $script.Contains($old)) { throw 'expected browser context patch literal not found' }
-          [IO.File]::WriteAllText('.repair_round3.py', $script.Replace($old, $new), [Text.UTF8Encoding]::new($false))
+          python -c "import base64;exec(base64.b64decode('ZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCnAgPSBQYXRoKCcucmVwYWlyX3JvdW5kMy5weScpCnMgPSBwLnJlYWRfdGV4dChlbmNvZGluZz0ndXRmLTgnKQpvbGQgPSAncmVwbGFjZV9vbmNlKCJiYW50b3UvZmV0Y2hpbmcvYnJvd3Nlcl9wcm9jZXNzLnB5IiwgIiAgICAgICAgY29udGV4dHMgPSB7fVxcbiIsICIiKScKbmV3ID0gJ3JlcGxhY2Vfb25jZSgiYmFudG91L2ZldGNoaW5nL2Jyb3dzZXJfcHJvY2Vzcy5weSIsICIgICAgY29udGV4dHMgPSB7fVxcbiIsICIiKScKaWYgb2xkIG5vdCBpbiBzOgogICAgcmFpc2UgUnVudGltZUVycm9yKCdleHBlY3RlZCBicm93c2VyIGNvbnRleHQgcGF0Y2ggbGl0ZXJhbCBub3QgZm91bmQnKQpzID0gcy5yZXBsYWNlKG9sZCwgbmV3LCAxKQpvbGRfdGFicyA9IHIiWyfnvZHnq5nlkI3np7BcdOWIhuexu1x05Y6f5ZugXHTnvZHlnYAnXSIKbmV3X3RhYnMgPSByIlsn572R56uZ5ZCN56ewXFx05YiG57G7XFx05Y6f5ZugXFx0572R5Z2AJ10iCmlmIHMuY291bnQob2xkX3RhYnMpICE9IDQ6CiAgICByYWlzZSBSdW50aW1lRXJyb3IoZidleHBlY3RlZCBmb3VyIGVzY2FwZWQtdGFiIHRlc3QgbGl0ZXJhbHMsIGZvdW5kIHtzLmNvdW50KG9sZF90YWJzKX0nKQpzID0gcy5yZXBsYWNlKG9sZF90YWJzLCBuZXdfdGFicykKcC53cml0ZV90ZXh0KHMsIGVuY29kaW5nPSd1dGYtOCcpCg=='))"
           python -B .repair_round3.py
       - name: Install Python 3.11 dependencies
         run: python -m pip install -c constraints.txt -e ".[test]"
