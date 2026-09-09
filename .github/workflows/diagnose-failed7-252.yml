@@ -21,8 +21,6 @@ jobs:
         shell: pwsh
         run: |
           Copy-Item apply_252_repairs.py "$env:RUNNER_TEMP\apply_252_repairs.py"
-          Copy-Item post_apply_252.py "$env:RUNNER_TEMP\post_apply_252.py"
-          Copy-Item post_apply_252_transport.py "$env:RUNNER_TEMP\post_apply_252_transport.py"
           Copy-Item verify_252_repairs.py "$env:RUNNER_TEMP\verify_252_repairs.py"
 
       - name: Switch to clean main base
@@ -48,8 +46,6 @@ jobs:
           $sitesBefore = (Get-FileHash sites.json -Algorithm SHA256).Hash
           $cacheBefore = (Get-FileHash recent_10_cache.json -Algorithm SHA256).Hash
           python -B "$env:RUNNER_TEMP\apply_252_repairs.py"
-          python -B "$env:RUNNER_TEMP\post_apply_252.py"
-          python -B "$env:RUNNER_TEMP\post_apply_252_transport.py"
           if ((Get-FileHash sites.json -Algorithm SHA256).Hash -ne $sitesBefore) { throw 'sites.json changed' }
           if ((Get-FileHash recent_10_cache.json -Algorithm SHA256).Hash -ne $cacheBefore) { throw 'recent_10_cache.json changed' }
 
@@ -65,7 +61,7 @@ jobs:
       - name: Check retry launcher on Python 3.11
         run: python -B check_retry_input.py
 
-      - name: Verify targeted live sites
+      - name: Verify six targeted live sites
         env:
           PYTHONUTF8: '1'
         run: python -B "$env:RUNNER_TEMP\verify_252_repairs.py"
@@ -92,10 +88,7 @@ jobs:
           git diff --check
           $allowed = @(
             'bantou/documents/collection.py',
-            'bantou/documents/dynamic/aggregate.py',
-            'bantou/documents/dynamic/routes.py',
             'bantou/fetching/policy.py',
-            'bantou/fetching/transport.py',
             'bantou/site_profiles/registry.py',
             'tests/test_issue252_repairs.py'
           )
@@ -112,6 +105,6 @@ jobs:
         run: |
           git config user.name 'xiaobai156'
           git config user.email '20069100+xiaobai156@users.noreply.github.com'
-          git add bantou/documents/collection.py bantou/documents/dynamic/aggregate.py bantou/documents/dynamic/routes.py bantou/fetching/policy.py bantou/fetching/transport.py bantou/site_profiles/registry.py tests/test_issue252_repairs.py
-          git commit -m 'fix: repair verified issue 252 site failures'
+          git add bantou/documents/collection.py bantou/fetching/policy.py bantou/site_profiles/registry.py tests/test_issue252_repairs.py
+          git commit -m 'fix: repair six verified issue 252 site failures'
           git push --force origin HEAD:refs/heads/repair/252-result-20260909
