@@ -4,6 +4,8 @@ on:
     branches: ['repair/audit-20260909']
 permissions:
   contents: write
+env:
+  PYTHONUTF8: '1'
 jobs:
   verify:
     runs-on: windows-latest
@@ -13,7 +15,7 @@ jobs:
         run: git config --global core.autocrlf false
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
-          fetch-depth: 2
+          fetch-depth: 0
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.11'
@@ -21,15 +23,26 @@ jobs:
         run: python -c "import io,zipfile,hashlib; from pathlib import Path; data=b''.join(p.read_bytes() for p in sorted(Path('.audit').glob('repair.part*'))); assert hashlib.sha256(data).hexdigest() == '7948d6ebd7dfc00858736e64751ee724adb594b8571c8a4942d32948f7152b24'; zipfile.ZipFile(io.BytesIO(data)).extractall('.')"
       - name: Apply exact-context code repairs
         run: python -B .audit_apply.py
+      - name: Apply reviewed test and compatibility corrections
+        run: python -B .audit/adjust.py
       - name: Install test dependencies
         run: python -m pip install -e ".[test]"
       - name: Install Chromium for an inline-document smoke test
         run: python -m playwright install chromium
-      - name: Run offline regressions and browser lifecycle tests
+      - name: Run Python 3.11 regressions and browser lifecycle tests
         env:
           RUN_BROWSER_SMOKE: '1'
         run: python -B -m pytest -q tests
       - name: Check existing safe retry launcher
+        run: python -B check_retry_input.py
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.10'
+      - name: Install dependencies for Python 3.10
+        run: python -m pip install -e ".[test]"
+      - name: Run Python 3.10 regressions
+        run: python -B -m pytest -q tests
+      - name: Check existing launcher with Python 3.10
         run: python -B check_retry_input.py
       - name: Publish tested candidate only, never main
         run: python -B .audit_publish.py
