@@ -23,10 +23,11 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
-      - name: Preserve patch and targeted diagnostic
+      - name: Preserve last verified patch payload and targeted diagnostic
         shell: pwsh
         run: |
-          Copy-Item .github/apply_252_failed_repairs.py.gz.b64 "$env:RUNNER_TEMP\repair.b64"
+          git show 0f1115ea2a8390ce423993e81847d5a1715b6263:.github/apply_252_failed_repairs.py.gz.b64 | Set-Content "$env:RUNNER_TEMP\repair.b64" -Encoding ascii -NoNewline
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Copy-Item diagnose_failed7_252.py "$env:RUNNER_TEMP\diagnose_failed7_252.py"
 
       - name: Check out untouched main baseline
@@ -53,6 +54,10 @@ jobs:
           python -c "import gzip,pathlib; pathlib.Path(r'$env:RUNNER_TEMP\apply_252_failed_repairs.py').write_bytes(gzip.decompress(pathlib.Path(r'$env:RUNNER_TEMP\apply_252_failed_repairs.py.gz').read_bytes()))"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -B "$env:RUNNER_TEMP\apply_252_failed_repairs.py"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -c "from pathlib import Path; p=Path('bantou/site_profiles/registry.py'); s=p.read_text(encoding='utf-8'); old='    GUANGDONG_BAER_URL: \"load\",\n'; new='    GUANGDONG_BAER_URL: \"domcontentloaded\",\n'; assert s.count(old)==1, s.count(old); p.write_text(s.replace(old,new,1),encoding='utf-8',newline='\n')"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -c "from pathlib import Path; p=Path('tests/test_issue252_failed_repairs.py'); s=p.read_text(encoding='utf-8'); s += '\n\ndef test_guangdong_baer_has_declared_domcontentloaded_wait():\n    from bantou.site_profiles import registry\n    assert registry.SITE_BROWSER_HTML_WAIT_UNTIL[registry.GUANGDONG_BAER_URL] == \"domcontentloaded\"\n'; p.write_text(s,encoding='utf-8',newline='\n')"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           git diff --check
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
