@@ -348,8 +348,8 @@ def record(number=1,family='forums'):
 def test_pagination_finds_second_matching_record_after_page_one(monkeypatch):
     s=site(url='https://example.test/#/users/123')
     monkeypatch.setattr(aggregate,'extra_api_urls',lambda url:['https://example.test/api/v1/users/123/forums?per_page=20'])
-    first=[record(1)]+[dict(record(i),draw=250) for i in range(2,21)]
-    second=[record(21)]
+    first=[record(21)]+[dict(record(i),draw=250) for i in range(20,1,-1)]
+    second=[record(1)]
     calls=[]
     def fetch(url,*args,**kwargs):
         calls.append(url)
@@ -358,6 +358,7 @@ def test_pagination_finds_second_matching_record_after_page_one(monkeypatch):
     with pytest.raises(ValueError,match='未唯一'):
         aggregate.resolve_user_aggregate_detail_url(s,251,2,True)
     assert len(calls)==2
+    assert 'lt=2' in calls[1]
 
 
 def test_reference_route_is_not_rewritten_as_forum(monkeypatch):
@@ -367,10 +368,17 @@ def test_reference_route_is_not_rewritten_as_forum(monkeypatch):
     assert aggregate.resolve_user_aggregate_detail_url(s,251,2,True).endswith('/references/5')
 
 
+def test_user_forum_detail_fetch_uses_exact_small_cursor():
+    from bantou.documents.dynamic.routes import extra_api_urls
+    assert extra_api_urls('https://example.test/#/users/123/forums/456') == [
+        'https://example.test/api/v1/users/123/forums?per_page=1&lt=457'
+    , 'https://example.test/api/v1/users/123']
+
+
 def test_repeated_full_api_page_is_incomplete(monkeypatch):
     s=site(url='https://example.test/#/users/123')
     monkeypatch.setattr(aggregate,'extra_api_urls',lambda url:['https://example.test/api/v1/users/123/forums'])
-    monkeypatch.setattr(aggregate,'fetch_text',lambda *a,**k:json.dumps([record(i) for i in range(1,21)]))
+    monkeypatch.setattr(aggregate,'fetch_text',lambda *a,**k:json.dumps([record(i) for i in range(20,0,-1)]))
     with pytest.raises(ValueError,match='同一页'):
         aggregate.resolve_user_aggregate_detail_url(s,251,2,True)
 

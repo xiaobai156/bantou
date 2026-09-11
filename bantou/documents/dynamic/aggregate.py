@@ -57,13 +57,14 @@ def aggregate_record_matches_request(record, user_id, requested_issue, site=None
 
 
 def _pages(api_url, timeout, verify_ssl, deadline):
-    """Follow explicit metadata or successive pages of the declared size.
+    """Follow page metadata, or the user API's decreasing-ID ``lt`` cursor.
 
     A repeated full page, malformed metadata or exhausted limit is incomplete,
     never evidence that a candidate is unique. Unverified endpoints fail closed.
     """
     parsed = urlparse(api_url)
     seen_pages = set()
+    cursor = None
     for page in range(1, 51):
         query = dict(parse_qsl(parsed.query, keep_blank_values=True))
         try:
@@ -73,6 +74,8 @@ def _pages(api_url, timeout, verify_ssl, deadline):
         if page_size < 1:
             raise ValueError("聚合接口分页大小无效")
         query.update(page=str(page), per_page=str(page_size))
+        if cursor is not None:
+            query["lt"] = str(cursor)
         page_url = urlunparse(parsed._replace(query=urlencode(query)))
         payload = json.loads(fetch_text(page_url, timeout, verify_ssl, deadline=deadline))
         if isinstance(payload, list):
@@ -92,6 +95,13 @@ def _pages(api_url, timeout, verify_ssl, deadline):
         if rows and fingerprint in seen_pages:
             raise ValueError("聚合接口重复返回同一页，无法证明记录完整")
         seen_pages.add(fingerprint)
+        if isinstance(payload, list) and rows:
+            ids = [row.get("id") if isinstance(row, dict) else None for row in rows]
+            if any(type(item) is not int or item <= 0 for item in ids):
+                raise ValueError("聚合接口游标记录ID无效")
+            if any(left <= right for left, right in zip(ids, ids[1:])) or (cursor is not None and ids[0] >= cursor):
+                raise ValueError("聚合接口游标未严格递减，无法证明记录完整")
+            cursor = ids[-1]
         yield rows
         if (last is not None and page == last) or (last is None and len(rows) < page_size):
             return
@@ -122,7 +132,7 @@ def resolve_user_aggregate_detail_url(site: Site, requested_issue: int, timeout:
                         raise ValueError(f"{requested_issue}期同类型同ID记录内容冲突：{family}/{record_id}")
                     records[key] = record
         except (FetchError, json.JSONDecodeError) as exc:
-            raise ValueError("用户聚合接口读取未完成，无法证明详情记录唯一") from exc
+            raise ValueError(f"用户聚合接口读取未完成，无法证明详情记录唯一：{api_url}：{exc}") from exc
     if len(records) != 1:
         raise ValueError(f"{requested_issue}期详情记录未唯一匹配：{len(records)}条")
     family, record_id = next(iter(records))

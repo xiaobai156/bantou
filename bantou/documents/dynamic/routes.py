@@ -56,8 +56,9 @@ def extra_api_urls(url: str) -> list[str]:
                 r"/(?:users/)(\d+)/forums/(\d+)(?:/|$)", parsed.fragment, re.I
             )
             if record_kind == "forum" and user_forum_match and user_forum_match.group(2) == record_id:
+                cursor = int(record_id) + 1
                 urls.append(
-                    f"{base}/api/v1/users/{user_forum_match.group(1)}/forums?per_page=1000"
+                    f"{base}/api/v1/users/{user_forum_match.group(1)}/forums?per_page=1&lt={cursor}"
                 )
             else:
                 urls.append(f"{base}/api/v1/forums/{record_id}")
@@ -70,9 +71,9 @@ def extra_api_urls(url: str) -> list[str]:
     if user_id is not None:
         urls.extend(
             [
-                f"{base}/api/v1/users/{user_id}/forums?per_page=5000",
-                f"{base}/api/v1/users/{user_id}/discoveries?per_page=1000",
-                f"{base}/api/v1/users/{user_id}/references?per_page=1000",
+                f"{base}/api/v1/users/{user_id}/forums?per_page=100",
+                f"{base}/api/v1/users/{user_id}/discoveries?per_page=100",
+                f"{base}/api/v1/users/{user_id}/references?per_page=100",
                 f"{base}/api/v1/users/{user_id}/references/history",
             ]
         )

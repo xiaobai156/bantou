@@ -102,6 +102,7 @@ def read_success_data_strict(
     configured_sites: list[Site],
     *,
     preserve_unconfigured: bool = False,
+    allow_stale_ranking: bool = False,
 ) -> list[tuple[str, str, str, str]]:
     """Read a formal success file without silently dropping damaged rows."""
     if not path.exists():
@@ -167,7 +168,7 @@ def read_success_data_strict(
     if rows and not saw_ranking_header:
         raise ValueError("成功文件缺少排行榜，拒绝在不完整文件上重抓合并")
     expected_rankings = build_rank_lines(rows)
-    if ranking_lines != expected_rankings[1:]:
+    if not allow_stale_ranking and ranking_lines != expected_rankings[1:]:
         raise ValueError("成功文件排行榜与网站数据不一致")
     return rows
 
