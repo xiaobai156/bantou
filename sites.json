@@ -942,5 +942,14 @@
     "anchors": [
       "绝杀半头"
     ]
+  },
+  {
+    "name": "慕容瑾萱",
+    "url": "https://ulefrw.i6sml-u8o4o-eibogo.work:17455/topic/610896.html",
+    "pick": "bottom",
+    "parser": "strict_half_head",
+    "anchors": [
+      "半头"
+    ]
   }
 ]
