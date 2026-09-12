@@ -20,6 +20,7 @@ from ..documents.dynamic.routes import (
     dynamic_record_scope,
     is_user_aggregate_page_without_record_id,
 )
+from ..site_profiles.registry import SITE_RENDERED_PAGE_AUTHORITY_URLS
 from ..domain.models import Site, SiteResult
 from ..domain.validation import validate_exact_matches
 from ..fetching.policy import FetchError, should_retry_fetch_error
@@ -84,7 +85,10 @@ def _fetch_url_for_issue(
         return resolve_wealth_reference_detail_url(
             site, issue, timeout, verify_ssl, deadline=deadline
         )
-    if is_user_aggregate_page_without_record_id(site.url):
+    if (
+        is_user_aggregate_page_without_record_id(site.url)
+        and site.url not in SITE_RENDERED_PAGE_AUTHORITY_URLS
+    ):
         return resolve_user_aggregate_detail_url(
             site, issue, timeout, verify_ssl, deadline=deadline
         )
@@ -99,7 +103,13 @@ def _documents_for_requested_issues(
     deadline: float,
 ) -> tuple[list, list[str]]:
     """Fetch issue-specific entry pages per issue; list pages only once."""
-    issue_specific = site.entry_mode in {"issue_link", "reference_issue_link"} or is_user_aggregate_page_without_record_id(site.url)
+    issue_specific = (
+        site.entry_mode in {"issue_link", "reference_issue_link"}
+        or (
+            is_user_aggregate_page_without_record_id(site.url)
+            and site.url not in SITE_RENDERED_PAGE_AUTHORITY_URLS
+        )
+    )
     issue_groups = sorted(wanted_issues) if issue_specific else [max(wanted_issues)]
     documents = []
     script_errors: list[str] = []
