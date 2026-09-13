@@ -23,6 +23,7 @@ from bantou.outputs.formatting import build_success_output_lines, read_success_d
 from bantou.fetching.transport import RunTransport, canonical_url, canonical_browser_url, FetchedText
 from bantou.documents.dynamic import records, aggregate
 from bantou.documents import collection
+from bantou.site_profiles import registry
 from bantou.text import extract_half_head_table_texts, normalize_target
 
 
@@ -288,6 +289,43 @@ def test_browser_fragments_are_distinct_and_reach_renderer(monkeypatch):
     assert seen==[a,b]
     assert canonical_url(a)==canonical_url(b)
     assert canonical_browser_url(a)!=canonical_browser_url(b)
+
+
+def test_rendered_dynamic_page_is_not_forced_through_aggregate_api(monkeypatch):
+    url = 'https://example.test/#/users/1293'
+    s = site('简单拖鞋', url)
+    monkeypatch.setattr(site_crawl, 'SITE_RENDERED_PAGE_AUTHORITY_URLS', {url})
+    monkeypatch.setattr(
+        site_crawl,
+        'resolve_user_aggregate_detail_url',
+        lambda *args, **kwargs: pytest.fail('rendered page must not use aggregate API'),
+    )
+    assert site_crawl._fetch_url_for_issue(s, 256, 5, True, time.monotonic() + 5) == url
+
+
+@pytest.mark.parametrize('url', [
+    'https://peubwtt.t3vdj-h3294-qpbmtj.work:16677/#am',
+    'https://alvjak.uh1h2-ru1qt-cyscbt.xyz:16677/topic/328416.html',
+])
+def test_slow_dedicated_pages_use_domcontentloaded(url):
+    assert registry.SITE_BROWSER_HTML_WAIT_UNTIL[url] == 'domcontentloaded'
+
+
+def test_simple_drag_uses_current_rendered_series(monkeypatch):
+    url = 'https://wcvwpj.mb4i3-vwk1b-cadppa.work/#/users/1293'
+    s = site('简单拖鞋', url)
+    rendered = '\n'.join([
+        '广告 100期 必杀半头 1头单 开00对',
+        '256期 必杀半头 3头单 开0000对',
+        '255期 必杀半头 4头双 开猪44对',
+        '254期 必杀半头 3头双 开蛇02对',
+    ])
+    monkeypatch.setattr(collection, 'fetch_rendered_text', lambda *args, **kwargs: rendered)
+    documents, errors = collection.collect_site_documents(s, url, {256}, 5, True)
+    assert errors == []
+    assert len(documents) == 1
+    assert '256期' in documents[0]
+    assert '100期' not in documents[0]
 
 
 def test_singleflight_waiter_is_bounded(monkeypatch):

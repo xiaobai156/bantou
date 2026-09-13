@@ -16,6 +16,7 @@ from ..fetching.policy import (
 from ..site_profiles.registry import (
     BABA_FORUM_DATA_URL,
     BABA_FORUM_URL,
+    DEDICATED_RENDERED_CURRENT_SERIES_URLS,
     DEDICATED_RENDERED_SITE_RULES,
     DYNAMIC_RECORD_SUBTOPIC_ALIASES,
     DYNAMIC_RECORD_TOPIC_ALIASES,
@@ -31,6 +32,7 @@ from ..text import normalize_text
 from ..fetching.transport import same_origin
 from .content import (
     add_document_with_decoded,
+    bound_current_rendered_series,
     extract_dedicated_rendered_documents,
     should_fetch_half_head_link,
     should_fetch_iframe,
@@ -487,6 +489,11 @@ def collect_site_documents(
             deadline=deadline,
             wait_until=SITE_BROWSER_HTML_WAIT_UNTIL.get(site.url, "networkidle"),
         )
+        position_offset = 0
+        if site.url in DEDICATED_RENDERED_CURRENT_SERIES_URLS:
+            rendered_text, position_offset = bound_current_rendered_series(
+                rendered_text, wanted_issues
+            )
         return [
             SourceDocument(
                 rendered_text,
@@ -494,8 +501,9 @@ def collect_site_documents(
                 source_kind="browser-text",
                 container_id=f"rendered-page:{fetch_url}",
                 document_authority="declared-rendered-page",
-                block_start=0,
-                block_end=len(rendered_text),
+                position_offset=position_offset,
+                block_start=position_offset,
+                block_end=position_offset + len(rendered_text),
             )
         ], []
     if fetch_url == site.url and site.url in DEDICATED_RENDERED_SITE_RULES:

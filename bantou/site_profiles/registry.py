@@ -24,6 +24,7 @@ DEFAULT_KEYWORDS = ("杀半头", "秒杀半头", "必杀半头", "绝杀半头",
 
 SITE_RENDERED_PAGE_AUTHORITY_URLS = {
     "https://zcphjs.ce83x-ms2rz-orwude.work:12277/#/users/116162",
+    "https://wcvwpj.mb4i3-vwk1b-cadppa.work/#/users/1293",
     "https://hbwtl.7xzry-2gul3-olawdt.xyz/topic/227014.html",
     "https://rh2fgz.w043g-ql5mr-lfxblm.work/topic/499784.html",
     "https://sfch0f.2c6xk-l5fko-klefxa.work/topic/453945.html",
@@ -85,6 +86,8 @@ SITE_BROWSER_HTML_WAIT_UNTIL = {
     "https://zcphjs.ce83x-ms2rz-orwude.work:12277/#/users/116162": "networkidle",
     GUANGDONG_BAER_URL: "load",
     MENGXIAOMENG_URL: "domcontentloaded",
+    "https://peubwtt.t3vdj-h3294-qpbmtj.work:16677/#am": "domcontentloaded",
+    "https://alvjak.uh1h2-ru1qt-cyscbt.xyz:16677/topic/328416.html": "domcontentloaded",
     "https://opfeal.zbwno-faau4-zilwkd.xyz:16677/topic/930772.html": "domcontentloaded",
     "https://sadoleu.rznla-fgwyr-nzqalp.xyz:16677/topic/287642.html": "domcontentloaded",
     "https://vqyjnlug.qt1u6-vqjjl-vkdnzw.work:16655/topic/650194.html": "domcontentloaded",
@@ -154,6 +157,7 @@ DEDICATED_RENDERED_ALTERNATE_DATA_ANCHORS = {
     "https://269x6s.k4x2w-1o62c-peefnm.work/topic/206456.html": ("秒杀",),
 }
 DEDICATED_RENDERED_CURRENT_SERIES_URLS = {
+    "https://wcvwpj.mb4i3-vwk1b-cadppa.work/#/users/1293",
     "https://cpvqejp.avdja-la48l-xnsdva.xyz:16677/topic/336839.html",
     "https://zwhzkjo.fc4fh-otded-nvhceu.xyz:16677/topic/472642.html",
     "https://vqyjnlug.qt1u6-vqjjl-vkdnzw.work:16655/topic/650194.html",
