@@ -117,6 +117,9 @@ class ProcessBrowserWorker:
             if connection is not None:
                 connection.close()
 
+    def kill_now(self):
+        self._stop()
+
     def render(self, url, timeout, verify_ssl, html, wait_until, interaction=None):
         deadline = time.monotonic() + timeout
         if not self._lock.acquire(timeout=max(0, timeout)):
@@ -146,7 +149,10 @@ class ProcessBrowserWorker:
             self._lock.release()
 
     def close(self):
-        with self._lock:
+        if not self._lock.acquire(timeout=2):
+            self._stop()
+            return
+        try:
             if self._connection is not None:
                 try:
                     self._connection.send(None)
@@ -154,3 +160,5 @@ class ProcessBrowserWorker:
                 except (OSError, EOFError):
                     pass
             self._stop()
+        finally:
+            self._lock.release()

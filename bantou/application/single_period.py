@@ -5,7 +5,9 @@ from __future__ import annotations
 
 import concurrent.futures
 import json
+import os
 import sys
+import threading
 import time
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -23,7 +25,11 @@ from ..config.issues import parse_issue_range
 from ..config.sites import read_failed_sites, read_sites
 from ..domain.models import Match, Site, SiteResult
 from ..domain.validation import validate_exact_matches
-from ..fetching.policy import INSECURE_TLS_COMPATIBILITY_URLS, run_transport_scope
+from ..fetching.policy import (
+    INSECURE_TLS_COMPATIBILITY_URLS,
+    force_kill_browser_children,
+    run_transport_scope,
+)
 from ..fetching.transport import canonical_url
 from ..outputs.formatting import (
     append_script_error,
@@ -42,6 +48,10 @@ from ..outputs.transaction import formal_write_lock, write_transaction
 from ..paths import DUPLICATE_BACKUP_FILE, FAILURE_RESULT_DIR
 from ..text import normalize_target
 from .site_crawl import crawl_site, format_progress_line, print_failure_summary
+
+HARD_TIMEOUT_BUFFER_SECONDS = 30
+QUEUE_SAFETY_MARGIN_SECONDS = 300
+WATCHDOG_POLL_SECONDS = 1.0
 
 
 def _failure_rows(lines: list[str]) -> list[tuple[str, str, str]]:
@@ -219,13 +229,18 @@ def _prepare_cache_update(
 
 def _run_sites(
     args, sites: list[Site], wanted_issues: set[int], target: str | None
-) -> list[SiteResult]:
+) -> tuple[list[SiteResult], int]:
     worker_count = max(1, min(args.workers, len(sites)))
     print(f"并发线程数：{worker_count}", flush=True)
     results: list[SiteResult] = []
     start_time = time.perf_counter()
     progress_success = 0
     progress_fail = 0
+    hard_limit = max(1, int(args.site_timeout)) + HARD_TIMEOUT_BUFFER_SECONDS
+    queue_limit = hard_limit + QUEUE_SAFETY_MARGIN_SECONDS
+    timing_lock = threading.Lock()
+    started_at: dict[int, float] = {}
+    queued_at: dict[int, float] = {}
 
     def record_result(index: int, site: Site, result: SiteResult) -> None:
         nonlocal progress_success, progress_fail
@@ -246,22 +261,28 @@ def _run_sites(
             flush=True,
         )
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=worker_count) as executor:
-        future_map = {}
+    def guarded_crawl(index: int, site: Site) -> SiteResult:
+        with timing_lock:
+            started_at[index] = time.monotonic()
+        return crawl_site(
+            index,
+            site,
+            wanted_issues,
+            target,
+            args.timeout,
+            args.verify_ssl,
+            args.retries,
+            max(0, args.delay) * ((index - 1) % worker_count),
+            site_timeout=args.site_timeout,
+        )
+
+    executor = concurrent.futures.ThreadPoolExecutor(max_workers=worker_count)
+    future_map: dict[concurrent.futures.Future, tuple[int, Site]] = {}
+    abandoned_count = 0
+    try:
         for index, site in enumerate(sites, start=1):
             try:
-                future = executor.submit(
-                    crawl_site,
-                    index,
-                    site,
-                    wanted_issues,
-                    target,
-                    args.timeout,
-                    args.verify_ssl,
-                    args.retries,
-                    max(0, args.delay) * ((index - 1) % worker_count),
-                    site_timeout=args.site_timeout,
-                )
+                future = executor.submit(guarded_crawl, index, site)
             except Exception as exc:
                 record_result(
                     index,
@@ -274,16 +295,59 @@ def _run_sites(
                     ),
                 )
             else:
+                queued_at[index] = time.monotonic()
                 future_map[future] = (index, site)
 
-        for future in concurrent.futures.as_completed(future_map):
-            index, site = future_map[future]
-            try:
-                result = future.result()
-            except Exception as exc:
-                result = SiteResult(index, site, [], f"解析失败：{type(exc).__name__}: {exc}")
-            record_result(index, site, result)
-    return results
+        pending = set(future_map)
+        while pending:
+            done, not_done = concurrent.futures.wait(
+                pending,
+                timeout=WATCHDOG_POLL_SECONDS,
+                return_when=concurrent.futures.FIRST_COMPLETED,
+            )
+            for future in done:
+                index, site = future_map[future]
+                try:
+                    result = future.result()
+                except Exception as exc:
+                    result = SiteResult(index, site, [], f"解析失败：{type(exc).__name__}: {exc}")
+                record_result(index, site, result)
+            pending = set(not_done)
+            if not pending:
+                break
+            now = time.monotonic()
+            for future in sorted(pending, key=lambda item: future_map[item][0]):
+                index, site = future_map[future]
+                with timing_lock:
+                    started = started_at.get(index)
+                if started is None:
+                    if now - queued_at.get(index, now) < queue_limit:
+                        continue
+                    reason = f"单站硬超时：{int(queue_limit)}秒内未获得执行工作槽"
+                else:
+                    if now - started < hard_limit:
+                        continue
+                    reason = f"单站硬超时：{int(hard_limit)}秒未返回"
+                future.cancel()
+                pending.discard(future)
+                abandoned_count += 1
+                record_result(index, site, SiteResult(index, site, [], reason))
+    finally:
+        executor.shutdown(wait=False, cancel_futures=True)
+    return results, abandoned_count
+
+
+def _force_exit(code: int) -> None:
+    try:
+        force_kill_browser_children()
+    except Exception:
+        pass
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.flush()
+        except Exception:
+            pass
+    os._exit(code)
 
 
 def _finalize_run(
@@ -479,7 +543,7 @@ def main(argv: list[str] | None = None, *, multi_mode: bool = False) -> int:
     rank_rows: list[tuple[str, str, str, str]] = []
     cache_rows: dict[str, tuple[Site, dict[int, Match]]] = {}
     with run_transport_scope():
-        results = _run_sites(args, sites, wanted_issues, target)
+        results, abandoned_sites = _run_sites(args, sites, wanted_issues, target)
 
     for result in sorted(results, key=lambda item: item.index):
         site = result.site
@@ -494,8 +558,15 @@ def main(argv: list[str] | None = None, *, multi_mode: bool = False) -> int:
         for match in matches:
             rank_rows.append((site.name, f"{match.issue:0{issue_width}d}期", match.value, site.url))
 
-    return _finalize_run(
+    exit_code = _finalize_run(
         args, issues, sites, issues_label, rank_rows, cache_rows, fail_lines,
         multi_mode=multi_mode,
         configured_sites=configured_sites,
     )
+    if abandoned_sites:
+        print(
+            f"警告：{abandoned_sites} 个站点线程硬超时未回收，结果已写入，进程强制退出",
+            file=sys.stderr,
+        )
+        _force_exit(exit_code)
+    return exit_code

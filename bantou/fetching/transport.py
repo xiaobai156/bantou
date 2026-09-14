@@ -390,6 +390,13 @@ class RunTransport:
             self._render_flights.clear()
             self._domains.clear()
 
+    def force_kill_browsers(self) -> None:
+        for worker in list(self._browser_workers):
+            try:
+                worker.kill_now()
+            except Exception:
+                continue
+
     def close(self) -> None:
         with self._lock:
             browser_workers = self._browser_workers

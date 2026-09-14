@@ -58,6 +58,10 @@ def run_transport_scope():
             _RUN_SCOPE_LOCK.release()
 
 
+def force_kill_browser_children() -> None:
+    DEFAULT_TRANSPORT.force_kill_browsers()
+
+
 def decode_bytes(raw: bytes) -> str:
     for encoding in ("utf-8", "gb18030", "big5"):
         try:

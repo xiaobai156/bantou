@@ -26,6 +26,27 @@ def echo_worker(connection):
     connection.close()
 
 
+def test_close_is_bounded_when_render_lock_is_stuck():
+    worker=ProcessBrowserWorker(target=echo_worker)
+    worker._lock.acquire()
+    start=time.monotonic()
+    try:
+        worker.close()
+    finally:
+        worker._lock.release()
+    assert time.monotonic()-start<10
+    assert worker._process is None
+
+
+def test_kill_now_clears_started_worker_process():
+    worker=ProcessBrowserWorker(target=echo_worker)
+    assert worker.render('https://example.test/#x',5,True,True,'load')=='ok'
+    assert worker._process is not None
+    worker.kill_now()
+    assert worker._process is None
+    assert worker._connection is None
+
+
 def test_killable_timeout_and_recovery():
     worker=ProcessBrowserWorker(target=hanging_worker)
     start=time.monotonic()
