@@ -65,6 +65,7 @@ SITE_RENDERED_PAGE_AUTHORITY_URLS = {
     "https://bzdolgna.0115r-u1nk5-zioots.xyz:16677/topic/250880.html",
     "https://xoxtpupt.bvptr-i3mv8-pbjxin.work:17455/topic/257049.html",
     "https://xoxtpupt.bvptr-i3mv8-pbjxin.work:17455/topic/393298.html",
+    "https://ulefrw.i6sml-u8o4o-eibogo.work:17455/topic/610896.html",
     "https://huqtzej.vvlq2-j4i8n-lisghq.xyz:16677/topic/281481.html",
     "https://xmdrbud.eqpr2-6tpvi-pjqztv.xyz:16677/topic/320718.html",
     "https://xmdrbud.eqpr2-6tpvi-pjqztv.xyz:16677/",
@@ -84,6 +85,7 @@ SITE_BROWSER_HTML_URLS = {CAIYUNTONG_URL, GUANGDONG_BAER_URL, MENGXIAOMENG_URL}
 SITE_BROWSER_HTML_WAIT_UNTIL = {
     CAIYUNTONG_URL: "domcontentloaded",
     "https://zcphjs.ce83x-ms2rz-orwude.work:12277/#/users/116162": "networkidle",
+    "https://ulefrw.i6sml-u8o4o-eibogo.work:17455/topic/610896.html": "domcontentloaded",
     GUANGDONG_BAER_URL: "load",
     MENGXIAOMENG_URL: "domcontentloaded",
     "https://peubwtt.t3vdj-h3294-qpbmtj.work:16677/#am": "domcontentloaded",
