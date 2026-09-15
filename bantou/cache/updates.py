@@ -19,7 +19,6 @@ from .validation import (
     _entry_source,
     _validate_entry,
     cache_entry_from_match,
-    compare_cached_match,
     validate_cache_for_update,
 )
 
@@ -77,17 +76,8 @@ def merge_cache_updates(
         if not isinstance(records, dict):
             conflicts[name] = "缓存 records 缺失"
             continue
-        conflict_reason = None
-        for issue, match in sorted(by_issue.items()):
-            cached = records.get(str(issue))
-            if isinstance(cached, dict):
-                reason = compare_cached_match(cached, match)
-                if reason is not None:
-                    conflict_reason = f"{issue}期{reason}"
-                    break
-        if conflict_reason is not None:
-            conflicts[name] = conflict_reason
-            continue
+        # A formal crawl is the newest source of truth for the same site/issue.
+        # Same-issue records are intentionally replaced by the fresh evidence.
         for issue, match in by_issue.items():
             records[str(issue)] = cache_entry_from_match(match)
         site_failures = item.get("failures", {})

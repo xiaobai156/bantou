@@ -5,6 +5,7 @@ import json
 import socket
 import threading
 import time
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import Mock
@@ -132,6 +133,19 @@ def test_cache_historical_or_unspecified_retry_rejected(target_issue):
 def test_cache_key_must_match_live_issue():
     with pytest.raises(CacheValidationError, match='缓存键'):
         _site_cache_item_for_issues(site(), {251: match(250)}, [251])
+
+
+def test_same_issue_cache_update_overwrites_previous_match():
+    original = payload()
+    incoming_match = replace(match(251), value="4头双", snippet="251期 必杀半头[4头双]开00对")
+    updated, conflicts = merge_cache_updates(
+        original,
+        {"A": (site(), {251: incoming_match})},
+        [],
+        target_issue=251,
+    )
+    assert conflicts == {}
+    assert updated["sites"][0]["records"]["251"]["value"] == "4头双"
 
 
 def finalize_args(tmp_path, **kwargs):
