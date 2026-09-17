@@ -7,6 +7,19 @@ import signal
 import subprocess
 import threading
 import time
+from urllib.parse import urlsplit
+
+
+ANTI_BOT_USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+)
+ANTI_BOT_INIT_SCRIPT = """
+Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+Object.defineProperty(navigator, 'plugins', {get: () => [{}, {}]});
+Object.defineProperty(navigator, 'languages', {get: () => ['zh-CN', 'zh', 'en']});
+Object.defineProperty(window, 'chrome', {value: {runtime: {}}});
+"""
 
 
 def _browser_main(connection):
@@ -19,7 +32,7 @@ def _browser_main(connection):
             task = connection.recv()
             if task is None:
                 return
-            url, timeout, verify_ssl, html, wait_until, interaction = task
+            url, timeout, verify_ssl, html, wait_until, interaction, anti_bot = task
             context = None
             page = None
             try:
@@ -27,11 +40,22 @@ def _browser_main(connection):
                 from .transport import _click_interactive_card, same_origin
                 if playwright is None:
                     playwright = sync_playwright().start()
-                    browser = playwright.chromium.launch(headless=True)
+                    browser = playwright.chromium.launch(
+                        headless=True,
+                        args=["--disable-blink-features=AutomationControlled"],
+                    )
                 context = browser.new_context(
                     ignore_https_errors=not verify_ssl,
                     service_workers="block",
+                    user_agent=ANTI_BOT_USER_AGENT if anti_bot else None,
                 )
+                if anti_bot:
+                    parsed = urlsplit(url)
+                    context.grant_permissions(
+                        ["notifications"],
+                        origin=f"{parsed.scheme}://{parsed.netloc}",
+                    )
+                    context.add_init_script(ANTI_BOT_INIT_SCRIPT)
                 page = context.new_page()
                 page.set_default_timeout(timeout * 1000)
                 # A top-level cross-origin redirect must not be followed. Normal
@@ -120,7 +144,16 @@ class ProcessBrowserWorker:
     def kill_now(self):
         self._stop()
 
-    def render(self, url, timeout, verify_ssl, html, wait_until, interaction=None):
+    def render(
+        self,
+        url,
+        timeout,
+        verify_ssl,
+        html,
+        wait_until,
+        interaction=None,
+        anti_bot=False,
+    ):
         deadline = time.monotonic() + timeout
         if not self._lock.acquire(timeout=max(0, timeout)):
             raise TimeoutError("单站总超时：等待浏览器工作槽超时")
@@ -135,7 +168,17 @@ class ProcessBrowserWorker:
                 status, _payload = self._receive(deadline)
                 if status != "ready":
                     raise RuntimeError("浏览器工作进程初始化失败")
-            self._connection.send((url, self._remaining(deadline), verify_ssl, html, wait_until, interaction))
+            self._connection.send(
+                (
+                    url,
+                    self._remaining(deadline),
+                    verify_ssl,
+                    html,
+                    wait_until,
+                    interaction,
+                    anti_bot,
+                )
+            )
             status, payload = self._receive(deadline)
             if status != "ok":
                 raise RuntimeError(f"浏览器渲染失败：{payload}")

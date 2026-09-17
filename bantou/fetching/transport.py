@@ -105,6 +105,7 @@ class _Flight:
 
 
 from .browser_process import ProcessBrowserWorker as _BrowserWorker
+from ..site_profiles.registry import SITE_BROWSER_ANTI_BOT_URLS
 
 
 
@@ -296,6 +297,7 @@ class RunTransport:
             html,
             wait_until,
             interaction=interaction,
+            anti_bot=url in SITE_BROWSER_ANTI_BOT_URLS,
         )
 
     def fetch_rendered(

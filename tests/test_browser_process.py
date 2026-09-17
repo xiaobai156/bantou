@@ -26,6 +26,13 @@ def echo_worker(connection):
     connection.close()
 
 
+def profile_worker(connection):
+    connection.send(('ready', None))
+    task = connection.recv()
+    connection.send(('ok', ('anti-bot' if task[6] else 'normal', task[0])))
+    connection.close()
+
+
 def test_close_is_bounded_when_render_lock_is_stuck():
     worker=ProcessBrowserWorker(target=echo_worker)
     worker._lock.acquire()
@@ -59,6 +66,16 @@ def test_killable_timeout_and_recovery():
     process=worker._process
     worker.close()
     assert worker._process is None
+
+
+def test_render_passes_anti_bot_profile_flag():
+    worker = ProcessBrowserWorker(target=profile_worker)
+    try:
+        assert worker.render(
+            'https://example.test/', 3, True, True, 'load', anti_bot=True
+        ) == 'anti-bot'
+    finally:
+        worker.close()
 
 
 @pytest.mark.skipif(os.environ.get('RUN_BROWSER_SMOKE')!='1',reason='Chromium smoke explicitly enabled by Windows CI')

@@ -359,3 +359,8 @@ SITE_TARGET_PLACEHOLDER_URLS = {
     "https://4.48kk49.com:1888/Article/ar_content/id/134/tid/9.html",
     "https://4.48kk49.com:1888/Article/ar_content/id/545/tid/35.html",
 }
+
+SITE_BROWSER_ANTI_BOT_URLS = frozenset({
+    "https://dh81163.2cv5a08j69.cyou/PrZpSoLrkj.html",
+    "https://dh81163.xx947zqiqi.cyou/duiijLEuEl.html",
+})
