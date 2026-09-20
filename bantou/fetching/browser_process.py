@@ -22,6 +22,37 @@ Object.defineProperty(window, 'chrome', {value: {runtime: {}}});
 """
 
 
+def _wait_for_ready(page, issue, terms, selector, timeout):
+    if issue is None or not terms:
+        return
+    page.wait_for_function(
+        r"""
+        ({issue, terms, selector}) => {
+            const scope = selector ? document.querySelector(selector) : document.body;
+            const text = scope ? (scope.innerText || "") : "";
+            const compact = text.replaceAll(" ", "").replaceAll("\n", "")
+                .replaceAll("\r", "").replaceAll("\t", "");
+            const marker = `${String(issue)}期`;
+            const normalizedTerms = terms.map(term => String(term).replaceAll(" ", ""));
+            let issueIndex = compact.indexOf(marker);
+            while (issueIndex >= 0) {
+                const previous = compact[issueIndex - 1] || "";
+                if (!(previous >= "0" && previous <= "9")) {
+                    const start = Math.max(0, issueIndex - 4000);
+                    const nearby = compact.slice(start, issueIndex + 4000);
+                    if (normalizedTerms.every(term => nearby.includes(term))
+                        && /[0-4]头(?:单|双)/.test(nearby)) return true;
+                }
+                issueIndex = compact.indexOf(marker, issueIndex + marker.length);
+            }
+            return false;
+        }
+        """,
+        arg={"issue": int(issue), "terms": list(terms), "selector": selector},
+        timeout=max(1, int(float(timeout) * 1000)),
+    )
+
+
 def _browser_main(connection):
     if os.name != "nt":
         os.setsid()
@@ -32,7 +63,10 @@ def _browser_main(connection):
             task = connection.recv()
             if task is None:
                 return
-            url, timeout, verify_ssl, html, wait_until, interaction, anti_bot = task
+            url, timeout, verify_ssl, html, wait_until, interaction, anti_bot, *ready = task
+            ready_issue = ready[0] if ready else None
+            ready_terms = tuple(ready[1] or ()) if len(ready) > 1 else ()
+            ready_selector = ready[2] if len(ready) > 2 else None
             context = None
             page = None
             try:
@@ -73,6 +107,12 @@ def _browser_main(connection):
                     raise ValueError(f"浏览器HTTP {response.status}")
                 if not same_origin(url, page.url):
                     raise ValueError("浏览器最终来源与请求来源不一致")
+                if ready_issue is not None and ready_terms:
+                    _wait_for_ready(page, ready_issue, ready_terms, ready_selector, timeout)
+                elif wait_until == "load":
+                    # ponytail: fixed settle for post-load feeds; replace with a DOM marker if pages diverge.
+                    page.wait_for_timeout(3000)
+                interactive_html = None
                 if interaction is not None:
                     _click_interactive_card(page, *interaction, timeout=timeout)
                 text = page.content() if html else page.inner_text("body", timeout=timeout * 1000)
@@ -153,6 +193,9 @@ class ProcessBrowserWorker:
         wait_until,
         interaction=None,
         anti_bot=False,
+        ready_issue=None,
+        ready_terms=(),
+        ready_selector=None,
     ):
         deadline = time.monotonic() + timeout
         if not self._lock.acquire(timeout=max(0, timeout)):
@@ -177,6 +220,9 @@ class ProcessBrowserWorker:
                     wait_until,
                     interaction,
                     anti_bot,
+                    ready_issue,
+                    tuple(ready_terms),
+                    ready_selector,
                 )
             )
             status, payload = self._receive(deadline)

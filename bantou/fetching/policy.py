@@ -282,6 +282,9 @@ def fetch_rendered_text(
     *,
     deadline: float | None = None,
     wait_until: str = "networkidle",
+    ready_issue: int | None = None,
+    ready_terms: tuple[str, ...] = (),
+    ready_selector: str | None = None,
 ) -> str:
     return DEFAULT_TRANSPORT.fetch_rendered(
         url,
@@ -289,6 +292,9 @@ def fetch_rendered_text(
         verify_ssl,
         html=False,
         wait_until=wait_until,
+        ready_issue=ready_issue,
+        ready_terms=ready_terms,
+        ready_selector=ready_selector,
     )
 
 
@@ -299,6 +305,9 @@ def fetch_rendered_html(
     *,
     deadline: float | None = None,
     wait_until: str = "networkidle",
+    ready_issue: int | None = None,
+    ready_terms: tuple[str, ...] = (),
+    ready_selector: str | None = None,
 ) -> str:
     return DEFAULT_TRANSPORT.fetch_rendered(
         url,
@@ -306,6 +315,9 @@ def fetch_rendered_html(
         verify_ssl,
         html=True,
         wait_until=wait_until,
+        ready_issue=ready_issue,
+        ready_terms=ready_terms,
+        ready_selector=ready_selector,
     )
 
 

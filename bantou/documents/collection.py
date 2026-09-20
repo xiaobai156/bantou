@@ -25,6 +25,8 @@ from ..site_profiles.registry import (
     SCRIPT_SRC_RE,
     SITE_BROWSER_HTML_URLS,
     SITE_BROWSER_HTML_WAIT_UNTIL,
+    SITE_BROWSER_READY_SELECTORS,
+    SITE_BROWSER_READY_TERMS,
     SITE_RENDERED_PAGE_AUTHORITY_URLS,
     WUZHUANXINGYI_URL,
 )
@@ -155,6 +157,9 @@ def collect_documents(
     *,
     deadline: float | None = None,
     follow_resources: bool = True,
+    ready_issue: int | None = None,
+    ready_terms: tuple[str, ...] = (),
+    ready_selector: str | None = None,
 ) -> tuple[list[SourceDocument], list[str]]:
     documents: list[SourceDocument] = []
     seen_docs: set[tuple[str, str, str, int]] = set()
@@ -184,6 +189,9 @@ def collect_documents(
                 verify_ssl,
                 deadline=deadline,
                 wait_until=SITE_BROWSER_HTML_WAIT_UNTIL.get(url, "networkidle"),
+                ready_issue=ready_issue,
+                ready_terms=ready_terms,
+                ready_selector=ready_selector,
             )
         except Exception as exc:
             script_errors.append(f"浏览器 HTML 渲染失败：{exc}")
@@ -448,6 +456,13 @@ def collect_site_documents(
     *,
     deadline: float | None = None,
 ) -> tuple[list[SourceDocument], list[str]]:
+    ready_issue = (
+        next(iter(wanted_issues))
+        if wanted_issues and len(wanted_issues) == 1
+        else None
+    )
+    ready_terms = SITE_BROWSER_READY_TERMS.get(site.url, ())
+    ready_selector = SITE_BROWSER_READY_SELECTORS.get(site.url)
     if dynamic_record_scope(fetch_url) is not None:
         return collect_dynamic_api_documents(
             fetch_url, timeout, verify_ssl, deadline=deadline
@@ -488,6 +503,9 @@ def collect_site_documents(
             verify_ssl,
             deadline=deadline,
             wait_until=SITE_BROWSER_HTML_WAIT_UNTIL.get(site.url, "networkidle"),
+            ready_issue=ready_issue,
+            ready_terms=ready_terms,
+            ready_selector=ready_selector,
         )
         position_offset = 0
         if site.url in DEDICATED_RENDERED_CURRENT_SERIES_URLS:
@@ -513,11 +531,22 @@ def collect_site_documents(
             verify_ssl,
             deadline=deadline,
             wait_until=SITE_BROWSER_HTML_WAIT_UNTIL.get(site.url, "networkidle"),
+            ready_issue=ready_issue,
+            ready_terms=ready_terms,
+            ready_selector=ready_selector,
         )
         return extract_dedicated_rendered_documents(
             rendered_html, site, wanted_issues, direction_first=True
         ), []
-    return collect_documents(fetch_url, timeout, verify_ssl, deadline=deadline)
+    return collect_documents(
+        fetch_url,
+        timeout,
+        verify_ssl,
+        deadline=deadline,
+        ready_issue=ready_issue,
+        ready_terms=ready_terms,
+        ready_selector=ready_selector,
+    )
 
 
 def collect_dynamic_browser_documents(

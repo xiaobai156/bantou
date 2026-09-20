@@ -282,6 +282,9 @@ class RunTransport:
         html: bool,
         wait_until: str = "networkidle",
         interaction: tuple[int, str] | None = None,
+        ready_issue: int | None = None,
+        ready_terms: tuple[str, ...] = (),
+        ready_selector: str | None = None,
     ) -> str:
         with self._lock:
             if not self._browser_workers:
@@ -298,6 +301,9 @@ class RunTransport:
             wait_until,
             interaction=interaction,
             anti_bot=url in SITE_BROWSER_ANTI_BOT_URLS,
+            ready_issue=ready_issue,
+            ready_terms=ready_terms,
+            ready_selector=ready_selector,
         )
 
     def fetch_rendered(
@@ -309,8 +315,11 @@ class RunTransport:
         html: bool,
         wait_until: str = "networkidle",
         interaction: tuple[int, str] | None = None,
+        ready_issue: int | None = None,
+        ready_terms: tuple[str, ...] = (),
+        ready_selector: str | None = None,
     ) -> str:
-        if wait_until not in {"domcontentloaded", "load", "networkidle"}:
+        if wait_until not in {"commit", "domcontentloaded", "load", "networkidle"}:
             raise ValueError(f"浏览器等待方式无效：{wait_until}")
         normalized = canonical_browser_url(url)
         key = (
@@ -319,6 +328,9 @@ class RunTransport:
             normalized,
             verify_ssl,
             interaction,
+            ready_issue,
+            tuple(ready_terms),
+            ready_selector,
         )
         with self._lock:
             if key in self._render_cache:
@@ -339,6 +351,9 @@ class RunTransport:
                     html,
                     wait_until,
                     interaction,
+                    ready_issue,
+                    tuple(ready_terms),
+                    ready_selector,
                 )
             except Exception as exc:
                 with self._lock:
