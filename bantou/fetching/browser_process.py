@@ -70,6 +70,7 @@ def _browser_main(connection):
             context = None
             page = None
             try:
+                connection.send(("stage", "浏览器初始化"))
                 from playwright.sync_api import sync_playwright
                 from .transport import _click_interactive_card, same_origin
                 if playwright is None:
@@ -102,19 +103,24 @@ def _browser_main(connection):
                     else:
                         route.continue_()
                 page.route("**/*", route_navigation)
+                connection.send(("stage", f"页面导航/{wait_until}"))
                 response = page.goto(url, wait_until=wait_until, timeout=timeout * 1000)
                 if response is not None and response.status >= 400:
                     raise ValueError(f"浏览器HTTP {response.status}")
                 if not same_origin(url, page.url):
                     raise ValueError("浏览器最终来源与请求来源不一致")
                 if ready_issue is not None and ready_terms:
+                    connection.send(("stage", "目标内容等待"))
                     _wait_for_ready(page, ready_issue, ready_terms, ready_selector, timeout)
                 elif wait_until == "load":
+                    connection.send(("stage", "页面加载后等待"))
                     # ponytail: fixed settle for post-load feeds; replace with a DOM marker if pages diverge.
                     page.wait_for_timeout(3000)
                 interactive_html = None
                 if interaction is not None:
+                    connection.send(("stage", "目标卡片交互"))
                     _click_interactive_card(page, *interaction, timeout=timeout)
+                connection.send(("stage", "读取正文"))
                 text = page.content() if html else page.inner_text("body", timeout=timeout * 1000)
                 connection.send(("ok", (text, page.url)))
             except Exception as exc:
@@ -141,6 +147,7 @@ class ProcessBrowserWorker:
         self._process = None
         self._connection = None
         self._lock = threading.Lock()
+        self._stage = "浏览器进程启动"
 
     @staticmethod
     def _remaining(deadline):
@@ -150,9 +157,14 @@ class ProcessBrowserWorker:
         return remaining
 
     def _receive(self, deadline):
-        if not self._connection.poll(self._remaining(deadline)):
-            raise TimeoutError("单站总超时：浏览器任务超时")
-        return self._connection.recv()
+        while True:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0 or not self._connection.poll(remaining):
+                raise TimeoutError(f"单站总超时：浏览器任务超时（阶段：{self._stage}）")
+            status, payload = self._connection.recv()
+            if status != "stage":
+                return status, payload
+            self._stage = str(payload)
 
     def _stop(self):
         process, connection = self._process, self._connection
@@ -201,6 +213,7 @@ class ProcessBrowserWorker:
         if not self._lock.acquire(timeout=max(0, timeout)):
             raise TimeoutError("单站总超时：等待浏览器工作槽超时")
         try:
+            self._stage = "浏览器进程启动"
             if self._process is None or not self._process.is_alive():
                 self._stop()
                 parent, child = self._context.Pipe()

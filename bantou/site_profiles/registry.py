@@ -90,7 +90,7 @@ SITE_BROWSER_HTML_WAIT_UNTIL = {
     "https://zwhzkjo.fc4fh-otded-nvhceu.xyz:16677/topic/472642.html": "domcontentloaded",
     "https://cpvqejp.avdja-la48l-xnsdva.xyz:16677/topic/336839.html": "domcontentloaded",
     "https://ulefrw.i6sml-u8o4o-eibogo.work:17455/topic/610896.html": "domcontentloaded",
-    "https://dh81163.2cv5a08j69.cyou/PrZpSoLrkj.html": "domcontentloaded",
+    "https://dh81163.2cv5a08j69.cyou/PrZpSoLrkj.html": "commit",
     "https://dh81163.xx947zqiqi.cyou/duiijLEuEl.html": "commit",
     "https://wojedcr.ltslh-5g80v-eeujep.xyz:16677/topic/805239.html": "domcontentloaded",
     GUANGDONG_BAER_URL: "load",
@@ -114,7 +114,8 @@ SITE_BROWSER_READY_TERMS = {
     "https://sqddimfu.evs71-kia2b-gshsdc.xyz:16677/topic/205530.html": ("半头",),
     "https://wojedcr.ltslh-5g80v-eeujep.xyz:16677/topic/805239.html": ("半头",),
     CAIYUNTONG_URL: ("半头",),
-    "https://dh81163.xx947zqiqi.cyou/duiijLEuEl.html": ("半头",),
+    "https://dh81163.2cv5a08j69.cyou/PrZpSoLrkj.html": ("孟婆大人", "半头"),
+    "https://dh81163.xx947zqiqi.cyou/duiijLEuEl.html": ("星宇股份", "半头"),
 }
 SITE_BROWSER_READY_SELECTORS = {
     CAIYUNTONG_URL: "#con_jihuadanshuang50000aloa_1",

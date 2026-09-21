@@ -230,7 +230,7 @@ def sewai_taoyuan_matches(
 
 def caiyuntong_macau_matches(
     documents: list[str],
-    wanted_issues: set[int],
+    wanted_issues: set[int] | None,
 ) -> list[Match]:
     matches: list[Match] = []
     for document_order, document in enumerate(documents):
@@ -268,7 +268,7 @@ def caiyuntong_macau_matches(
     return matches
 
 
-def caiyuntong_macau_matches_from_joined(joined: str, wanted_issues: set[int]) -> list[Match]:
+def caiyuntong_macau_matches_from_joined(joined: str, wanted_issues: set[int] | None) -> list[Match]:
     matches = []
     starts = [m.start() for m in re.finditer(r"id=[\"']con_jihuadanshuang50000aloa_1[\"']", joined)]
     for start in starts:
@@ -290,10 +290,10 @@ def caiyuntong_macau_matches_from_joined(joined: str, wanted_issues: set[int]) -
                 continue
             token = tokens[0]
             issue = int(token.group(1))
-            if issue not in wanted_issues:
+            if wanted_issues is not None and issue not in wanted_issues:
                 continue
             row_start, row_end = start + row.start(), start + row.end()
-            positions = [p for p in issue_token_positions(joined, token.group(1)) if row_start <= p < row_end]
+            positions = issue_token_positions(joined, token.group(1), start=row_start, end=row_end)
             if len(positions) != 1:
                 continue
             values = list(dict.fromkeys(f"{int(v.group(1))}头{v.group(2)}" for v in VALUE_RE.finditer(cells[3])))
@@ -307,7 +307,7 @@ def caiyuntong_macau_matches_from_joined(joined: str, wanted_issues: set[int]) -
 
 def guangdong_baer_left_half_head_matches(
     documents: list[str],
-    wanted_issues: set[int],
+    wanted_issues: set[int] | None,
 ) -> list[Match]:
     matches: list[Match] = []
     for document_order, document in enumerate(documents):
@@ -347,7 +347,7 @@ def guangdong_baer_left_half_head_matches(
 
 def guangdong_baer_left_half_head_matches_from_joined(
     joined: str,
-    wanted_issues: set[int],
+    wanted_issues: set[int] | None,
 ) -> list[Match]:
     found: list[Match] = []
     order = 0
@@ -384,7 +384,7 @@ def guangdong_baer_left_half_head_matches_from_joined(
         left_text = normalize_text(html_to_text(table_section[left_start:left_end]))
         for match in pattern.finditer(left_text):
             issue = int(match.group(1))
-            if issue not in wanted_issues:
+            if wanted_issues is not None and issue not in wanted_issues:
                 continue
             value = normalize_half_head_value(match.group(2), match.group(3))
             if value is None:
@@ -394,11 +394,7 @@ def guangdong_baer_left_half_head_matches_from_joined(
             anchor_position = joined.find("半波半头", title_pos, title_end)
             if anchor_position < 0:
                 continue
-            positions = [
-                position
-                for position in issue_token_positions(joined, match.group(1))
-                if global_left_start <= position < global_left_end
-            ]
+            positions = issue_token_positions(joined, match.group(1), start=global_left_start, end=global_left_end)
             if len(positions) != 1:
                 continue
             position = positions[0]

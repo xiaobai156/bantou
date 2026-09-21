@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import html
 import re
+from functools import cache
 from html.parser import HTMLParser
 
 ANY_VALUE_RE = re.compile(r"(?<!\d)(\d{1,2})\s*头\s*(单|双)")
@@ -197,7 +198,7 @@ def normalize_text(text: str) -> str:
     return text.strip()
 
 
-def issue_token_positions(text: str, issue_text: str) -> list[int]:
+def issue_token_positions(text: str, issue_text: str, *, start: int = 0, end: int | None = None) -> list[int]:
     """Return exact source offsets for one issue token without normalizing it."""
     digits = "".join(
         f"[{digit}{FULLWIDTH_DIGIT_BY_ASCII[digit]}]" for digit in str(issue_text)
@@ -205,7 +206,8 @@ def issue_token_positions(text: str, issue_text: str) -> list[int]:
     pattern = re.compile(
         rf"(?<![0-9０-９]){digits}(?:[\s\u00a0\u3000]|&nbsp;|&#160;)*期"
     )
-    return [match.start() for match in pattern.finditer(text or "")]
+    text = text or ""
+    return [match.start() for match in pattern.finditer(text, start, len(text) if end is None else end)]
 
 
 def _inside_html_tag(text: str, position: int) -> bool:
@@ -224,67 +226,50 @@ def source_issue_token_positions(text: str, *, browser_text: bool = False) -> li
     return positions
 
 
-def original_issue_position(
+def source_position_lookup(
     source_text: str,
     searched_text: str,
-    issue_text: str,
-    searched_position: int,
-    required_value: str | None = None,
-) -> int | None:
-    """Map a parsed issue token back to its unique source-document offset.
+):
+    """Build a parse-local lookup; never retain documents between sites/runs.
 
-    Parsing may inspect plain text or an extracted table, but the cache must
-    retain a position from the original source document rather than a parser
-    candidate ordinal.  When a value is supplied, an occurrence must also
-    contain that value before the next same-issue token; this excludes IDs and
-    attributes that merely contain the same issue number.
+    Preserve the original occurrence/value mapping, including the boundary at
+    the next *same* issue token. Repeated candidates reuse the same scan.
     """
     is_browser_text = getattr(source_text, "source_kind", "") == "browser-text"
-    searched_positions = issue_token_positions(searched_text, issue_text)
     ignored_ranges = () if is_browser_text else _ignored_html_ranges(source_text)
-    source_positions = [
-        position
-        for position in issue_token_positions(source_text, issue_text)
-        if is_browser_text
-        or (
-            not _inside_html_tag(source_text, position)
-            and not _position_in_ranges(position, ignored_ranges)
-        )
-    ]
-    if required_value:
-        compact_value = re.sub(r"\s+", "", normalize_text(required_value))
 
-        def positions_with_value(
-            text: str,
-            positions: list[int],
-            *,
-            plain_text: bool = False,
-        ) -> list[int]:
-            matches: list[int] = []
+    @cache
+    def issue_segments(issue_text):
+        searched_positions = issue_token_positions(searched_text, issue_text)
+        source_positions = [
+            position for position in issue_token_positions(source_text, issue_text)
+            if is_browser_text or (
+                not _inside_html_tag(source_text, position)
+                and not _position_in_ranges(position, ignored_ranges)
+            )
+        ]
+
+        def compact_segments(text, positions):
+            segments = []
             for index, position in enumerate(positions):
                 end = positions[index + 1] if index + 1 < len(positions) else len(text)
-                # Browser-extracted text can legitimately include literal markup
-                # fragments. Treating it as HTML again can hide all later content.
-                segment = text[position:end] if plain_text else html_to_text(text[position:end])
-                compact_segment = re.sub(r"\s+", "", normalize_text(segment))
-                if compact_value in compact_segment:
-                    matches.append(position)
-            return matches
+                # Literal markup in browser text must not be interpreted as HTML.
+                segment = text[position:end] if is_browser_text else html_to_text(text[position:end])
+                segments.append((position, re.sub(r"\s+", "", normalize_text(segment))))
+            return segments
 
-        searched_positions = positions_with_value(
-            searched_text, searched_positions, plain_text=is_browser_text
-        )
-        source_positions = positions_with_value(
-            source_text, source_positions, plain_text=is_browser_text
-        )
-    try:
-        occurrence = searched_positions.index(searched_position)
-    except ValueError:
-        return None
+        return compact_segments(searched_text, searched_positions), compact_segments(source_text, source_positions)
 
-    if occurrence >= len(source_positions):
-        return None
-    return source_positions[occurrence]
+    @cache
+    def lookup(issue_text, required_value):
+        searched, source = issue_segments(issue_text)
+        value = re.sub(r"\s+", "", normalize_text(required_value))
+        return dict(zip(
+            (position for position, segment in searched if value in segment),
+            (position for position, segment in source if value in segment),
+        ))
+
+    return lookup
 
 
 def compact_line(text: str, limit: int = 120) -> str:
@@ -382,7 +367,7 @@ def extract_half_head_table_texts(document: str) -> list[str]:
             token = tokens[0]
             raw_cell_start = row_start + cells[issue_index].start(1)
             raw_cell_end = row_start + cells[issue_index].end(1)
-            positions = [p for p in issue_token_positions(working_document, token.group(1)) if raw_cell_start <= p < raw_cell_end]
+            positions = issue_token_positions(working_document, token.group(1), start=raw_cell_start, end=raw_cell_end)
             if len(positions) != 1:
                 continue
             indexes = current_headers or header_indexes

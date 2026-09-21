@@ -174,8 +174,13 @@ def crawl_site(
                 site, wanted_issues, timeout, verify_ssl, deadline
             )
             last_script_errors = len(script_errors)
-            candidate_issues = candidate_issue_set(documents)
-            candidate_issues.update(wanted_issues)
+            if site.parser_id in {"caiyuntong_macau", "guangdong_baer_left_half_head"}:
+                # These parsers enumerate the complete declared column themselves.
+                # None means all its periods, not just the requested boundary.
+                candidate_issues = None
+            else:
+                candidate_issues = candidate_issue_set(documents)
+                candidate_issues.update(wanted_issues)
             raw_matches = site_scoped_raw_matches(
                 documents,
                 candidate_issues,

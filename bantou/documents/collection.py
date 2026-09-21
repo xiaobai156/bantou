@@ -16,10 +16,12 @@ from ..fetching.policy import (
 from ..site_profiles.registry import (
     BABA_FORUM_DATA_URL,
     BABA_FORUM_URL,
+    CAIYUNTONG_URL,
     DEDICATED_RENDERED_CURRENT_SERIES_URLS,
     DEDICATED_RENDERED_SITE_RULES,
     DYNAMIC_RECORD_SUBTOPIC_ALIASES,
     DYNAMIC_RECORD_TOPIC_ALIASES,
+    GUANGDONG_BAER_URL,
     HALF_HEAD_LINK_RE,
     IFRAME_SRC_RE,
     SCRIPT_SRC_RE,
@@ -194,6 +196,10 @@ def collect_documents(
                 ready_selector=ready_selector,
             )
         except Exception as exc:
+            if url in {CAIYUNTONG_URL, GUANGDONG_BAER_URL}:
+                # The declared browser source is required; an empty HTTP shell
+                # cannot turn a transient browser failure into a parser miss.
+                raise
             script_errors.append(f"浏览器 HTML 渲染失败：{exc}")
         else:
             add_document_with_decoded(

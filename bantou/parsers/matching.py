@@ -21,7 +21,7 @@ from ..text import (
     compact_line,
     normalize_half_head_value,
     normalize_text,
-    original_issue_position,
+    source_position_lookup,
     source_issue_token_positions,
     source_text_without_hidden_html,
 )
@@ -94,25 +94,20 @@ def special_matches_in_text(
 
 
 def _source_block_bounds(
-    document: str,
     searched_text: str,
     issue_text: str,
     searched_position: int,
     value: str,
+    position_lookup,
+    source_ends: dict[int, int],
 ) -> tuple[int, int] | None:
     if hasattr(searched_text, "source_position"):
         return searched_text.source_position, searched_text.source_row_end
-    start = original_issue_position(
-        document, searched_text, issue_text, searched_position, value
-    )
+    start = position_lookup(issue_text, value).get(searched_position)
     if start is None:
         return None
-    positions = source_issue_token_positions(
-        str(document), browser_text=getattr(document, "source_kind", "") == "browser-text"
-    )
-    next_positions = [position for position in positions if position > start]
-    end = next_positions[0] if next_positions else len(document)
-    if end <= start:
+    end = source_ends.get(start)
+    if end is None or end <= start:
         return None
     return start, end
 
@@ -138,7 +133,7 @@ def _anchor_evidence(
 
 def find_matches(
     documents: list[str],
-    wanted_issues: set[int],
+    wanted_issues: set[int] | None,
     site: Site | None = None,
     target: str | None = None,
     *,
@@ -171,8 +166,13 @@ def find_matches(
     order = 0
 
     for document_order, document in enumerate(documents):
+        positions = source_issue_token_positions(
+            str(document), browser_text=getattr(document, "source_kind", "") == "browser-text"
+        )
+        source_ends = dict(zip(positions, positions[1:] + [len(document)]))
         for text in iter_search_texts(document):
             normalized_search_text = text if hasattr(text, "source_position") else normalize_text(text)
+            position_lookup = source_position_lookup(document, normalized_search_text)
             for issue, value, snippet, parsed_position in special_matches_in_text(
                 text,
                 wanted_issues,
@@ -183,7 +183,7 @@ def find_matches(
                     continue
                 order += 1
                 bounds = _source_block_bounds(
-                    document, normalized_search_text, str(issue), parsed_position, value
+                    normalized_search_text, str(issue), parsed_position, value, position_lookup, source_ends
                 )
                 if bounds is None:
                     continue
@@ -253,7 +253,7 @@ def find_matches(
                 snippet = compact_line(segment)
                 for value in values:
                     bounds = _source_block_bounds(
-                        document, normalized_search_text, issue_text, parsed_position, value
+                        normalized_search_text, issue_text, parsed_position, value, position_lookup, source_ends
                     )
                     if bounds is None:
                         continue
@@ -312,7 +312,7 @@ def find_matches(
 
 def site_scoped_raw_matches(
     documents: list[str],
-    wanted_issues: set[int],
+    wanted_issues: set[int] | None,
     site: Site,
     *,
     region_issues: set[int] | None = None,

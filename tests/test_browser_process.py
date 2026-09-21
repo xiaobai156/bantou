@@ -33,6 +33,34 @@ def profile_worker(connection):
     connection.close()
 
 
+def staged_worker(connection):
+    if os.name != 'nt':
+        os.setsid()
+    connection.send(('ready', None))
+    task = connection.recv()
+    connection.send(('stage', '目标内容等待'))
+    if task[0].endswith('/hang'):
+        time.sleep(30)
+    else:
+        connection.send(('ok', ('staged', task[0])))
+    connection.close()
+
+
+def test_browser_stage_messages_preserve_result_and_timeout_reason():
+    worker = ProcessBrowserWorker(target=staged_worker)
+    try:
+        assert worker.render('https://example.test/ok', 3, True, False, 'load') == 'staged'
+    finally:
+        worker.close()
+    worker = ProcessBrowserWorker(target=staged_worker)
+    try:
+        with pytest.raises(TimeoutError, match='目标内容等待'):
+            worker.render('https://example.test/hang', 2, True, False, 'load')
+        assert worker._process is None
+    finally:
+        worker.close()
+
+
 def test_close_is_bounded_when_render_lock_is_stuck():
     worker=ProcessBrowserWorker(target=echo_worker)
     worker._lock.acquire()

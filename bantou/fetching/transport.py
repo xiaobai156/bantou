@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import concurrent.futures
+import queue
 import re
 import threading
 from dataclasses import dataclass
@@ -146,7 +147,7 @@ class RunTransport:
         self._render_cache: dict[tuple[str, str, bool], str] = {}
         self._render_flights: dict[tuple[str, str, bool], _Flight] = {}
         self._browser_workers: list[_BrowserWorker] = []
-        self._browser_worker_index = 0
+        self._available_browsers: queue.Queue = queue.Queue()
 
     def session_for(self, verify_ssl: bool) -> requests.Session:
         sessions = getattr(self._local, "sessions", None)
@@ -286,25 +287,35 @@ class RunTransport:
         ready_terms: tuple[str, ...] = (),
         ready_selector: str | None = None,
     ) -> str:
+        deadline = time.monotonic() + timeout
         with self._lock:
             if not self._browser_workers:
                 self._browser_workers = [_BrowserWorker() for _ in range(2)]
-            worker = self._browser_workers[
-                self._browser_worker_index % len(self._browser_workers)
-            ]
-            self._browser_worker_index += 1
-        return worker.render(
-            url,
-            timeout,
-            verify_ssl,
-            html,
-            wait_until,
-            interaction=interaction,
-            anti_bot=url in SITE_BROWSER_ANTI_BOT_URLS,
-            ready_issue=ready_issue,
-            ready_terms=ready_terms,
-            ready_selector=ready_selector,
-        )
+                for worker in self._browser_workers:
+                    self._available_browsers.put(worker)
+            available = self._available_browsers
+        try:
+            worker = available.get(timeout=max(0, deadline - time.monotonic()))
+        except queue.Empty as exc:
+            raise TimeoutError("单站总超时：等待浏览器工作槽超时") from exc
+        try:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError("单站总超时：等待浏览器工作槽超时")
+            return worker.render(
+                url,
+                remaining,
+                verify_ssl,
+                html,
+                wait_until,
+                interaction=interaction,
+                anti_bot=url in SITE_BROWSER_ANTI_BOT_URLS,
+                ready_issue=ready_issue,
+                ready_terms=ready_terms,
+                ready_selector=ready_selector,
+            )
+        finally:
+            available.put(worker)
 
     def fetch_rendered(
         self,
@@ -418,6 +429,7 @@ class RunTransport:
         with self._lock:
             browser_workers = self._browser_workers
             self._browser_workers = []
+            self._available_browsers = queue.Queue()
             sessions = list(self._sessions)
             self._sessions.clear()
             try:
