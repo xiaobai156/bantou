@@ -79,7 +79,7 @@ SITE_RENDERED_PAGE_AUTHORITY_URLS = {
 
 CAIYUNTONG_URL = "https://fnulucd.s2569-p869e-eekdks.xyz:16677/"
 GUANGDONG_BAER_URL = "https://besjbec.6328v-8pwlk-jzhgyz.work:16677/#am"
-SEWAI_TAOYUAN_URL = "https://667755.xn--q9ja6j.xn--q9jyb4c/gsb/030.html"
+SEWAI_TAOYUAN_URL = "https://667755.xn--q9ja6j.xn--q9jyb4c/gsb/060.html"
 MENGXIAOMENG_URL = "https://xmdrbud.eqpr2-6tpvi-pjqztv.xyz:16677/"
 SITE_BROWSER_HTML_URLS = {CAIYUNTONG_URL, GUANGDONG_BAER_URL, MENGXIAOMENG_URL}
 SITE_BROWSER_HTML_WAIT_UNTIL = {
@@ -145,7 +145,7 @@ DEDICATED_RENDERED_SITE_RULES = {
     "https://sadoleu.rznla-fgwyr-nzqalp.xyz:16677/topic/656863.html": "detail_info_forum2_item",
     "https://ntvjzt.gau41-qu6jy-sotyug.work:16677/topic/309356.html": "detail_info_forum2_item",
     "https://gt6.59197c.com:8443/tie1/t30.html": "page",
-    "https://667755.xn--q9ja6j.xn--q9jyb4c/gsb/030.html": "content",
+    "https://667755.xn--q9ja6j.xn--q9jyb4c/gsb/060.html": "content",
     "https://62cc.xn--cckc4dwc5inab2m.xn--q9jyb4c/6dgsb/0002.html": "topic-content",
     "https://fbgbfg.www27521c.com:8443/gsb/am05.html": "page",
     "https://2.www39169b.com:888/gsbl/s23.html": "page",

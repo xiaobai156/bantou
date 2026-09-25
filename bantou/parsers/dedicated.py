@@ -25,10 +25,11 @@ from ..text import (
 )
 
 SEWAI_TAOYUAN_ROW_RE = re.compile(
-    r"(?:【|\[)\s*(?P<head>[0-4０-４])\s*头\s*"
-    r"(?P<parity>单|双)\s*(?:】|\])\s*"
     r"(?P<issue>[0-9０-９]{1,4})\s*期\s*[:：]?\s*"
-    r"(?:🌹\s*)?绝杀半头(?:\s*🌹)?[^\n]*",
+    r"(?:🌹\s*)?绝杀半头(?:\s*🌹)?\s*"
+    r"开\s*[:：]?\s*[^\n]{0,16}?[ \t]*\n?[ \t]*"
+    r"(?:【|\[)\s*(?P<head>[0-4０-４])\s*头\s*"
+    r"(?P<parity>单|双)\s*(?:】|\])",
     re.I,
 )
 WUZHUANXINGYI_CARD_RE = re.compile(
