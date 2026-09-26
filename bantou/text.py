@@ -6,6 +6,8 @@ from html.parser import HTMLParser
 
 ANY_VALUE_RE = re.compile(r"(?<!\d)(\d{1,2})\s*头\s*(单|双)")
 VALUE_RE = re.compile(r"(?<!\d)([0-4])\s*头\s*(单|双)")
+# 个别站点把半头值的单位字误写成“天”（如 269期【4天单】）；只纠正 数字+天+单/双 这一处。
+HALF_HEAD_UNIT_TYPO_RE = re.compile(r"(?<=[0-4])天(?=[单双])")
 ISSUE_RE = re.compile(r"(?<!\d)(\d{1,4})\s*期")
 SOURCE_ISSUE_TOKEN_RE = re.compile(
     r"(?<![0-9０-９])([0-9０-９]{1,4})(?:[\s\u00a0\u3000]|&nbsp;|&#160;)*期"
@@ -192,6 +194,8 @@ class RenderedContainerParser(HTMLParser):
 def normalize_text(text: str) -> str:
     text = html.unescape(text or "")
     text = text.translate(FULLWIDTH_DIGITS).translate(CHAR_TRANS)
+    if "天" in text:
+        text = HALF_HEAD_UNIT_TYPO_RE.sub("头", text)
     text = text.replace("\r\n", "\n").replace("\r", "\n")
     text = re.sub(r"[ \t\f\v]+", " ", text)
     text = re.sub(r" *\n+ *", "\n", text)
