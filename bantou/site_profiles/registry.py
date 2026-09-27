@@ -117,6 +117,11 @@ SITE_BROWSER_READY_TERMS = {
     "https://dh81163.2cv5a08j69.cyou/PrZpSoLrkj.html": ("孟婆大人", "半头"),
     "https://dh81163.xx947zqiqi.cyou/duiijLEuEl.html": ("星宇股份", "半头"),
 }
+# 这些站的正文由 JS 晚渲染：ready 成交时间不稳定（实测同一台机器 2s ~ >20s），
+# 抓取默认 --timeout 20s 会把偶发的慢加载判成失败，故给浏览器请求一个更大的下限。
+SITE_BROWSER_MIN_TIMEOUTS = {
+    "https://dh81163.2cv5a08j69.cyou/PrZpSoLrkj.html": 45,
+}
 SITE_BROWSER_READY_SELECTORS = {
     CAIYUNTONG_URL: "#con_jihuadanshuang50000aloa_1",
 }

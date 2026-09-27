@@ -12,6 +12,7 @@ from ..fetching.policy import (
     fetch_rendered_text,
     fetch_resource_group,
     fetch_text,
+    should_retry_fetch_error,
 )
 from ..site_profiles.registry import (
     BABA_FORUM_DATA_URL,
@@ -27,9 +28,14 @@ from ..site_profiles.registry import (
     SCRIPT_SRC_RE,
     SITE_BROWSER_HTML_URLS,
     SITE_BROWSER_HTML_WAIT_UNTIL,
+    SITE_BROWSER_MIN_TIMEOUTS,
     SITE_BROWSER_READY_SELECTORS,
     SITE_BROWSER_READY_TERMS,
     SITE_RENDERED_PAGE_AUTHORITY_URLS,
+    SEWAI_TAOYUAN_COLUMN,
+    SEWAI_TAOYUAN_INDEX_SCRIPTS,
+    SEWAI_TAOYUAN_NAME,
+    SEWAI_TAOYUAN_URL,
     WUZHUANXINGYI_URL,
 )
 from ..text import normalize_text
@@ -453,6 +459,56 @@ def resolve_wealth_reference_detail_url(
     return f"{parsed.scheme}://{parsed.netloc}/#/users/{user_id}/references/{candidate_ids[0]}"
 
 
+SEWAI_TAOYUAN_LINK_RE = re.compile(r"href=\\?['\"](/gsb/\d+\.html)\\?['\"]")
+SEWAI_TAOYUAN_ROW_RE = re.compile(
+    r"(?<!\d)(\d{3,4})期:"
+    + re.escape(SEWAI_TAOYUAN_NAME)
+    + r"[\s\S]{0,200}?【"
+    + re.escape(SEWAI_TAOYUAN_COLUMN)
+    + r"】"
+)
+
+
+def sewai_taoyuan_page_from_index(index_text: str, issue: int) -> str | None:
+    """从站内榜单脚本取值：指定期的【绝杀半头】写在哪个 /gsb/NNN.html。"""
+    links = [
+        (match.start(), match.group(1))
+        for match in SEWAI_TAOYUAN_LINK_RE.finditer(index_text)
+    ]
+    for row in SEWAI_TAOYUAN_ROW_RE.finditer(index_text):
+        if int(row.group(1)) != issue:
+            continue
+        earlier = [page for position, page in links if position < row.start()]
+        return earlier[-1] if earlier else None
+    return None
+
+
+def resolve_sewai_taoyuan_page_url(
+    site_url: str,
+    issue: int,
+    timeout: int,
+    verify_ssl: bool,
+    *,
+    deadline: float | None = None,
+) -> str:
+    """世外桃源每期换页，抓前先按当期现查页号；查不到就明确报错，不回退旧页。"""
+    parsed = urlparse(site_url)
+    origin = f"{parsed.scheme}://{parsed.netloc}"
+    for script in SEWAI_TAOYUAN_INDEX_SCRIPTS:
+        try:
+            index_text = fetch_text(f"{origin}{script}", timeout, verify_ssl, deadline=deadline)
+        except FetchError as exc:
+            if not should_retry_fetch_error(exc):
+                raise
+            continue
+        page = sewai_taoyuan_page_from_index(index_text, issue)
+        if page:
+            return f"{origin}{page}"
+    raise ValueError(
+        f"站内榜单未列出 {issue}期 {SEWAI_TAOYUAN_NAME}【{SEWAI_TAOYUAN_COLUMN}】"
+    )
+
+
 def collect_site_documents(
     site: Site,
     fetch_url: str,
@@ -469,6 +525,7 @@ def collect_site_documents(
     )
     ready_terms = SITE_BROWSER_READY_TERMS.get(site.url, ())
     ready_selector = SITE_BROWSER_READY_SELECTORS.get(site.url)
+    browser_timeout = max(timeout, SITE_BROWSER_MIN_TIMEOUTS.get(site.url, 0))
     if dynamic_record_scope(fetch_url) is not None:
         return collect_dynamic_api_documents(
             fetch_url, timeout, verify_ssl, deadline=deadline
@@ -505,7 +562,7 @@ def collect_site_documents(
     ):
         rendered_text = fetch_rendered_text(
             fetch_url,
-            timeout,
+            browser_timeout,
             verify_ssl,
             deadline=deadline,
             wait_until=SITE_BROWSER_HTML_WAIT_UNTIL.get(site.url, "networkidle"),
@@ -531,9 +588,17 @@ def collect_site_documents(
             )
         ], []
     if fetch_url == site.url and site.url in DEDICATED_RENDERED_SITE_RULES:
+        if site.url == SEWAI_TAOYUAN_URL and wanted_issues:
+            fetch_url = resolve_sewai_taoyuan_page_url(
+                site.url,
+                max(wanted_issues),
+                timeout,
+                verify_ssl,
+                deadline=deadline,
+            )
         rendered_html = fetch_rendered_html(
             fetch_url,
-            timeout,
+            browser_timeout,
             verify_ssl,
             deadline=deadline,
             wait_until=SITE_BROWSER_HTML_WAIT_UNTIL.get(site.url, "networkidle"),
