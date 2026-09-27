@@ -142,7 +142,6 @@ def find_matches(
     if site is not None and site.parser_id in {
         "caiyuntong_macau",
         "guangdong_baer_left_half_head",
-        "sewai_taoyuan",
         "shenzhen_futan_half_head",
         "wuzhuanxingyi_embedded",
     }:

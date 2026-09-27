@@ -6,7 +6,6 @@ from ..domain.models import Match, Site
 from ..site_profiles.registry import (
     CAIYUNTONG_URL,
     GUANGDONG_BAER_URL,
-    SEWAI_TAOYUAN_URL,
     SHENZHEN_FUTAN_URL,
     WUZHUANXINGYI_CARD_LABELS,
     WUZHUANXINGYI_URL,
@@ -24,14 +23,6 @@ from ..text import (
     source_text_without_hidden_html,
 )
 
-SEWAI_TAOYUAN_ROW_RE = re.compile(
-    r"(?P<issue>[0-9０-９]{1,4})\s*期\s*[:：]?\s*"
-    r"(?:🌹\s*)?绝杀半头(?:\s*🌹)?\s*"
-    r"开\s*[:：]?\s*[^\n]{0,16}?[ \t]*\n?[ \t]*"
-    r"(?:【|\[)\s*(?P<head>[0-4０-４])\s*头\s*"
-    r"(?P<parity>单|双)\s*(?:】|\])",
-    re.I,
-)
 WUZHUANXINGYI_CARD_RE = re.compile(
     r'<div\b[^>]*class=["\'][^"\']*\btitle_container\b[^"\']*["\'][^>]*>'
     r"(?P<header>.*?)"
@@ -154,78 +145,6 @@ def wuzhuanxingyi_matches(
                         rule_id="wuzhuanxingyi_embedded",
                     )
                 )
-    return matches
-
-
-def sewai_taoyuan_matches(
-    documents: list[str],
-    wanted_issues: set[int],
-) -> list[Match]:
-    matches: list[Match] = []
-    for document_order, document in enumerate(documents):
-        text = source_text_without_hidden_html(str(document))
-        if "世外桃源" not in text or "绝杀半头" not in text:
-            continue
-        row_matches = list(SEWAI_TAOYUAN_ROW_RE.finditer(text))
-        for row_index, row_match in enumerate(row_matches):
-            issue = int(normalize_text(row_match.group("issue")))
-            if issue not in wanted_issues:
-                continue
-            value = normalize_half_head_value(
-                normalize_text(row_match.group("head")),
-                row_match.group("parity"),
-            )
-            if value is None:
-                continue
-            positions = [
-                position
-                for position in issue_token_positions(text, row_match.group("issue"))
-                if row_match.start() <= position < row_match.end()
-            ]
-            if len(positions) != 1:
-                continue
-            offset = int(getattr(document, "position_offset", 0) or 0)
-            row_start = row_match.start() + offset
-            row_end = (
-                row_matches[row_index + 1].start() + offset
-                if row_index + 1 < len(row_matches)
-                else len(text) + offset
-            )
-            anchor_position = text.find("世外桃源") + offset
-            half_head_position = text.find("半头", row_match.start(), row_match.end())
-            if anchor_position < offset or half_head_position < 0:
-                continue
-            matches.append(
-                Match(
-                    issue,
-                    row_match.group("issue"),
-                    value,
-                    compact_line(row_match.group(0)),
-                    len(matches) + 1,
-                    document_order=document_order,
-                    position=positions[0] + offset,
-                    source_url=getattr(document, "source_url", ""),
-                    source_kind=getattr(document, "source_kind", "page"),
-                    record_id=getattr(document, "record_id", ""),
-                    record_path=getattr(document, "record_path", ""),
-                    route_type=getattr(document, "route_type", ""),
-                    url_record_id=getattr(document, "url_record_id", ""),
-                    api_url=getattr(document, "api_url", ""),
-                    title=getattr(document, "title", ""),
-                    author=getattr(document, "author", ""),
-                    anchor_text="半头",
-                    anchor_position=half_head_position + offset,
-                    block_id=f"sewai:{row_start}:{row_end}",
-                    block_start=row_start,
-                    block_end=row_end,
-                    container_id=(
-                        getattr(document, "container_id", "")
-                        or f"sewai-taoyuan:{document_order}"
-                    ),
-                    document_authority=getattr(document, "document_authority", ""),
-                    rule_id="sewai_taoyuan",
-                )
-            )
     return matches
 
 
@@ -527,8 +446,6 @@ def special_matches_in_documents(
         return caiyuntong_macau_matches(documents, wanted_issues)
     if site.url == GUANGDONG_BAER_URL:
         return guangdong_baer_left_half_head_matches(documents, wanted_issues)
-    if site.url == SEWAI_TAOYUAN_URL:
-        return sewai_taoyuan_matches(documents, wanted_issues)
     if site.url == WUZHUANXINGYI_URL:
         return wuzhuanxingyi_matches(documents, wanted_issues)
     if (

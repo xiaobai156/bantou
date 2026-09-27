@@ -9,7 +9,6 @@ from ..paths import PROJECT_DIR
 from ..site_profiles.registry import (
     CAIYUNTONG_URL,
     GUANGDONG_BAER_URL,
-    SEWAI_TAOYUAN_URL,
     SHENZHEN_FUTAN_URL,
     SUPPORTED_PARSER_IDS,
     URL_RE,
@@ -87,7 +86,6 @@ def parse_json_sites(text: str, source: str) -> list[Site]:
         special_parser_urls = {
             "caiyuntong_macau": CAIYUNTONG_URL,
             "guangdong_baer_left_half_head": GUANGDONG_BAER_URL,
-            "sewai_taoyuan": SEWAI_TAOYUAN_URL,
             "shenzhen_futan_half_head": SHENZHEN_FUTAN_URL,
             "wuzhuanxingyi_embedded": WUZHUANXINGYI_URL,
         }
