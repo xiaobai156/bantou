@@ -16,3 +16,22 @@ coverage.xml
 build/
 dist/
 *.egg-info/
+
+# --- 生成物与本地临时文件（统一清理时补充） ---
+# Python / runtime artifacts
+.coverage.*
+# Local locks, temp files, logs and backups
+*.lock
+*.bak
+*.before
+*.before_*
+*.orig
+*.rej
+nul
+# Browser profiles and build outputs
+browser-profile/
+dist_*/
+.paddleocr-cpu-venv/
+
+# --- 生成物与本地临时文件（统一清理时补充） ---
+_validation/

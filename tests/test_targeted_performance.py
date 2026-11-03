@@ -110,3 +110,13 @@ def test_position_lookup_keeps_value_occurrence_and_document_isolation():
 def test_anti_bot_sites_wait_for_identity_and_content_instead_of_all_scripts(url, name):
     assert registry.SITE_BROWSER_HTML_WAIT_UNTIL[url] == 'commit'
     assert set(registry.SITE_BROWSER_READY_TERMS[url]) == {name, '半头'}
+
+
+@pytest.mark.parametrize('url,name', [
+    (registry.CAIYUNTONG_URL, '彩运通'),
+    (registry.GUANGDONG_BAER_URL, '广东八二'),
+    ('https://fbgbfg.www27521c.com:8443/gsb/am05.html', '山野独行'),
+])
+def test_historical_browser_tables_do_not_wait_for_unpublished_target(url, name):
+    assert url in registry.SITE_BROWSER_READY_TERMS_ONLY_URLS
+    assert set(registry.SITE_BROWSER_READY_TERMS[url]) == {name, '半头'}

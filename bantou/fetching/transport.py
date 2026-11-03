@@ -28,13 +28,29 @@ _META_CHARSET_RE = re.compile(
 )
 _WEAK_DEFAULT_ENCODINGS = {"ascii", "iso-8859-1", "latin-1", "latin1"}
 MAX_BODY_BYTES = 16 * 1024 * 1024
+BROWSER_WORKER_COUNT = 2
 
 
-def _click_interactive_card(page, issue: int, site_name: str, timeout: int) -> None:
+def _click_interactive_card(page, issue: int, site_name: str, timeout: int) -> str | None:
     card_text = f"{issue}期: 白蛇传【绝杀半头】→{site_name}"
+    page.wait_for_function(
+        r"""
+        ([issue, siteName]) => {
+            const compact = (document.body.innerText || "")
+                .replace(/\s+/g, "");
+            const target = `${issue}期:白蛇传【绝杀半头】→${siteName}`;
+            if (compact.includes(target)) return true;
+            return /\d+期:白蛇传【绝杀半头】→/.test(compact);
+        }
+        """,
+        arg=[str(issue), site_name],
+        timeout=timeout * 1000,
+    )
     card = page.get_by_text(card_text, exact=True)
-    card.wait_for(state="attached", timeout=timeout * 1000)
     count = card.count()
+    if count == 0:
+        raise ValueError(f"目标卡片未找到指定期：{card_text}")
+    card.wait_for(state="attached", timeout=timeout * 1000)
     if count != 1:
         raise ValueError(f"目标卡片未唯一命中：{card_text}，找到{count}个")
     # The verified data card is covered by a separate advertising overlay.
@@ -49,6 +65,12 @@ def _click_interactive_card(page, issue: int, site_name: str, timeout: int) -> N
         arg=[str(issue)],
         timeout=timeout * 1000,
     )
+    container = card.locator(
+        "xpath=ancestor::div[contains(concat(' ', normalize-space(@class), ' '), ' list-boxriow ')][1]"
+    )
+    if container.count() == 1:
+        return container.evaluate("node => node.outerHTML")
+    return None
 
 
 def canonical_url(url: str) -> str:
@@ -106,7 +128,7 @@ class _Flight:
 
 
 from .browser_process import ProcessBrowserWorker as _BrowserWorker
-from ..site_profiles.registry import SITE_BROWSER_ANTI_BOT_URLS
+from ..site_profiles.registry import SITE_BROWSER_ANTI_BOT_URLS, SITE_BROWSER_HEADFUL_URLS
 
 
 
@@ -290,7 +312,7 @@ class RunTransport:
         deadline = time.monotonic() + timeout
         with self._lock:
             if not self._browser_workers:
-                self._browser_workers = [_BrowserWorker() for _ in range(2)]
+                self._browser_workers = [_BrowserWorker() for _ in range(BROWSER_WORKER_COUNT)]
                 for worker in self._browser_workers:
                     self._available_browsers.put(worker)
             available = self._available_browsers
@@ -310,6 +332,7 @@ class RunTransport:
                 wait_until,
                 interaction=interaction,
                 anti_bot=url in SITE_BROWSER_ANTI_BOT_URLS,
+                headful=url in SITE_BROWSER_HEADFUL_URLS,
                 ready_issue=ready_issue,
                 ready_terms=ready_terms,
                 ready_selector=ready_selector,

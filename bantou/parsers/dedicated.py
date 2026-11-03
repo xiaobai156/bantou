@@ -4,6 +4,8 @@ from dataclasses import replace
 
 from ..domain.models import Match, Site
 from ..site_profiles.registry import (
+    CAIYOULUO_LAOAYI_ANCHOR,
+    CAIYOULUO_LAOAYI_URL,
     CAIYUNTONG_URL,
     GUANGDONG_BAER_URL,
     SHENZHEN_FUTAN_URL,
@@ -435,6 +437,148 @@ def shenzhen_futan_matches(
     return matches
 
 
+CAIYOULUO_LAOAYI_ROW_RE = re.compile(
+    r"(?<!\d)(?P<issue>\d{1,4})\s*期\s*杀\s*(?P<head>[0-4])\s*头\s*(?P<parity>单|双)"
+)
+CAIYOULUO_LAOAYI_WRITE_RE = re.compile(
+    r"document\.writeln\s*\(\s*([\"'])(?P<body>.*?)\1\s*\)\s*;",
+    re.I | re.S,
+)
+# 下一个栏目标题即本栏目结束，避免把后续作者的记录并入本栏目。
+CAIYOULUO_SECTION_BREAK_RE = re.compile(r"【[^】]{1,20}】")
+
+
+def caiyouluo_laoayi_matches_from_joined(
+    joined: str,
+    wanted_issues: set[int],
+) -> list[Match]:
+    """Read the 【码友老阿姨】 section of the bound data script.
+
+    The anchor leads to the section, and each record keeps the source position
+    of its own issue token, so the configured direction decides which period is
+    used.  Every distinct value on a record is kept as its own candidate, so a
+    record carrying two different values is failed by the conflict gate instead
+    of silently keeping the first one.
+    """
+    matches: list[Match] = []
+    anchor_position = joined.find(CAIYOULUO_LAOAYI_ANCHOR)
+    if anchor_position < 0:
+        return matches
+    anchor_end = anchor_position + len(CAIYOULUO_LAOAYI_ANCHOR)
+    # 锚点自身通常就写成【码友老阿姨】，跳过它再找下一个栏目标题，否则区块被切成空。
+    section_scan_from = anchor_end
+    while True:
+        following = CAIYOULUO_SECTION_BREAK_RE.search(joined, section_scan_from)
+        if following is None:
+            section_limit = len(joined)
+            break
+        if following.group(0) == CAIYOULUO_LAOAYI_ANCHOR:
+            section_scan_from = following.end()
+            continue
+        section_limit = following.start()
+        break
+
+    writes = [
+        (found.start(), found.end(), found.group("body"))
+        for found in CAIYOULUO_LAOAYI_WRITE_RE.finditer(joined, anchor_position)
+        if found.start() < section_limit
+    ]
+    if not writes:
+        return matches
+
+    order = 0
+    for index, (write_start, write_end, body) in enumerate(writes):
+        # 区块边界不得越过本栏目结束位置。
+        section_end = min(
+            writes[index + 1][0] if index + 1 < len(writes) else section_limit,
+            section_limit,
+        )
+        # 同一条 writeln 里若混入下一个栏目，先截到栏目边界再扫行。
+        if section_limit < write_end:
+            body = body[: max(0, section_limit - write_start)]
+        # 去重按（期, 值）：同值跨期是真实存在的，不能把后一期丢掉。
+        seen_records: set[tuple[int, str]] = set()
+        for row in CAIYOULUO_LAOAYI_ROW_RE.finditer(body):
+            issue = int(row.group("issue"))
+            if issue not in wanted_issues:
+                continue
+            value = normalize_half_head_value(row.group("head"), row.group("parity"))
+            if value is None or (issue, value) in seen_records:
+                continue
+            positions = [
+                position
+                for position in issue_token_positions(joined, row.group("issue"))
+                if write_start <= position < write_end
+            ]
+            if len(positions) != 1:
+                continue
+            seen_records.add((issue, value))
+            order += 1
+            # 证据只用真实行文本。区块已按【栏目】边界截断，记录确实属于本栏目，
+            # 因此锚点归属是真实的；但不得把锚点字符串拼进 snippet 制造必然通过的校验。
+            matches.append(
+                Match(
+                    issue=issue,
+                    issue_text=row.group("issue"),
+                    value=value,
+                    snippet=compact_line(row.group(0)),
+                    order=order,
+                    position=positions[0],
+                    anchor_text=CAIYOULUO_LAOAYI_ANCHOR,
+                    anchor_position=anchor_position,
+                    block_id=(
+                        f"caiyouluo-laoayi:{anchor_position}:{section_end}"
+                        f":{write_start}:{write_end}"
+                    ),
+                    block_start=anchor_position,
+                    block_end=section_end,
+                    table_column="laoayi-half-head",
+                    rule_id="caiyouluo_laoayi",
+                )
+            )
+    return matches
+
+
+def caiyouluo_laoayi_matches(
+    documents: list[str],
+    wanted_issues: set[int],
+) -> list[Match]:
+    matches: list[Match] = []
+    for document_order, document in enumerate(documents):
+        local_matches = caiyouluo_laoayi_matches_from_joined(
+            source_text_without_hidden_html(str(document)), wanted_issues
+        )
+        for local_match in local_matches:
+            offset = int(getattr(document, "position_offset", 0) or 0)
+            matches.append(
+                replace(
+                    local_match,
+                    order=len(matches) + 1,
+                    document_order=document_order,
+                    position=local_match.position + offset,
+                    source_url=getattr(document, "source_url", ""),
+                    source_kind=getattr(document, "source_kind", "page"),
+                    record_id=getattr(document, "record_id", ""),
+                    record_path=getattr(document, "record_path", ""),
+                    route_type=getattr(document, "route_type", ""),
+                    url_record_id=getattr(document, "url_record_id", ""),
+                    api_url=getattr(document, "api_url", ""),
+                    title=getattr(document, "title", ""),
+                    author=getattr(document, "author", ""),
+                    anchor_position=local_match.anchor_position + offset,
+                    block_id=f"{document_order}:{local_match.block_id}",
+                    block_start=local_match.block_start + offset,
+                    block_end=local_match.block_end + offset,
+                    container_id=(
+                        getattr(document, "container_id", "")
+                        or f"caiyouluo-laoayi:{document_order}"
+                    ),
+                    document_authority=getattr(document, "document_authority", ""),
+                )
+            )
+    return matches
+
+
 def special_matches_in_documents(
     documents: list[str],
     wanted_issues: set[int],
@@ -442,6 +586,8 @@ def special_matches_in_documents(
 ) -> list[Match]:
     if site is None:
         return []
+    if site.url == CAIYOULUO_LAOAYI_URL:
+        return caiyouluo_laoayi_matches(documents, wanted_issues)
     if site.url == CAIYUNTONG_URL:
         return caiyuntong_macau_matches(documents, wanted_issues)
     if site.url == GUANGDONG_BAER_URL:

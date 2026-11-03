@@ -24,6 +24,8 @@ DEFAULT_KEYWORDS = ("杀半头", "秒杀半头", "必杀半头", "绝杀半头",
 
 SITE_RENDERED_PAGE_AUTHORITY_URLS = {
     "https://zcphjs.ce83x-ms2rz-orwude.work:12277/#/users/116162",
+    "https://dh81163.2cv5a08j69.cyou/PrZpSoLrkj.html",
+    "https://dh81163.xx947zqiqi.cyou/duiijLEuEl.html",
     "https://wcvwpj.mb4i3-vwk1b-cadppa.work/#/users/1293",
     "https://hbwtl.7xzry-2gul3-olawdt.xyz/topic/227014.html",
     "https://rh2fgz.w043g-ql5mr-lfxblm.work/topic/499784.html",
@@ -50,7 +52,7 @@ SITE_RENDERED_PAGE_AUTHORITY_URLS = {
     "https://e7rzi6.t5ti5-at6k5-fugxpa.work/topic/206464.html",
     "https://pyjgoe.burj6-ovh80-gurlas.xyz:16677/topic/697235.html",
     "https://xxn08n.w2jqr-rbl71-ngvkmq.work/topic/453964.html",
-    "https://pvxiftuf.yumkw-u4s81-hpytyz.work:16677/",
+    "https://qprrntjm.fxpja-gdu7n-nysuyo.work:17466/",
     "https://e7rzi6.vkzoy-tj5wf-umxqmx.work/topic/453616.html",
     "https://qzpwvvvb.a3qgk-l2h5k-opahdg.xyz:16677/topic/254838.html",
     "https://qzpwvvvb.a3qgk-l2h5k-opahdg.xyz:16677/topic/254821.html",
@@ -83,8 +85,10 @@ MENGXIAOMENG_URL = "https://xmdrbud.eqpr2-6tpvi-pjqztv.xyz:16677/"
 SITE_BROWSER_HTML_URLS = {CAIYUNTONG_URL, GUANGDONG_BAER_URL, MENGXIAOMENG_URL}
 SITE_BROWSER_HTML_WAIT_UNTIL = {
     CAIYUNTONG_URL: "domcontentloaded",
+    "https://zouibdh.6c8rw-eic61-abilpw.work:17477/topic/256298.html": "domcontentloaded",
     # These pages keep long-lived requests open; the ready marker below is the
     # actual settle condition, not network-idle/load.
+    "https://fbgbfg.www27521c.com:8443/gsb/am05.html": "domcontentloaded",
     "https://zcphjs.ce83x-ms2rz-orwude.work:12277/#/users/116162": "domcontentloaded",
     "https://zwhzkjo.fc4fh-otded-nvhceu.xyz:16677/topic/472642.html": "domcontentloaded",
     "https://cpvqejp.avdja-la48l-xnsdva.xyz:16677/topic/336839.html": "domcontentloaded",
@@ -92,7 +96,7 @@ SITE_BROWSER_HTML_WAIT_UNTIL = {
     "https://dh81163.2cv5a08j69.cyou/PrZpSoLrkj.html": "commit",
     "https://dh81163.xx947zqiqi.cyou/duiijLEuEl.html": "commit",
     "https://wojedcr.ltslh-5g80v-eeujep.xyz:16677/topic/805239.html": "domcontentloaded",
-    GUANGDONG_BAER_URL: "load",
+    GUANGDONG_BAER_URL: "domcontentloaded",
     MENGXIAOMENG_URL: "domcontentloaded",
     "https://peubwtt.t3vdj-h3294-qpbmtj.work:16677/#am": "domcontentloaded",
     "https://alvjak.uh1h2-ru1qt-cyscbt.xyz:16677/topic/328416.html": "domcontentloaded",
@@ -107,12 +111,15 @@ SITE_BROWSER_HTML_WAIT_UNTIL = {
     "https://tlwggkde.dp86b-grpqw-uiiazp.work:17466/topic/247714.html": "domcontentloaded",
 }
 SITE_BROWSER_READY_TERMS = {
+    "https://zouibdh.6c8rw-eic61-abilpw.work:17477/topic/256298.html": ("绝杀特码半头",),
     "https://zcphjs.ce83x-ms2rz-orwude.work:12277/#/users/116162": ("半头",),
     "https://zwhzkjo.fc4fh-otded-nvhceu.xyz:16677/topic/472642.html": ("半头",),
     "https://cpvqejp.avdja-la48l-xnsdva.xyz:16677/topic/336839.html": ("半头",),
     "https://sqddimfu.evs71-kia2b-gshsdc.xyz:16677/topic/205530.html": ("半头",),
     "https://wojedcr.ltslh-5g80v-eeujep.xyz:16677/topic/805239.html": ("半头",),
-    CAIYUNTONG_URL: ("半头",),
+    CAIYUNTONG_URL: ("彩运通", "半头"),
+    GUANGDONG_BAER_URL: ("广东八二", "半头"),
+    "https://fbgbfg.www27521c.com:8443/gsb/am05.html": ("山野独行", "半头"),
     "https://dh81163.2cv5a08j69.cyou/PrZpSoLrkj.html": ("孟婆大人", "半头"),
     "https://dh81163.xx947zqiqi.cyou/duiijLEuEl.html": ("星宇股份", "半头"),
 }
@@ -121,10 +128,22 @@ SITE_BROWSER_READY_TERMS = {
 SITE_BROWSER_MIN_TIMEOUTS = {
     "https://dh81163.2cv5a08j69.cyou/PrZpSoLrkj.html": 45,
 }
+# These pages expose a stable, identity-bound historical table even when the
+# requested new period has not been published yet.  Wait for the table, then
+# let the parser report the missing period as no data instead of a browser
+# timeout.
+SITE_BROWSER_READY_TERMS_ONLY_URLS = frozenset({
+    "https://zouibdh.6c8rw-eic61-abilpw.work:17477/topic/256298.html",
+    CAIYUNTONG_URL,
+    GUANGDONG_BAER_URL,
+    "https://fbgbfg.www27521c.com:8443/gsb/am05.html",
+})
 SITE_BROWSER_READY_SELECTORS = {
+    "https://zouibdh.6c8rw-eic61-abilpw.work:17477/topic/256298.html": ".content",
     CAIYUNTONG_URL: "#con_jihuadanshuang50000aloa_1",
 }
 DEDICATED_RENDERED_SITE_RULES = {
+    "https://zouibdh.6c8rw-eic61-abilpw.work:17477/topic/256298.html": "content",
     "https://s4wqb.p2b6h-0xj4v-suxrzo.xyz/topic/206519.html": "topic-content",
     "https://zwhzkjo.fc4fh-otded-nvhceu.xyz:16677/topic/472642.html": "content",
     "https://cpvqejp.avdja-la48l-xnsdva.xyz:16677/topic/336839.html": "topic-content",
@@ -155,6 +174,7 @@ DEDICATED_RENDERED_SITE_RULES = {
     "https://tlwggkde.dp86b-grpqw-uiiazp.work:17466/topic/247714.html": "page",
 }
 DEDICATED_RENDERED_AUTHOR_CONTEXT_URLS = {
+    "https://zouibdh.6c8rw-eic61-abilpw.work:17477/topic/256298.html",
     "https://s4wqb.p2b6h-0xj4v-suxrzo.xyz/topic/206519.html",
     "https://zwhzkjo.fc4fh-otded-nvhceu.xyz:16677/topic/472642.html",
     "https://cpvqejp.avdja-la48l-xnsdva.xyz:16677/topic/336839.html",
@@ -169,6 +189,7 @@ DEDICATED_RENDERED_AUTHOR_CONTEXT_URLS = {
     "https://62cc.xn--cckc4dwc5inab2m.xn--q9jyb4c/6dgsb/0002.html",
 }
 DEDICATED_RENDERED_PAGE_IDENTITIES = {
+    "https://zouibdh.6c8rw-eic61-abilpw.work:17477/topic/256298.html": "澳门百事通[绝杀特码半头]",
     "https://xxn08n.w2jqr-rbl71-ngvkmq.work/": "澳门周公神算",
     "https://peubwtt.t3vdj-h3294-qpbmtj.work:16677/#am": "澳门跑狗",
     "https://fflkqo.fvi38-kyblx-znvboh.work:17466/topic/1008749.html": "诸葛亮",
@@ -214,6 +235,11 @@ WUZHUANXINGYI_CARD_LABELS = ("星移物换", "物转星移")
 BABA_FORUM_URL = "https://43666.886677a.app:2563/htm/bbs/top080.html"
 BABA_FORUM_DATA_URL = "https://43666.886677a.app:2563/main/bbs/080.html"
 SHENZHEN_FUTAN_URL = "https://128.241.252.220:9201/tz/bbsjs/080.html"
+# 码友老阿姨: the data script reached through 首页 -> yjjy/wenzhang.js ->
+# iframe /62.html.  The page number rotates, the script name does not, so the
+# configuration binds the stable script and reads its 【码友老阿姨】 section.
+CAIYOULUO_LAOAYI_URL = "https://62139c.com/bbs/byg.js"
+CAIYOULUO_LAOAYI_ANCHOR = "【码友老阿姨】"
 SITE_IFRAME_PAGE_AUTHORITY_URLS = {BABA_FORUM_URL}
 
 # A site may share the strict parsing engine, but it must still declare its own
@@ -224,6 +250,7 @@ SUPPORTED_PARSER_IDS = {
     "guangdong_baer_left_half_head",
     "shenzhen_futan_half_head",
     "wuzhuanxingyi_embedded",
+    "caiyouluo_laoayi",
 }
 
 
@@ -232,6 +259,9 @@ def _special_pattern(pattern: str) -> re.Pattern[str]:
 
 
 SITE_SPECIAL_VALUE_PATTERNS = {
+    "https://zouibdh.6c8rw-eic61-abilpw.work:17477/topic/256298.html": (
+        _special_pattern(r"(?<!\d)(\d{1,4})期\s*[:：]\s*绝杀特码半头\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)数\s*(?:】|\])\s*开[^\n]{0,12}"),
+    ),
     "https://hbwtl.7xzry-2gul3-olawdt.xyz/topic/227014.html": (
         _special_pattern(r"(?<!\d)(\d{1,4})期\s*[:：]\s*必杀半头\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])\s*开(?:(?!(?<!\d)\d{1,4}期)[^\n]){0,12}"),
     ),
@@ -283,7 +313,7 @@ SITE_SPECIAL_VALUE_PATTERNS = {
     "https://2.www39169b.com:888/gsbl/s23.html": (
         _special_pattern(r"(?<!\d)(\d{1,4})期\s*[:：]\s*必杀半头\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])\s*开[^\n]{0,12}"),
     ),
-    "https://a.995546.com/gsb.aspx?id=amjyb089": (
+    "https://995546.com/gsb.aspx?id=amjyb089": (
         _special_pattern(r"(?<!\d)(\d{1,4})期[^\n]{0,20}?(?:稳杀半头|绝杀半头)[^\n]{0,30}?(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])[^\n]{0,20}?开[^\n]{0,12}"),
     ),
     "https://a.909922.com/bbs.aspx?id=amsmh058": (
@@ -293,7 +323,10 @@ SITE_SPECIAL_VALUE_PATTERNS = {
         _special_pattern(r"(?<!\d)(\d{1,4})期\s*[:：]?\s*(?:【|\[)\s*绝杀半头\s*(?:】|\])\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])[^\n]{0,20}?开[^\n]{0,12}"),
     ),
     "https://43666.886677a.app:2563/htm/bbs/top080.html": (
-        _special_pattern(r"(?<!\d)(\d{1,4})期\s*[:：]\s*(?:🍀?\s*瞬杀半头\s*🍀?|🎪?\s*灭杀半头\s*🎪?)\s*开\s*[:：?？]?\s*(?:[鼠牛虎兔龙蛇马羊猴鸡狗猪]\s*)?[?？]?\s*\d{2,4}\s*[对准中√错×xX]\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])"),
+        # 用户裁决：本站栏目口径就是「瞬杀半头」；「灭杀半头」栏数值不同，
+        # 不再接受。装饰符号会变（🌺/🍀…），用有界非词字符类吸收，
+        # 避免换表情后专属规则整条不命中。
+        _special_pattern(r"(?<!\d)(\d{1,4})期\s*[:：]\s*[^\w\s]{0,3}\s*瞬杀半头\s*[^\w\s]{0,3}\s*开\s*[:：?？]?\s*(?:[鼠牛虎兔龙蛇马羊猴鸡狗猪]\s*)?[?？]?\s*\d{2,4}\s*[对准中√错×xX]\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])"),
     ),
     "https://cthvktrb.am9a6-vk0h6-lwbxab.xyz:16677/": (
         _special_pattern(r"(?<!\d)(\d{1,4})期\s*[:：]\s*绝杀半头\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])\s*开\s*[:：?？]?\s*(?:[鼠牛虎兔龙蛇马羊猴鸡狗猪]\s*)?[?？]?\s*\d{2,4}\s*[对准中赢√错×xX]"),
@@ -316,8 +349,8 @@ SITE_SPECIAL_VALUE_PATTERNS = {
     "https://sadoleu.rznla-fgwyr-nzqalp.xyz:16677/topic/656863.html": (
         _special_pattern(r"(?<!\d)(\d{1,4})期\s*杀\s*(?:【|\[)?\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])?\s*\+{3}\s*杀[^\n]{0,20}?开[^\n]{0,12}"),
     ),
-    "https://mflmcobome.26222hi.app:2569/htm/bbs/top080.html": (
-        _special_pattern(r"(?<!\d)(\d{1,4})期\s*[:：]\s*(?:⚡️?\s*秒杀半头\s*⚡️?|❄️?\s*绝杀半头\s*❄️?)\s*开\s*[:：?？]?\s*(?:[鼠牛虎兔龙蛇马羊猴鸡狗猪]\s*)?[?？]?\s*\d{2,4}\s*[对准中√错×xX]\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])"),
+    "https://mflmcobome.26222hi.app:2569/htm/bbs/top011.html": (
+        _special_pattern(r"(?<!\d)(\d{1,4})期\s*[:：]\s*🎇?\s*精选半头\s*🎇?\s*开\s*[:：?？]?\s*(?:[鼠牛虎兔龙蛇马羊猴鸡狗猪]\s*)?[?？]?\s*\d{2,4}\s*[对准中√错×xX]\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])"),
     ),
     "https://peubwtt.t3vdj-h3294-qpbmtj.work:16677/#am": (
         _special_pattern(r"(?<!\d)(\d{1,4})期\s*[:：]?\s*(?:绝杀半头|必杀半头)\s*(?:【|\[)\s*([0-4])\s*头\s*(单|双)\s*(?:】|\])[^\n]{0,20}?开[^\n]{0,12}"),
@@ -384,5 +417,13 @@ SITE_TARGET_PLACEHOLDER_URLS = {
 
 SITE_BROWSER_ANTI_BOT_URLS = frozenset({
     "https://dh81163.2cv5a08j69.cyou/PrZpSoLrkj.html",
+    "https://dh81163.xx947zqiqi.cyou/duiijLEuEl.html",
+})
+
+# 站方脚本在无头模式下返回空白（正文 0 字节，jquery/静态资源全 ERR_ABORTED），
+# 必须以有头窗口启动才渲染出正文；实测同 URL 有头正常、同一内容与历史缓存逐期吻合。
+SITE_BROWSER_HEADFUL_URLS = frozenset({
+    "https://dh81163.2cv5a08j69.cyou/PrZpSoLrkj.html",
+    # 同为 dh81163 站群（同一 api.bdmijg.com 外壳），2026-10-07 实测无头同样空白。
     "https://dh81163.xx947zqiqi.cyou/duiijLEuEl.html",
 })

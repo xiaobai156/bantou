@@ -30,7 +30,13 @@ from ..fetching.policy import (
     force_kill_browser_children,
     run_transport_scope,
 )
-from ..fetching.transport import canonical_url
+from ..fetching.transport import BROWSER_WORKER_COUNT, canonical_url
+from ..site_profiles.registry import (
+    DEDICATED_RENDERED_SITE_RULES,
+    SITE_BROWSER_HTML_URLS,
+    SITE_RENDERED_PAGE_AUTHORITY_URLS,
+    WUZHUANXINGYI_URL,
+)
 from ..outputs.formatting import (
     append_script_error,
     build_success_output_lines,
@@ -52,6 +58,21 @@ from .site_crawl import crawl_site, format_progress_line, print_failure_summary
 HARD_TIMEOUT_BUFFER_SECONDS = 30
 QUEUE_SAFETY_MARGIN_SECONDS = 300
 WATCHDOG_POLL_SECONDS = 1.0
+
+_BROWSER_LANE_URLS = frozenset(
+    SITE_BROWSER_HTML_URLS
+    | SITE_RENDERED_PAGE_AUTHORITY_URLS
+    | set(DEDICATED_RENDERED_SITE_RULES)
+    | {WUZHUANXINGYI_URL}
+)
+
+
+def _uses_browser_lane(site: Site) -> bool:
+    """Keep known browser-authority sites off the HTTP executor queue."""
+    return site.url in _BROWSER_LANE_URLS or site.entry_mode in {
+        "issue_link",
+        "reference_issue_link",
+    }
 
 
 def _failure_rows(lines: list[str]) -> list[tuple[str, str, str]]:
@@ -241,6 +262,8 @@ def _run_sites(
     timing_lock = threading.Lock()
     started_at: dict[int, float] = {}
     queued_at: dict[int, float] = {}
+    future_lane: dict[concurrent.futures.Future, str] = {}
+    timed_out_lanes: dict[str, int] = {}
 
     def record_result(index: int, site: Site, result: SiteResult) -> None:
         nonlocal progress_success, progress_fail
@@ -276,13 +299,26 @@ def _run_sites(
             site_timeout=args.site_timeout,
         )
 
+    def lane_for(site: Site) -> str:
+        return "browser" if _uses_browser_lane(site) else "http"
+
     executor = concurrent.futures.ThreadPoolExecutor(max_workers=worker_count)
+    browser_sites = [site for site in sites if _uses_browser_lane(site)]
+    browser_executor = (
+        concurrent.futures.ThreadPoolExecutor(
+            max_workers=min(BROWSER_WORKER_COUNT, len(browser_sites))
+        )
+        if browser_sites
+        else None
+    )
     future_map: dict[concurrent.futures.Future, tuple[int, Site]] = {}
     abandoned_count = 0
     try:
         for index, site in enumerate(sites, start=1):
             try:
-                future = executor.submit(guarded_crawl, index, site)
+                lane_name = lane_for(site)
+                lane = browser_executor if lane_name == "browser" else executor
+                future = lane.submit(guarded_crawl, index, site)
             except Exception as exc:
                 record_result(
                     index,
@@ -297,6 +333,7 @@ def _run_sites(
             else:
                 queued_at[index] = time.monotonic()
                 future_map[future] = (index, site)
+                future_lane[future] = lane_name
 
         pending = set(future_map)
         while pending:
@@ -332,8 +369,38 @@ def _run_sites(
                 pending.discard(future)
                 abandoned_count += 1
                 record_result(index, site, SiteResult(index, site, [], reason))
+                if started is not None:
+                    lane_name = future_lane[future]
+                    timed_out_lanes[lane_name] = timed_out_lanes.get(lane_name, 0) + 1
+                    lane_capacity = (
+                        min(BROWSER_WORKER_COUNT, len(browser_sites))
+                        if lane_name == "browser"
+                        else worker_count
+                    )
+                    if timed_out_lanes[lane_name] >= lane_capacity:
+                        for queued_future in list(pending):
+                            if future_lane[queued_future] != lane_name:
+                                continue
+                            queued_index, queued_site = future_map[queued_future]
+                            with timing_lock:
+                                queued_started = started_at.get(queued_index)
+                            if queued_started is not None or not queued_future.cancel():
+                                continue
+                            pending.discard(queued_future)
+                            record_result(
+                                queued_index,
+                                queued_site,
+                                SiteResult(
+                                    queued_index,
+                                    queued_site,
+                                    [],
+                                    "单站硬超时：未发起请求（同通道工作槽均已超时）",
+                                ),
+                            )
     finally:
         executor.shutdown(wait=False, cancel_futures=True)
+        if browser_executor is not None:
+            browser_executor.shutdown(wait=False, cancel_futures=True)
     return results, abandoned_count
 
 

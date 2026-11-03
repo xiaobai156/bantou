@@ -23,9 +23,7 @@ from .transport import (
 
 # Compatibility transport is opt-in by exact normalized URL only. New sites
 # must be verified before being added here; all other URLs keep strict TLS.
-CURL_COMPATIBILITY_URLS: frozenset[str] = frozenset(
-    {"https://7.www113368a.com:2053/gengxin/58.html"}
-)
+CURL_COMPATIBILITY_URLS: frozenset[str] = frozenset()
 INSECURE_TLS_COMPATIBILITY_URLS: frozenset[str] = frozenset()
 PERMANENT_HTTP_STATUSES = frozenset({400, 401, 403, 404, 405, 410})
 TRANSIENT_HTTP_STATUSES = frozenset({408, 425, 429, 500, 502, 503, 504, 520, 521, 522, 523, 524})

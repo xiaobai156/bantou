@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "name": "忠不可兼",
     "url": "https://hbwtl.7xzry-2gul3-olawdt.xyz/topic/227014.html",
@@ -217,7 +217,7 @@
   },
   {
     "name": "澳门大联盟",
-    "url": "https://7.www113368a.com:2053/gengxin/58.html",
+    "url": "https://isjf0bzw.669944.app:2026/gengxin/58.html",
     "pick": "top",
     "parser": "strict_half_head",
     "anchors": [
@@ -325,7 +325,7 @@
   },
   {
     "name": "狀元紅",
-    "url": "https://3.www112291a.com:2053/gengxin/15.html",
+    "url": "https://otwuomdb.882244a.app:2026/gengxin/15.html",
     "pick": "top",
     "parser": "strict_half_head",
     "anchors": [
@@ -334,7 +334,7 @@
   },
   {
     "name": "慈善网",
-    "url": "https://4.www337731a.com:2053/gsb/03.html",
+    "url": "https://so6f8erm.881199.app:2026/gsb/03.html",
     "pick": "top",
     "parser": "strict_half_head",
     "anchors": [
@@ -343,7 +343,7 @@
   },
   {
     "name": "流合",
-    "url": "https://pvxiftuf.yumkw-u4s81-hpytyz.work:16677/",
+    "url": "https://qprrntjm.fxpja-gdu7n-nysuyo.work:17466/",
     "pick": "top",
     "parser": "strict_half_head",
     "anchors": [
@@ -534,15 +534,6 @@
     "entry_mode": "issue_link"
   },
   {
-    "name": "白虎",
-    "url": "https://mkhomxq.gqmpb-vuxji-pfnheu.work:16677/topic/510826.html",
-    "pick": "top",
-    "parser": "strict_half_head",
-    "anchors": [
-      "半头"
-    ]
-  },
-  {
     "name": "彩运通",
     "url": "https://fnulucd.s2569-p869e-eekdks.xyz:16677/",
     "pick": "top",
@@ -672,7 +663,7 @@
   },
   {
     "name": "荆棘丛生",
-    "url": "https://a.995546.com/gsb.aspx?id=amjyb089",
+    "url": "https://995546.com/gsb.aspx?id=amjyb089",
     "pick": "bottom",
     "parser": "strict_half_head",
     "anchors": [
@@ -693,15 +684,6 @@
     "url": "https://ocnrhq.du156-vb27w-tmhsed.xyz:16677/",
     "pick": "top",
     "parser": "wuzhuanxingyi_embedded",
-    "anchors": [
-      "半头"
-    ]
-  },
-  {
-    "name": "跑狗论坛",
-    "url": "https://peubwtt.t3vdj-h3294-qpbmtj.work:16677/#am",
-    "pick": "top",
-    "parser": "strict_half_head",
     "anchors": [
       "半头"
     ]
@@ -752,25 +734,6 @@
     ]
   },
   {
-    "name": "一本万利秒杀半头",
-    "url": "https://mflmcobome.26222hi.app:2569/htm/bbs/top080.html",
-    "pick": "bottom",
-    "parser": "strict_half_head",
-    "anchors": [
-      "半头"
-    ],
-    "fetch_url": "https://mflmcobome.26222hi.app:2569/htm/tz/bbs/080.html"
-  },
-  {
-    "name": "山高水厂",
-    "url": "https://opfeal.zbwno-faau4-zilwkd.xyz:16677/topic/930772.html",
-    "pick": "top",
-    "parser": "strict_half_head",
-    "anchors": [
-      "半头"
-    ]
-  },
-  {
     "name": "诸葛亮",
     "url": "https://fflkqo.fvi38-kyblx-znvboh.work:17466/topic/1008749.html",
     "pick": "top",
@@ -813,16 +776,6 @@
     "parser": "strict_half_head",
     "anchors": [
       "半头"
-    ]
-  },
-  {
-    "name": "深圳福坛",
-    "url": "https://128.241.252.220:9201/tz/bbsjs/080.html",
-    "pick": "bottom",
-    "parser": "shenzhen_futan_half_head",
-    "anchors": [
-      "深圳福坛",
-      "绝杀半头"
     ]
   },
   {
@@ -935,13 +888,81 @@
     ]
   },
   {
-    "name": "慕容瑾萱",
-    "url": "https://ulefrw.i6sml-u8o4o-eibogo.work:17455/topic/610896.html",
+    "name": "码友老阿姨",
+    "url": "https://62139c.com/bbs/byg.js",
+    "pick": "bottom",
+    "parser": "caiyouluo_laoayi",
+    "anchors": [
+      "码友老阿姨"
+    ]
+  },
+  {
+    "name": "孟婆大人",
+    "url": "https://dh81163.2cv5a08j69.cyou/PrZpSoLrkj.html",
     "pick": "bottom",
     "parser": "strict_half_head",
     "anchors": [
       "半头"
-    ]
+    ],
+    "history_exception": {
+      "scope": "不足10期",
+      "authorization": "用户明确：特例添加",
+      "valid_issues": [
+        253,
+        254,
+        255,
+        256,
+        257,
+        258,
+        259
+      ]
+    }
+  },
+  {
+    "name": "星宇股份",
+    "url": "https://dh81163.xx947zqiqi.cyou/duiijLEuEl.html",
+    "pick": "bottom",
+    "parser": "strict_half_head",
+    "anchors": [
+      "半头"
+    ],
+    "history_exception": {
+      "scope": "不足10期",
+      "authorization": "用户明确：特例添加",
+      "valid_issues": [
+        229,
+        230,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        237,
+        238,
+        239,
+        240,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247,
+        248,
+        249,
+        250,
+        251,
+        252,
+        253,
+        254,
+        255,
+        256,
+        257,
+        258,
+        259
+      ]
+    }
   },
   {
     "name": "世外桃源",
@@ -950,6 +971,15 @@
     "parser": "strict_half_head",
     "anchors": [
       "半头"
+    ]
+  },
+  {
+    "name": "争奇斗异",
+    "url": "https://zouibdh.6c8rw-eic61-abilpw.work:17477/topic/256298.html",
+    "pick": "bottom",
+    "parser": "strict_half_head",
+    "anchors": [
+      "绝杀特码半头"
     ]
   }
 ]

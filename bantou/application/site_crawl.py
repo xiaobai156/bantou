@@ -20,19 +20,27 @@ from ..documents.dynamic.routes import (
     dynamic_record_scope,
     is_user_aggregate_page_without_record_id,
 )
-from ..site_profiles.registry import SITE_RENDERED_PAGE_AUTHORITY_URLS
-from ..domain.models import Site, SiteResult
+from ..site_profiles.registry import (
+    DEDICATED_RENDERED_AUTHOR_CONTEXT_URLS,
+    DEDICATED_RENDERED_SITE_RULES,
+    SITE_RENDERED_PAGE_AUTHORITY_URLS,
+)
+from ..domain.models import Match, Site, SiteResult
 from ..domain.validation import validate_exact_matches
 from ..fetching.policy import FetchError, should_retry_fetch_error
 from ..outputs.formatting import failure_category
 from ..parsers.matching import (
+    ambiguous_column_issues,
     apply_direction_source_scope,
     apply_secondary_site_scope,
+    has_generic_half_head_anchor,
+    same_period_position_conflicts,
     site_scoped_raw_matches,
 )
 from ..parsers.segments import candidate_issue_set, format_issue_list
 from ..selection.engine import (
     conflicting_issue_values,
+    direction_window,
     select_direction_window_matches,
     select_requested_matches,
 )
@@ -187,16 +195,145 @@ def crawl_site(
                 site,
                 region_issues=wanted_issues,
             )
-            identity_candidates, secondary_reason, rejection_evidence = apply_secondary_site_scope(
-                raw_matches, site, wanted_issues
+            # 先只做文档锁定，在「未过滤」的权威文档候选上确定真实方向边界；
+            # 锚点/栏目过滤之后若边界发生位移，说明内部记录被顶成边界，必须失败。
+            # 例外：专属容器/作者上下文站的多容器页面需先按作者、身份筛选才能唯一
+            # 锁定文档，否则同一页面里的广告块会让整站失败，故对这些站沿用过滤优先。
+            filter_first = site.url in DEDICATED_RENDERED_SITE_RULES or (
+                site.url in DEDICATED_RENDERED_AUTHOR_CONTEXT_URLS
             )
-            if secondary_reason is not None:
+            if filter_first:
+                identity_candidates, secondary_reason, rejection_evidence = (
+                    apply_secondary_site_scope(raw_matches, site, wanted_issues)
+                )
+                if secondary_reason is not None:
+                    return SiteResult(
+                        index, site, [], None, last_script_errors, secondary_reason,
+                        debug_sample_from_documents(documents, wanted_issues),
+                        rejection_evidence,
+                        tuple(raw_matches),
+                    )
+                document_matches, source_reason = apply_direction_source_scope(
+                    identity_candidates, site, documents
+                )
+                if source_reason is not None:
+                    return SiteResult(
+                        index,
+                        site,
+                        [],
+                        None,
+                        last_script_errors,
+                        source_reason,
+                        debug_sample_from_documents(documents, wanted_issues),
+                        rejection_evidence,
+                        tuple(identity_candidates),
+                    )
+                true_boundary = direction_window(document_matches, site.pick)
+                displaced: list[Match] = []
+            else:
+                document_matches, source_reason = apply_direction_source_scope(
+                    raw_matches, site, documents
+                )
+                if source_reason is not None:
+                    return SiteResult(
+                        index,
+                        site,
+                        [],
+                        None,
+                        last_script_errors,
+                        source_reason,
+                        debug_sample_from_documents(documents, wanted_issues),
+                        direction_evidence=tuple(raw_matches),
+                    )
+                true_boundary = direction_window(document_matches, site.pick)
+                identity_candidates, secondary_reason, rejection_evidence = (
+                    apply_secondary_site_scope(document_matches, site, wanted_issues)
+                )
+                if secondary_reason is not None:
+                    return SiteResult(
+                        index, site, [], None, last_script_errors, secondary_reason,
+                        debug_sample_from_documents(documents, wanted_issues),
+                        rejection_evidence,
+                        tuple(document_matches),
+                    )
+                surviving = {
+                    (match.document_order, match.position, match.issue, match.value)
+                    for match in identity_candidates
+                }
+                displaced = [
+                    match
+                    for match in true_boundary
+                    if (match.document_order, match.position, match.issue, match.value)
+                    not in surviving
+                ]
+            if not true_boundary:
                 return SiteResult(
-                    index, site, [], None, last_script_errors, secondary_reason,
+                    index, site, [], None, last_script_errors,
+                    f"{site.pick} 方向边界无有效候选",
+                    debug_sample_from_documents(documents, wanted_issues),
+                )
+            if displaced:
+                details = "、".join(
+                    f"{match.issue}期 {match.value}@位置{match.position}"
+                    for match in displaced
+                )
+                return SiteResult(
+                    index, site, [], None, last_script_errors,
+                    f"{site.pick} 方向边界候选未通过栏目校验，禁止内部记录顶替边界：{details}",
                     debug_sample_from_documents(documents, wanted_issues),
                     rejection_evidence,
-                    tuple(raw_matches),
+                    tuple(true_boundary),
                 )
+            # 通用锚点「半头」无法区分栏目：只检查真正落在方向边界上的同期候选，
+            # 非边界位置的同期期数不参与边界裁决（项目规则）。
+            if has_generic_half_head_anchor(site):
+                boundary_candidates = [
+                    match
+                    for match in identity_candidates
+                    if (match.document_order, match.position) in {
+                        (item.document_order, item.position) for item in true_boundary
+                    }
+                ]
+                ambiguous = ambiguous_column_issues(
+                    boundary_candidates, wanted_issues
+                )
+                if ambiguous:
+                    details = "；".join(
+                        f"{issue}期栏目归属不唯一：{','.join(labels)}"
+                        for issue, labels in ambiguous.items()
+                    )
+                    return SiteResult(
+                        index,
+                        site,
+                        [],
+                        None,
+                        last_script_errors,
+                        details,
+                        debug_sample_from_documents(documents, wanted_issues),
+                        rejection_evidence,
+                        tuple(boundary_candidates),
+                    )
+                # 非边界位置的同期期数不参与边界裁决；但同一期在不同位置出现
+                # 不同值属于归属不明（页脚广告重复同名栏目），必须失败。
+                same_issue_values = same_period_position_conflicts(
+                    boundary_candidates, wanted_issues
+                )
+                if same_issue_values:
+                    details = "；".join(
+                        f"{issue}期同期候选冲突：{','.join(values)}"
+                        for issue, values in same_issue_values.items()
+                    )
+                    return SiteResult(
+                        index,
+                        site,
+                        [],
+                        None,
+                        last_script_errors,
+                        details,
+                        debug_sample_from_documents(documents, wanted_issues),
+                        rejection_evidence,
+                        tuple(identity_candidates),
+                    )
             matches, source_reason = apply_direction_source_scope(
                 identity_candidates, site, documents
             )

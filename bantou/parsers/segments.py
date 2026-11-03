@@ -22,6 +22,13 @@ RAW_HALF_HEAD_LABEL_RE = re.compile(
     re.I,
 )
 _METADATA_BOUNDARY_RE = re.compile(r"(?:作者|网站|站点|栏目)\s*[:：]", re.I)
+# 上一期/历史开奖信息常紧跟在本期记录下一行且没有期号，不能并入本期字段。
+# 必须用左边界挡住「当前期开奖」「本期历史准确率」这类正常文案。
+_CROSS_PERIOD_LINE_RE = re.compile(
+    r"(?:(?<![本前])期开|(?<![当本])前期|上期|往期|上轮|上一期"
+    r"|历史(?:开|记|最高|成绩|数据))",
+    re.I,
+)
 
 
 def values_in_segment(segment: str) -> list[str]:
@@ -150,6 +157,9 @@ def iter_issue_segments(text: str, wanted_issues: set[int]):
                     if contains_non_half_head_column(next_line) and "半头" not in next_line:
                         break
                     if re.match(r"^\s*(?:作者|网站|站点|栏目)\s*[:：]", next_line):
+                        break
+                    # 上一期/历史开奖信息不属于本期字段，遇到即截断。
+                    if _CROSS_PERIOD_LINE_RE.search(next_line):
                         break
                     keyword = HALF_HEAD_KEYWORD_RE.search(next_line)
                     if keyword is not None:

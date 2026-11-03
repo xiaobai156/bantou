@@ -30,6 +30,7 @@ from ..site_profiles.registry import (
     SITE_BROWSER_MIN_TIMEOUTS,
     SITE_BROWSER_READY_SELECTORS,
     SITE_BROWSER_READY_TERMS,
+    SITE_BROWSER_READY_TERMS_ONLY_URLS,
     SITE_RENDERED_PAGE_AUTHORITY_URLS,
     WUZHUANXINGYI_URL,
 )
@@ -468,6 +469,8 @@ def collect_site_documents(
         if wanted_issues and len(wanted_issues) == 1
         else None
     )
+    if site.url in SITE_BROWSER_READY_TERMS_ONLY_URLS:
+        ready_issue = None
     ready_terms = SITE_BROWSER_READY_TERMS.get(site.url, ())
     ready_selector = SITE_BROWSER_READY_SELECTORS.get(site.url)
     browser_timeout = max(timeout, SITE_BROWSER_MIN_TIMEOUTS.get(site.url, 0))
@@ -520,12 +523,14 @@ def collect_site_documents(
             rendered_text, position_offset = bound_current_rendered_series(
                 rendered_text, wanted_issues
             )
+        # 换址后 final_url 才是真实来源，证据必须反映真实落点。
+        evidence_url = str(getattr(rendered_text, "final_url", "") or fetch_url)
         return [
             SourceDocument(
                 rendered_text,
-                source_url=fetch_url,
+                source_url=evidence_url,
                 source_kind="browser-text",
-                container_id=f"rendered-page:{fetch_url}",
+                container_id=f"rendered-page:{evidence_url}",
                 document_authority="declared-rendered-page",
                 position_offset=position_offset,
                 block_start=position_offset,

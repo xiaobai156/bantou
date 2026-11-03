@@ -270,6 +270,11 @@ def extract_dedicated_rendered_documents(
     page_identity = DEDICATED_RENDERED_PAGE_IDENTITIES.get(site.url, "")
     alternate_data_anchors = DEDICATED_RENDERED_ALTERNATE_DATA_ANCHORS.get(site.url, ())
     page_matches = bool(page_identity and page_identity in root_text)
+    if site.url in DEDICATED_RENDERED_AUTHOR_CONTEXT_URLS and page_identity:
+        if not page_matches:
+            raise ValueError(f"专属页面身份未匹配：{page_identity}")
+        if getattr(rendered_html, "final_url", site.url) != site.url:
+            raise ValueError("专属文章 URL 与配置不一致")
     blocks: list[tuple[str, int, int, str, str]] = []
     if preferred == "page":
         if not direction_first and (not page_identity or page_identity not in root_text):

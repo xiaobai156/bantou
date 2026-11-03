@@ -140,6 +140,7 @@ def find_matches(
     placeholder_issues: set[int] | None = None,
 ) -> list[Match]:
     if site is not None and site.parser_id in {
+        "caiyouluo_laoayi",
         "caiyuntong_macau",
         "guangdong_baer_left_half_head",
         "shenzhen_futan_half_head",
@@ -309,6 +310,98 @@ def find_matches(
     )
 
 
+GENERIC_HALF_HEAD_ANCHOR = "半头"
+# 通用锚点「半头」会同时命中秒杀/必杀/绝杀/稳杀/瞬杀/灭杀等不同栏目，属于跨栏目
+# 串值通道。这里不维护栏目词表（词表永远会漏），而是直接取「半头」前面的修饰词
+# 作为栏目标签，这样站方新增栏目也不需要改代码。
+_COLUMN_LABEL_PREFIX_RE = re.compile(r"([\u4e00-\u9fff]{1,6})\s*半\s*头")
+# 期数尾字、虚词、结果判定词都可能贴在栏目前面，不能算作栏目标签。
+_COLUMN_LABEL_NOISE = frozenset("期开的是了点本站栏目对错准中赢")
+
+
+def column_labels(snippet: str) -> set[str]:
+    """Return the column modifiers written immediately before 半头."""
+    compact = re.sub(r"\s+", "", normalize_text(snippet))
+    labels: set[str] = set()
+    for found in _COLUMN_LABEL_PREFIX_RE.finditer(compact):
+        prefix = found.group(1)
+        # 从右往左剥掉期数尾字、虚词与结果判定词，只留真正的栏目修饰词。
+        while prefix and prefix[-1] in _COLUMN_LABEL_NOISE:
+            prefix = prefix[:-1]
+        while prefix and prefix[0] in _COLUMN_LABEL_NOISE:
+            prefix = prefix[1:]
+        if len(prefix) >= 1:
+            labels.add(prefix)
+    return labels
+
+
+def _exact_anchor_hit(snippet: str, anchors: tuple[str, ...]) -> str:
+    """Match a declared anchor; a bare 半头 anchor only claims a real 半头 record."""
+    compact = re.sub(r"\s+", "", snippet)
+    for anchor in anchors:
+        if anchor == GENERIC_HALF_HEAD_ANCHOR:
+            continue
+        if anchor in snippet or re.sub(r"\s+", "", anchor) in compact:
+            return anchor
+    if GENERIC_HALF_HEAD_ANCHOR in anchors and GENERIC_HALF_HEAD_ANCHOR in compact:
+        # 栏目归属的唯一性由 ambiguous_column_issues 在调用方裁决。
+        return GENERIC_HALF_HEAD_ANCHOR
+    return ""
+
+
+def has_generic_half_head_anchor(site: Site) -> bool:
+    """True when the site declares the generic 半头 anchor."""
+    return GENERIC_HALF_HEAD_ANCHOR in tuple(site.anchors)
+
+
+def ambiguous_column_issues(
+    matches: list[Match], wanted_issues: set[int]
+) -> dict[int, list[str]]:
+    """Report issues whose candidates carry two different column labels.
+
+    A generic 半头 anchor accepts 绝杀半头/瞬杀半头/灭杀半头 alike, so a footer ad
+    column can shadow the real body column.  When one issue yields more than one
+    distinct column label the ownership is unproven and must fail.
+    """
+    labels_by_issue: dict[int, set[str]] = {}
+    for match in matches:
+        if match.issue not in wanted_issues:
+            continue
+        labels = column_labels(match.snippet)
+        if labels:
+            labels_by_issue.setdefault(match.issue, set()).update(labels)
+    return {
+        issue: sorted(labels)
+        for issue, labels in sorted(labels_by_issue.items())
+        if len(labels) > 1
+    }
+
+
+def same_period_position_conflicts(
+    matches: list[Match], wanted_issues: set[int]
+) -> dict[int, list[str]]:
+    """Report one issue carrying different values at different page positions.
+
+    A footer ad repeating the same column name at another position is not a
+    duplicate display: it is unproven ownership and must fail.  Values inside a
+    single position stay with the existing conflict gate.
+    """
+    by_issue_position: dict[tuple[int, int], set[str]] = {}
+    for match in matches:
+        if match.issue not in wanted_issues:
+            continue
+        key = (match.issue, match.position)
+        by_issue_position.setdefault(key, set()).add(match.value)
+    values_by_issue: dict[int, set[str]] = {}
+    for (issue, _position), values in by_issue_position.items():
+        values_by_issue.setdefault(issue, set()).update(values)
+    return {
+        issue: sorted(values)
+        for issue, values in sorted(values_by_issue.items())
+        if len(values) > 1
+    }
+
+
 def site_scoped_raw_matches(
     documents: list[str],
     wanted_issues: set[int] | None,
@@ -363,13 +456,15 @@ def apply_secondary_site_scope(
         "caiyuntong_macau",
         "guangdong_baer_left_half_head",
         "shenzhen_futan_half_head",
+        # 专属解析器已按【栏目】边界截断，锚点归属由解析器自身证明。
+        "caiyouluo_laoayi",
     }:
         anchors = tuple(site.anchors)
         if anchors:
             annotated: list[Match] = []
             for match in scoped:
                 normalized = normalize_text(match.snippet)
-                anchor = next((item for item in anchors if item in normalized), "")
+                anchor = _exact_anchor_hit(normalized, anchors)
                 if not anchor:
                     rejected.append(
                         f"{match.issue}期 {match.value}@文档{match.document_order}/位置{match.position}：栏目锚点未命中"

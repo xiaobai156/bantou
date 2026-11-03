@@ -2,7 +2,7 @@
 import os
 import time
 import pytest
-from bantou.fetching.browser_process import ProcessBrowserWorker
+from bantou.fetching.browser_process import ProcessBrowserWorker, _wait_for_ready
 
 
 def hanging_worker(connection):
@@ -104,6 +104,21 @@ def test_render_passes_anti_bot_profile_flag():
         ) == 'anti-bot'
     finally:
         worker.close()
+
+
+def test_ready_terms_without_target_issue_allow_parser_to_report_missing_period():
+    calls = []
+
+    class Page:
+        def wait_for_function(self, script, *, arg, timeout):
+            calls.append((script, arg, timeout))
+
+    _wait_for_ready(Page(), None, ("广东八二", "半头"), None, 5)
+    assert calls
+    script, arg, timeout = calls[0]
+    assert "issue == null" in script
+    assert arg == {"issue": None, "terms": ["广东八二", "半头"], "selector": None}
+    assert timeout == 5000
 
 
 @pytest.mark.skipif(os.environ.get('RUN_BROWSER_SMOKE')!='1',reason='Chromium smoke explicitly enabled by Windows CI')
