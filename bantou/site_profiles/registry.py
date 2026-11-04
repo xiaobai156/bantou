@@ -193,7 +193,7 @@ DEDICATED_RENDERED_PAGE_IDENTITIES = {
     "https://xxn08n.w2jqr-rbl71-ngvkmq.work/": "澳门周公神算",
     "https://peubwtt.t3vdj-h3294-qpbmtj.work:16677/#am": "澳门跑狗",
     "https://fflkqo.fvi38-kyblx-znvboh.work:17466/topic/1008749.html": "诸葛亮",
-    "https://eudkyp.luqv0-yf46s-xrnpkz.xyz:16677/topic/324148.html": "内幕资料[半波半头]免费公开",
+    "https://eudkyp.luqv0-yf46s-xrnpkz.xyz:16677/topic/324148.html": "内幕资料[杀半波半头]免费公开",
     "https://gt6.59197c.com:8443/tie1/t30.html": "缘起缘灭",
     "https://fbgbfg.www27521c.com:8443/gsb/am05.html": "山野独行",
     "https://2.www39169b.com:888/gsbl/s23.html": "虚情假意",

@@ -326,7 +326,7 @@
   {
     "name": "狀元紅",
     "url": "https://otwuomdb.882244a.app:2026/gengxin/15.html",
-    "pick": "top",
+    "pick": "bottom",
     "parser": "strict_half_head",
     "anchors": [
       "半头"
