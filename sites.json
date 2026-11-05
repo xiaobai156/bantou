@@ -218,7 +218,7 @@
   {
     "name": "澳门大联盟",
     "url": "https://isjf0bzw.669944.app:2026/gengxin/58.html",
-    "pick": "top",
+    "pick": "bottom",
     "parser": "strict_half_head",
     "anchors": [
       "半头"
@@ -335,7 +335,7 @@
   {
     "name": "慈善网",
     "url": "https://so6f8erm.881199.app:2026/gsb/03.html",
-    "pick": "top",
+    "pick": "bottom",
     "parser": "strict_half_head",
     "anchors": [
       "半头"
