@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import datetime as dt
 import hashlib
 import msvcrt
 import os
@@ -17,7 +18,58 @@ _PROJECT_KEY = hashlib.sha256(
     str(Path(__file__).resolve().parents[2]).encode("utf-8")
 ).hexdigest()[:16]
 _LOCK_PATH = Path(tempfile.gettempdir()) / f"bantou-{_PROJECT_KEY}-output.lock"
+# Windows 文件锁是强制锁：锁住第 0 字节后别人连读该字节都会被拒绝，
+# 所以占用者信息必须写在锁区之外（单独一个 .owner 文件）。
+_OWNER_PATH = _LOCK_PATH.with_name(_LOCK_PATH.name + ".owner")
+LOCK_WAIT_SECONDS = 30
 _LOCK_STATE = threading.local()
+
+
+def _open_lock_handle():
+    """Open the project lock file; the handle must never be inheritable.
+
+    可继承的句柄会被 spawn 出来的子进程带走，父进程退出后锁仍然被占，表现为
+    「等待正式输出锁超过30秒」的假故障。这里显式拒绝可继承句柄。
+    """
+    handle = _LOCK_PATH.open("a+b")
+    if os.get_inheritable(handle.fileno()):
+        handle.close()
+        raise RuntimeError("正式输出锁句柄可被子进程继承，拒绝使用")
+    return handle
+
+
+def _write_lock_owner() -> None:
+    try:
+        _OWNER_PATH.write_text(
+            f"{os.getpid()}\t"
+            f"{dt.datetime.now().astimezone().isoformat(timespec='seconds')}\n",
+            encoding="utf-8",
+        )
+    except OSError:
+        pass
+
+
+def _clear_lock_owner() -> None:
+    try:
+        _OWNER_PATH.unlink(missing_ok=True)
+    except OSError:
+        pass
+
+
+def _read_lock_owner() -> str:
+    """Read the holder written by the current lock owner (best effort)."""
+    try:
+        text = _OWNER_PATH.read_text(encoding="utf-8").strip()
+    except OSError:
+        return ""
+    if not text:
+        return ""
+    parts = text.split("\t")
+    pid = parts[0].strip()
+    started = parts[1].strip() if len(parts) > 1 else ""
+    if not pid.isdigit():
+        return ""
+    return f"pid={pid} 占用（自 {started or '未知时间'}）"
 
 
 @contextmanager
@@ -33,13 +85,15 @@ def formal_write_lock():
                 _LOCK_STATE.depth = depth
             return
 
-        with _LOCK_PATH.open("a+b") as handle:
+        with _open_lock_handle() as handle:
             _lock_handle(handle)
             _LOCK_STATE.depth = 1
             try:
                 yield
             finally:
                 _LOCK_STATE.depth = 0
+                # 先清占用者再解锁，避免解锁后与下一个持锁者的写入竞争。
+                _clear_lock_owner()
                 handle.seek(0)
                 msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
 
@@ -49,15 +103,20 @@ def _lock_handle(handle) -> None:
     if handle.tell() == 0:
         handle.write(b"\0")
         handle.flush()
-    deadline = time.monotonic() + 30
+    deadline = time.monotonic() + LOCK_WAIT_SECONDS
     while True:
         try:
             handle.seek(0)
             msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+            _write_lock_owner()
             return
         except OSError:
             if time.monotonic() >= deadline:
-                raise TimeoutError("等待正式输出锁超过30秒")
+                owner = _read_lock_owner()
+                suffix = f"：锁被 {owner}" if owner else "：占用者未知"
+                raise TimeoutError(
+                    f"等待正式输出锁超过{LOCK_WAIT_SECONDS}秒{suffix}"
+                )
             time.sleep(0.05)
 
 

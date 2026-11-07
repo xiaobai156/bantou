@@ -63,4 +63,5 @@ def test_force_exit_kills_browser_children_before_exit(monkeypatch):
     )
     monkeypatch.setattr(single_period.os, "_exit", lambda code: calls.append(("exit", code)))
     single_period._force_exit(2)
-    assert calls == ["kill", ("exit", 2)]
+    # 两轮清扫：被放弃的抓取线程可能在第一轮之后又起新进程，退出前必须再扫一次。
+    assert calls == ["kill", "kill", ("exit", 2)]

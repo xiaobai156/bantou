@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import re
 import time
 
 from ..documents.collection import (
@@ -33,6 +34,7 @@ from ..parsers.matching import (
     ambiguous_column_issues,
     apply_direction_source_scope,
     apply_secondary_site_scope,
+    column_labels,
     has_generic_half_head_anchor,
     same_period_position_conflicts,
     site_scoped_raw_matches,
@@ -45,6 +47,52 @@ from ..selection.engine import (
     select_requested_matches,
 )
 from ..text import html_to_text, normalize_text
+
+# 本期未开奖时站点普遍写「开？00」「开:0000」「开 ??」；已开奖写「开虎16」「开 13」。
+# 繁体站写「開:0000 / 開:虎16」，与简体等价处理（烟花易冷）。
+# 这两类记录在页面上往往并排存在（当期记录 + 历史/存档记录），不是同一类候选。
+_PENDING_OPEN_RE = re.compile(r"[开開][:：]?[?？]{1,}|[开開][:：]?[0０]{2,}")
+
+
+def draw_state(match: Match) -> str:
+    """Return whether a record still waits for the draw or already has a result."""
+    compact = re.sub(r"\s+", "", normalize_text(match.snippet))
+    return "pending" if _PENDING_OPEN_RE.search(compact) else "settled"
+
+
+# 泛化锚点站在权威文档里只剩一条本期候选时，没有任何同页对照，必须证明栏目归属。
+SINGLE_CANDIDATE_NO_LABEL = "单条候选且栏目名不可辨识"
+SINGLE_CANDIDATE_NO_REFERENCE = "单条候选且同文档没有其他期记录可对照"
+SINGLE_CANDIDATE_UNSEEN_LABEL = "单条候选且栏目名在同文档其他期从未出现"
+
+
+def single_candidate_verdict(candidate: Match, other_period_matches: list[Match]) -> str:
+    """Prove a lone candidate's column from the page itself; "" means accepted.
+
+    Only page evidence is used: the candidate's own column label must reappear on
+    another period of the same authoritative document.
+    """
+    labels = column_labels(candidate.snippet)
+    if not labels:
+        return (
+            f"{SINGLE_CANDIDATE_NO_LABEL}："
+            f"{candidate.issue}期 {candidate.value}@位置{candidate.position}"
+        )
+    if not other_period_matches:
+        return (
+            f"{SINGLE_CANDIDATE_NO_REFERENCE}："
+            f"{candidate.issue}期 {candidate.value}@位置{candidate.position}"
+        )
+    seen: set[str] = set()
+    for match in other_period_matches:
+        seen |= column_labels(match.snippet)
+    if labels & seen:
+        return ""
+    return (
+        f"{SINGLE_CANDIDATE_UNSEEN_LABEL}："
+        f"{candidate.issue}期 {candidate.value}@位置{candidate.position}"
+        f"（{'/'.join(sorted(labels))}）"
+    )
 
 
 def debug_sample_from_documents(
@@ -313,15 +361,80 @@ def crawl_site(
                         rejection_evidence,
                         tuple(boundary_candidates),
                     )
-                # 非边界位置的同期期数不参与边界裁决；但同一期在不同位置出现
-                # 不同值属于归属不明（页脚广告重复同名栏目），必须失败。
-                same_issue_values = same_period_position_conflicts(
-                    boundary_candidates, wanted_issues
-                )
-                if same_issue_values:
+            # 归属不明一律否决，但只比较「同一开奖状态」的同期候选：这些站点常把
+            # 本期未开奖记录（开？？/开0000）与已开奖的历史记录（开虎16）并列写在
+            # 同一页，两者不是同一类候选，跨状态比较会把当期值误杀。
+            # 该闸只做否决、不参与选取：边界仍由未过滤候选决定，非边界位置的同期
+            # 候选不决定选哪个值，只让归属不明的本站本期失败。
+            authoritative_orders = {
+                match.document_order for match in document_matches
+            }
+            same_issue_candidates = [
+                match
+                for match in identity_candidates
+                if match.document_order in authoritative_orders
+                and match.issue in wanted_issues
+            ]
+            # 泛化锚点站只剩一条本期候选时，没有同页对照就必须自证栏目归属：
+            # 栏目名要在同一权威文档的其他期记录里重现，否则按 fail-closed 判失败。
+            if (
+                has_generic_half_head_anchor(site)
+                and site.parser_id == "strict_half_head"
+            ):
+                for issue in sorted(wanted_issues):
+                    issue_candidates = [
+                        match
+                        for match in same_issue_candidates
+                        if match.issue == issue
+                    ]
+                    if len(issue_candidates) != 1:
+                        continue
+                    # 对照池用次级校验之前的同权威文档候选：占位符/系列规则会把其他
+                    # 期的记录筛掉，但那仍是页面上真实存在的同类栏目证据。
+                    # 代价：本闸因此只负责拦「认不出栏目」「栏目孤例」；整页只剩广告
+                    # 的情形仍由锚点、专属正则和同期冲突闸负责，不要把这里当兜底。
+                    other_period_matches = [
+                        match
+                        for match in document_matches
+                        if match.document_order in authoritative_orders
+                        and match.issue != issue
+                    ]
+                    reason = single_candidate_verdict(
+                        issue_candidates[0], other_period_matches
+                    )
+                    if reason:
+                        return SiteResult(
+                            index,
+                            site,
+                            [],
+                            None,
+                            last_script_errors,
+                            reason,
+                            debug_sample_from_documents(documents, wanted_issues),
+                            rejection_evidence,
+                            tuple(issue_candidates),
+                        )
+            same_issue_values = same_period_position_conflicts(
+                same_issue_candidates, wanted_issues
+            )
+            if same_issue_values:
+                boundary_state = {
+                    match.issue: draw_state(match) for match in true_boundary
+                }
+                gated_values: dict[int, list[str]] = {}
+                for issue, values in same_issue_values.items():
+                    state = boundary_state.get(issue)
+                    same_state_values = {
+                        match.value
+                        for match in same_issue_candidates
+                        if match.issue == issue and draw_state(match) == state
+                    }
+                    if len(same_state_values) > 1:
+                        gated_values[issue] = values
+                if gated_values:
                     details = "；".join(
-                        f"{issue}期同期候选冲突：{','.join(values)}"
-                        for issue, values in same_issue_values.items()
+                        f"{issue}期同期候选冲突（权威文档多处同期候选）：{','.join(values)}"
+                        for issue, values in gated_values.items()
                     )
                     return SiteResult(
                         index,
@@ -332,7 +445,7 @@ def crawl_site(
                         details,
                         debug_sample_from_documents(documents, wanted_issues),
                         rejection_evidence,
-                        tuple(identity_candidates),
+                        tuple(same_issue_candidates),
                     )
             matches, source_reason = apply_direction_source_scope(
                 identity_candidates, site, documents
@@ -436,6 +549,27 @@ def print_failure_summary(fail_lines: list[str]) -> None:
             counts[category] = counts.get(category, 0) + 1
     if counts:
         print("失败分类：" + "，".join(f"{category} {count}" for category, count in sorted(counts.items())))
+    # 第 4 类（同文档无其他期对照）必须单独统计，不能被混进“其他失败”。
+    single_candidate = {
+        "栏目不可辨识": sum(
+            1 for line in fail_lines[1:] if SINGLE_CANDIDATE_NO_LABEL in line
+        ),
+        "无其他期对照": sum(
+            1 for line in fail_lines[1:] if SINGLE_CANDIDATE_NO_REFERENCE in line
+        ),
+        "栏目未在其他期出现": sum(
+            1 for line in fail_lines[1:] if SINGLE_CANDIDATE_UNSEEN_LABEL in line
+        ),
+    }
+    if any(single_candidate.values()):
+        print(
+            "单条候选闸："
+            + "，".join(
+                f"{label} {count} 站"
+                for label, count in single_candidate.items()
+                if count
+            )
+        )
 
 
 def format_progress_line(

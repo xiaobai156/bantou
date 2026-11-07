@@ -250,13 +250,21 @@ def test_boundary_multivalue_never_success(monkeypatch,text):
 
 
 def test_identical_value_repeat_is_allowed(monkeypatch):
-    result=run_document(monkeypatch,'251期 必杀半头 2头双 2头双 开00对')
+    # 单条候选闸要求同文档有同期对照期，这里补一条同栏目记录，测试仍只验证同值去重。
+    result=run_document(monkeypatch,'251期 必杀半头 2头双 2头双 开00对\n250期 必杀半头 1头单 开00对')
     assert [m.value for m in result.matches]==['2头双']
 
 
-def test_nonboundary_same_issue_conflict_does_not_veto(monkeypatch):
+def test_nonboundary_pending_same_issue_conflict_vetoes(monkeypatch):
+    """2026-11 审核修复：同一权威文档内、开奖状态相同的同期候选写出不同值即归属不明。
+
+    旧断言（仍采纳边界值 2头双）正是「页脚/页首另一条半头记录可顶替边界」的成因，
+    现按契约收紧为失败；已开奖的历史记录与未开奖的当期记录不互相否决，
+    见 tests/test_boundary_position_conflict.py。
+    """
     result=run_document(monkeypatch,'251期 必杀半头 2头双 开00对\n250期 必杀半头 1头单 开00对\n251期 必杀半头 0头单 3头单 开00对')
-    assert [m.value for m in result.matches]==['2头双']
+    assert not result.matches
+    assert '同期候选冲突' in (result.error or result.miss_reason or '')
 
 
 def test_special_regex_must_not_hide_second_value(monkeypatch):
@@ -267,7 +275,7 @@ def test_special_regex_must_not_hide_second_value(monkeypatch):
 
 
 def test_anchor_offset_uses_raw_source_not_compacted_snippet(monkeypatch):
-    text='<p>251期 <b>必杀半头</b> [2头双] 开00对</p>'
+    text='<p>251期 <b>必杀半头</b> [2头双] 开00对</p><p>250期 必杀半头 1头单 开00对</p>'
     result=run_document(monkeypatch,text)
     assert result.matches
     assert result.matches[0].anchor_position == text.index('半头')
@@ -524,7 +532,8 @@ def test_existing_success_not_overwritten_before_crawl(tmp_path,monkeypatch):
 
 
 def test_table_values_and_header_coordinates_reach_full_parser(monkeypatch):
-    html='<table><tr><th>期数</th><th>半头</th><th>开奖</th></tr><tr><td>251期</td><td>2头双</td><td>开00对</td></tr></table>'
+    # 补一条下一期行，满足单条候选闸的同类对照要求；断言仍只验证表格坐标。
+    html='<table><tr><th>期数</th><th>半头</th><th>开奖</th></tr><tr><td>251期</td><td>2头双</td><td>开00对</td></tr><tr><td>250期</td><td>1头单</td><td>开00对</td></tr></table>'
     result=run_document(monkeypatch,html)
     assert [m.value for m in result.matches]==['2头双']
     assert result.matches[0].anchor_position==html.index('半头')

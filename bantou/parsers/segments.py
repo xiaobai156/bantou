@@ -17,8 +17,12 @@ from ..text import (
 )
 
 
+# 栏目标签与「半头」之间允许出现的装饰符号：解析器和 column_labels 共用同一套字符集，
+# 避免两处各写一套导致「能抓到值但认不出栏目」。
+HALF_HEAD_LABEL_DECORATION = r"\s㊣正★☆✿ღ:：\-—|【】\[\]（）()"
+
 RAW_HALF_HEAD_LABEL_RE = re.compile(
-    r"(?:(?:秒杀|必杀|绝杀|稳杀|杀)[\s㊣正★☆✿ღ:：\-—|【】\[\]（）()]{0,12})?半\s*头",
+    rf"(?:(?:秒杀|必杀|绝杀|稳杀|杀)[{HALF_HEAD_LABEL_DECORATION}]{{0,12}})?半\s*头",
     re.I,
 )
 _METADATA_BOUNDARY_RE = re.compile(r"(?:作者|网站|站点|栏目)\s*[:：]", re.I)

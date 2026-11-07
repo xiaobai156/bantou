@@ -89,9 +89,11 @@ def test_other_column_value_is_never_borrowed(monkeypatch):
 
 
 def test_half_head_value_stops_before_other_column(monkeypatch):
+    # 非泛化锚点：本条只测「值在别的栏目处截止」，不涉及单条候选闸。
     result = run_document(
         monkeypatch,
         "251期 必杀半头：2头双 三头中特：3头单 开00对",
+        s=site(anchors=("必杀半头",)),
     )
     assert [match.value for match in result.matches] == ["2头双"]
 
@@ -382,11 +384,12 @@ def test_hidden_script_same_issue_does_not_steal_source_position(monkeypatch):
     html = (
         "<script>const old='251期 必杀半头 2头双 开00对';</script>"
         "<p>251期 必杀半头 2头双 开00对</p>"
+        "<p>250期 必杀半头 1头单 开00对</p>"
     )
     result = run_document(monkeypatch, html)
     assert result.matches
-    assert result.matches[0].position == html.rindex("251期")
-    assert result.matches[0].anchor_position == html.rindex("半头")
+    assert result.matches[0].position == html.index("251期", html.index("</script>"))
+    assert result.matches[0].anchor_position == html.index("半头", html.index("</script>"))
 
 
 def test_fake_table_inside_script_is_not_parsed():
@@ -478,10 +481,11 @@ def test_hidden_script_anchor_after_visible_issue_is_ignored(monkeypatch):
     html = (
         "<p>251期</p><script>const fake='半头';</script>"
         "<p>必杀半头 2头双 开00对</p>"
+        "<p>250期 必杀半头 1头单 开00对</p>"
     )
     result = run_document(monkeypatch, html)
     assert result.matches
-    assert result.matches[0].anchor_position == html.rindex("半头")
+    assert result.matches[0].anchor_position == html.index("半头", html.index("</script>"))
 
 
 def test_retry_without_success_requires_all_sites_in_failure_file(tmp_path):

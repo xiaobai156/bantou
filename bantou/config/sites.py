@@ -7,6 +7,7 @@ from urllib.parse import urlsplit, urlunsplit
 from ..domain.models import Site
 from ..paths import PROJECT_DIR
 from ..site_profiles.registry import (
+    CAIYOULUO_LAOAYI_URL,
     CAIYUNTONG_URL,
     GUANGDONG_BAER_URL,
     SHENZHEN_FUTAN_URL,
@@ -88,6 +89,7 @@ def parse_json_sites(text: str, source: str) -> list[Site]:
             "guangdong_baer_left_half_head": GUANGDONG_BAER_URL,
             "shenzhen_futan_half_head": SHENZHEN_FUTAN_URL,
             "wuzhuanxingyi_embedded": WUZHUANXINGYI_URL,
+            "caiyouluo_laoayi": CAIYOULUO_LAOAYI_URL,
         }
         expected_url = special_parser_urls.get(parser_id)
         if expected_url is not None and url != expected_url:

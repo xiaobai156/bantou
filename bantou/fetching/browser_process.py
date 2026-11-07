@@ -5,6 +5,7 @@ import multiprocessing as mp
 import os
 import signal
 import subprocess
+import sys
 import threading
 import time
 from urllib.parse import urlsplit, urlunsplit
@@ -208,11 +209,31 @@ def _browser_main(connection):
     except (EOFError, BrokenPipeError, OSError):
         pass
     finally:
-        if browser is not None:
-            browser.close()
-        if playwright is not None:
-            playwright.stop()
-        connection.close()
+        cleanup_errors: list[str] = []
+        try:
+            if browser is not None:
+                browser.close()
+        except Exception as exc:
+            cleanup_errors.append(f"browser.close: {type(exc).__name__}: {exc}")
+        try:
+            if playwright is not None:
+                playwright.stop()
+        except Exception as exc:
+            cleanup_errors.append(f"playwright.stop: {type(exc).__name__}: {exc}")
+        try:
+            connection.close()
+        except Exception as exc:
+            cleanup_errors.append(f"connection.close: {type(exc).__name__}: {exc}")
+        if cleanup_errors:
+            # 不掩盖异常：正常关闭失败必须留痕，之后仍然强制结束进程，
+            # 避免 Playwright 驱动挂住把 worker 变成孤儿。
+            print(
+                "浏览器工作进程清理异常：" + "；".join(cleanup_errors),
+                file=sys.stderr,
+                flush=True,
+            )
+        if mp.parent_process() is not None:
+            os._exit(0 if not cleanup_errors else 1)
 
 
 class ProcessBrowserWorker:

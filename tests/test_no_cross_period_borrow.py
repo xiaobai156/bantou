@@ -89,6 +89,32 @@ def test_column_labels_cover_words_outside_any_vocabulary():
     assert column_labels("298期 绝杀半头【2头双】") == {"绝杀"}
 
 
+def test_column_labels_allow_decorations_between_modifier_and_half_head():
+    """装饰符（㊣/正/★）与解析器共用同一字符集，不能把同一栏目拆成两个标签。"""
+    assert column_labels("310期 绝杀㊣半头[3头单]开:鸡46准") == {"绝杀"}
+    assert column_labels("310期 秒杀正半头【2头双】") == {"秒杀"}
+    assert column_labels("310期 ★必杀★半头【1头单】") == {"必杀"}
+
+
+def test_decorated_same_column_is_not_ambiguous():
+    """带装饰符的同栏目记录：标签相同，不能判成栏目歧义。"""
+    matches = [
+        _match(298, "2头双", 100, "298期 绝杀㊣半头【2头双】开00准"),
+        _match(298, "4头单", 900, "298期 绝杀半头【4头单】开00准"),
+    ]
+    assert ambiguous_column_issues(matches, {298}) == {}
+    assert same_period_position_conflicts(matches, {298}) == {298: ["2头双", "4头单"]}
+
+
+def test_decorated_different_columns_still_ambiguous():
+    """带装饰符的异栏目记录：仍然判栏目归属不唯一，不能因装饰符退化。"""
+    matches = [
+        _match(298, "2头双", 100, "298期 绝杀㊣半头【2头双】开00准"),
+        _match(298, "4头单", 900, "298期 秒杀㊣半头【4头单】开00准"),
+    ]
+    assert set(ambiguous_column_issues(matches, {298})[298]) == {"绝杀", "秒杀"}
+
+
 def test_out_of_vocabulary_ad_column_is_rejected():
     """正文 绝杀半头 + 页脚 瞬杀半头（词表外）仍须判归属不唯一。"""
     matches = [

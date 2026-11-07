@@ -27,6 +27,7 @@ from ..text import (
 )
 from .dedicated import special_matches_in_documents
 from .segments import (
+    HALF_HEAD_LABEL_DECORATION,
     focused_half_head_block,
     iter_issue_segments,
     segment_has_body_locator,
@@ -314,9 +315,11 @@ GENERIC_HALF_HEAD_ANCHOR = "半头"
 # 通用锚点「半头」会同时命中秒杀/必杀/绝杀/稳杀/瞬杀/灭杀等不同栏目，属于跨栏目
 # 串值通道。这里不维护栏目词表（词表永远会漏），而是直接取「半头」前面的修饰词
 # 作为栏目标签，这样站方新增栏目也不需要改代码。
-_COLUMN_LABEL_PREFIX_RE = re.compile(r"([\u4e00-\u9fff]{1,6})\s*半\s*头")
+_COLUMN_LABEL_PREFIX_RE = re.compile(
+    rf"([\u4e00-\u9fff]{{1,6}})[{HALF_HEAD_LABEL_DECORATION}]*半\s*头"
+)
 # 期数尾字、虚词、结果判定词都可能贴在栏目前面，不能算作栏目标签。
-_COLUMN_LABEL_NOISE = frozenset("期开的是了点本站栏目对错准中赢")
+_COLUMN_LABEL_NOISE = frozenset("期开的是了点本站栏目对错准中赢正")
 
 
 def column_labels(snippet: str) -> set[str]:

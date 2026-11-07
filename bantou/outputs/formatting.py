@@ -42,6 +42,8 @@ def failure_category(reason: str) -> str:
         return "方向候选冲突"
     if "候选内未找到" in normalized or "缺少" in normalized:
         return "期数不存在"
+    if "单条候选" in normalized:
+        return "单条候选无对照"
     if "栏目" in normalized or "锚点" in normalized:
         return "栏目没找到"
     if "字段" in normalized or "格式" in normalized or "半头" in normalized:

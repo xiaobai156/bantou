@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import concurrent.futures
 import json
+import multiprocessing as mp
 import os
 import sys
 import threading
@@ -53,6 +54,12 @@ from ..outputs.formatting import (
 from ..outputs.transaction import formal_write_lock, write_transaction
 from ..paths import DUPLICATE_BACKUP_FILE, FAILURE_RESULT_DIR
 from ..text import normalize_target
+from .period_warnings import (
+    collect_repeated_value_runs,
+    overlay_current_results,
+    records_by_site_from_payload,
+)
+from .period_warnings import print_warnings as print_value_run_warnings
 from .site_crawl import crawl_site, format_progress_line, print_failure_summary
 
 HARD_TIMEOUT_BUFFER_SECONDS = 30
@@ -404,9 +411,62 @@ def _run_sites(
     return results, abandoned_count
 
 
+CHILD_REAP_SECONDS = 2.0
+
+
+def _reap_spawn_children(deadline: float) -> int:
+    """Terminate lingering multiprocessing children within a hard time limit."""
+    try:
+        children = mp.active_children()
+    except Exception:
+        return 0
+    if not children:
+        return 0
+    for child in children:
+        try:
+            child.terminate()
+        except Exception:
+            pass
+    for child in children:
+        remaining = deadline - time.monotonic()
+        if remaining > 0:
+            try:
+                child.join(remaining)
+            except Exception:
+                pass
+        if child.is_alive():
+            try:
+                child.kill()
+            except Exception:
+                pass
+            remaining = deadline - time.monotonic()
+            if remaining > 0:
+                try:
+                    child.join(remaining)
+                except Exception:
+                    pass
+    return len(children)
+
+
 def _force_exit(code: int) -> None:
+    """Hard exit that leaves no orphan child behind (bounded, never blocks)."""
     try:
         force_kill_browser_children()
+    except Exception:
+        pass
+    try:
+        reaped = _reap_spawn_children(time.monotonic() + CHILD_REAP_SECONDS)
+        # 被放弃的抓取线程可能在第一次清扫后又起了新进程，再扫一轮。
+        try:
+            force_kill_browser_children()
+        except Exception:
+            pass
+        reaped += _reap_spawn_children(time.monotonic() + CHILD_REAP_SECONDS)
+        if reaped:
+            print(
+                f"收尾强制结束 {reaped} 个残留子进程",
+                file=sys.stderr,
+            )
     except Exception:
         pass
     for stream in (sys.stdout, sys.stderr):
@@ -415,6 +475,32 @@ def _force_exit(code: int) -> None:
         except Exception:
             pass
     os._exit(code)
+
+
+def _print_single_site_value_runs(
+    success_rows: dict[str, tuple[Site, dict[int, Match]]],
+    payload: dict[str, object] | None = None,
+) -> None:
+    """Warn about a site repeating one value for several consecutive periods.
+
+    Read-only: the cache (or the payload about to be written) is only read, and the
+    current run's verified values are folded in memory.  Never changes a result, a
+    TXT line, the cache, or the exit code.
+    """
+    if payload is not None:
+        view = records_by_site_from_payload(payload)
+    else:
+        try:
+            cached = read_cache_for_update(
+                DUPLICATE_BACKUP_FILE, allow_legacy_bootstrap=True
+            )
+        except Exception as exc:  # noqa: BLE001 - a warning must never break the run
+            print(f"单站连续同值告警跳过：正式缓存不可用（{exc}）", file=sys.stderr)
+            return
+        view = records_by_site_from_payload(cached)
+    print_value_run_warnings(
+        collect_repeated_value_runs(overlay_current_results(view, success_rows))
+    )
 
 
 def _finalize_run(
@@ -432,9 +518,12 @@ def _finalize_run(
     if args.diagnose:
         print(f"完成：成功 {len(rank_rows)} 条，失败 {len(fail_lines) - 1} 条")
         print_failure_summary(fail_lines)
+        _print_single_site_value_runs(cache_rows)
         print("无写入诊断完成：未更新成功TXT、失败TXT或 recent_10_cache.json")
         return 0
 
+    exit_code = 0
+    cache_payload: dict[str, object] | None = None
     with formal_write_lock():
         cache_update_error: CacheValidationError | None = None
         try:
@@ -466,6 +555,7 @@ def _finalize_run(
         default_success_name, default_fail_name = default_output_names(issues_label)
         success_path = args.resolved_success_path
         fail_path = args.resolved_fail_path
+        merge_allowed = True
         try:
             if args.retry_fail:
                 rank_rows, fail_lines = _merge_retry_rows(
@@ -477,50 +567,62 @@ def _finalize_run(
                 raise ValueError("成功文件已存在；失败重抓使用 --retry-fail，整期替换需 --replace-existing")
         except ValueError as exc:
             print(f"结果合并拒绝：{exc}", file=sys.stderr)
-            return 2
+            merge_allowed = False
 
-        if fail_path.name != default_fail_name:
-            fail_lines = ["期数\t" + fail_lines[0]] + [
-                f"{issues[0]}\t{line}" for line in fail_lines[1:] if line.strip()
-            ]
-        try:
-            write_transaction(
-                {
-                    success_path: _success_bytes(rank_rows),
-                    fail_path: _failure_bytes(fail_lines),
-                }
-            )
-        except Exception as exc:
-            print(f"结果输出事务失败：{exc}", file=sys.stderr)
-            return 2
-
-        cache_write_error: Exception | None = None
-        if cache_payload is not None:
+        if merge_allowed:
+            if fail_path.name != default_fail_name:
+                fail_lines = ["期数\t" + fail_lines[0]] + [
+                    f"{issues[0]}\t{line}" for line in fail_lines[1:] if line.strip()
+                ]
             try:
                 write_transaction(
                     {
-                        DUPLICATE_BACKUP_FILE: (
-                            json.dumps(cache_payload, ensure_ascii=False, indent=2)
-                            + "\n"
-                        ).encode("utf-8-sig")
+                        success_path: _success_bytes(rank_rows),
+                        fail_path: _failure_bytes(fail_lines),
                     }
                 )
             except Exception as exc:
-                cache_write_error = exc
+                print(f"结果输出事务失败：{exc}", file=sys.stderr)
+                merge_allowed = False
 
-        print(f"成功结果：{success_path.resolve()}")
-        print(
-            f"失败结果：{fail_path.resolve() if fail_path.exists() else '无失败，不生成失败文件'}"
-        )
-        if cache_payload is not None:
-            if cache_write_error is None:
-                print(f"最近10期缓存已独立同步：{DUPLICATE_BACKUP_FILE.resolve()}")
-            else:
-                print(
-                    f"缓存写入失败（结果文件已保留）：{cache_write_error}",
-                    file=sys.stderr,
-                )
-        return 2 if cache_update_error is not None or cache_write_error is not None else 0
+        if merge_allowed:
+            cache_write_error: Exception | None = None
+            if cache_payload is not None:
+                try:
+                    write_transaction(
+                        {
+                            DUPLICATE_BACKUP_FILE: (
+                                json.dumps(cache_payload, ensure_ascii=False, indent=2)
+                                + "\n"
+                            ).encode("utf-8-sig")
+                        }
+                    )
+                except Exception as exc:
+                    cache_write_error = exc
+
+            print(f"成功结果：{success_path.resolve()}")
+            print(
+                f"失败结果：{fail_path.resolve() if fail_path.exists() else '无失败，不生成失败文件'}"
+            )
+            if cache_payload is not None:
+                if cache_write_error is None:
+                    print(f"最近10期缓存已独立同步：{DUPLICATE_BACKUP_FILE.resolve()}")
+                else:
+                    print(
+                        f"缓存写入失败（结果文件已保留）：{cache_write_error}",
+                        file=sys.stderr,
+                    )
+            exit_code = (
+                2
+                if cache_update_error is not None or cache_write_error is not None
+                else 0
+            )
+        else:
+            exit_code = 2
+
+    # 告警只读取缓存，放在锁外，避免持锁期间重复读 958KB 缓存。
+    _print_single_site_value_runs(cache_rows, cache_payload)
+    return exit_code
 
 
 def main(argv: list[str] | None = None, *, multi_mode: bool = False) -> int:
