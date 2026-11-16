@@ -68,12 +68,54 @@ def _follow_relocated_origin(page, requested, landed, wait_until, timeout):
     return page.url
 
 
+# 站方用 `content-visibility:auto` 省渲染开销，屏幕外的整块正文不会进入
+# innerText（DOM 里数据在，但 Playwright 的 inner_text 与 _wait_for_ready 都
+# 读不到）。这不是懒加载，也没有可点击的展开按钮，只能把已存在的块强制
+# 参与渲染。只改渲染样式，不注入、不排序、不改写任何文本。
+REVEAL_DEFERRED_CONTENT_SCRIPT = r"""
+() => {
+    const skipped = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'LINK', 'META', 'HEAD', 'TITLE']);
+    const root = document.body || document.documentElement;
+    if (!root) return 0;
+    const targets = [];
+    for (const element of root.getElementsByTagName('*')) {
+        if (skipped.has(element.tagName)) continue;
+        if (getComputedStyle(element).contentVisibility !== 'auto') continue;
+        targets.push(element);
+    }
+    for (const element of targets) {
+        element.style.setProperty('content-visibility', 'visible', 'important');
+    }
+    return targets.length;
+}
+"""
+
+
+def _reveal_deferred_content(page):
+    """让 content-visibility:auto 的正文块参与布局，返回解锁的容器数量。"""
+    return int(page.evaluate(REVEAL_DEFERRED_CONTENT_SCRIPT) or 0)
+
+
 def _wait_for_ready(page, issue, terms, selector, timeout):
+    # 先解锁 content-visibility:auto 的正文块，否则下面按 innerText 找 marker
+    # 会永远找不到屏幕外的目标内容。
+    _reveal_deferred_content(page)
     if not terms:
         return
     page.wait_for_function(
         r"""
         ({issue, terms, selector}) => {
+            // 轮询期间新渲染出来的块同样可能带 content-visibility:auto。
+            // 等待刚开始时文档可能还没有 body（甚至仍是空白页），必须先兜底，
+            // 否则这里抛 TypeError 会让整次渲染判定失败。
+            const root = document.body || document.documentElement;
+            if (root) {
+                for (const element of root.getElementsByTagName('*')) {
+                    if (getComputedStyle(element).contentVisibility === 'auto') {
+                        element.style.setProperty('content-visibility', 'visible', 'important');
+                    }
+                }
+            }
             const scope = selector ? document.querySelector(selector) : document.body;
             const text = scope ? (scope.innerText || "") : "";
             const pageText = document.body ? (document.body.innerText || "") : text;
@@ -193,11 +235,17 @@ def _browser_main(connection):
                     connection.send(("stage", "目标卡片交互"))
                     interactive_html = _click_interactive_card(page, *interaction, timeout=timeout)
                 connection.send(("stage", "读取正文"))
-                text = (
-                    interactive_html
-                    if interactive_html is not None
-                    else page.content() if html else page.inner_text("body", timeout=timeout * 1000)
-                )
+                if html:
+                    # 取 HTML 时内容已在 DOM 里，不需要解锁也要拿到完整标记。
+                    text = interactive_html if interactive_html is not None else page.content()
+                else:
+                    # content-visibility:auto 的块不会进 innerText；解锁后再读。
+                    _reveal_deferred_content(page)
+                    text = (
+                        interactive_html
+                        if interactive_html is not None
+                        else page.inner_text("body", timeout=timeout * 1000)
+                    )
                 connection.send(("ok", (text, page.url)))
             except Exception as exc:
                 connection.send(("error", f"{type(exc).__name__}: {exc}"))

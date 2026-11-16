@@ -110,15 +110,63 @@ def test_ready_terms_without_target_issue_allow_parser_to_report_missing_period(
     calls = []
 
     class Page:
+        def evaluate(self, script):
+            calls.append(('reveal', script))
+            return 0
+
         def wait_for_function(self, script, *, arg, timeout):
             calls.append((script, arg, timeout))
 
     _wait_for_ready(Page(), None, ("广东八二", "半头"), None, 5)
-    assert calls
-    script, arg, timeout = calls[0]
-    assert "issue == null" in script
+    # 先解锁 content-visibility:auto 的正文块，再等 marker。
+    assert calls[0][0] == 'reveal'
+    assert 'content-visibility' in calls[0][1]
+    _, arg, timeout = calls[1]
+    assert "issue == null" in calls[1][0]
     assert arg == {"issue": None, "terms": ["广东八二", "半头"], "selector": None}
     assert timeout == 5000
+
+
+def test_ready_wait_marker_script_tolerates_missing_body():
+    """文档还没生成 body 时脚本不能抛 TypeError，否则整次渲染判失败。"""
+    calls = []
+
+    class Page:
+        def evaluate(self, script):
+            calls.append(('reveal', script))
+            return 0
+
+        def wait_for_function(self, script, *, arg, timeout):
+            calls.append((script, arg, timeout))
+
+    _wait_for_ready(Page(), 318, ("半头",), None, 5)
+    script = calls[1][0]
+    assert 'document.body || document.documentElement' in script
+    assert script.index('const root = document.body') < script.index(
+        'root.getElementsByTagName'
+    )
+    assert 'document.body.getElementsByTagName' not in script
+
+
+def test_ready_wait_reveals_deferred_content_before_probing_marker():
+    """content-visibility:auto 的正文块不在 innerText 里，必须先解锁。"""
+    from bantou.fetching.browser_process import (
+        REVEAL_DEFERRED_CONTENT_SCRIPT,
+        _reveal_deferred_content,
+    )
+
+    assert "content-visibility" in REVEAL_DEFERRED_CONTENT_SCRIPT
+    assert "'visible'" in REVEAL_DEFERRED_CONTENT_SCRIPT
+
+    seen = {}
+
+    class Page:
+        def evaluate(self, script):
+            seen['script'] = script
+            return 46
+
+    assert _reveal_deferred_content(Page()) == 46
+    assert seen['script'] == REVEAL_DEFERRED_CONTENT_SCRIPT
 
 
 @pytest.mark.skipif(os.environ.get('RUN_BROWSER_SMOKE')!='1',reason='Chromium smoke explicitly enabled by Windows CI')
